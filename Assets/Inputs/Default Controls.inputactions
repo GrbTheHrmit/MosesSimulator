@@ -1,5 +1,5 @@
 {
-    "name": "New Controls",
+    "name": "Default Controls",
     "maps": [
         {
             "name": "Default",
@@ -7,7 +7,7 @@
             "actions": [
                 {
                     "name": "Walk",
-                    "type": "Value",
+                    "type": "PassThrough",
                     "id": "9a9ed5ed-fdc7-4b73-bdbd-db61a16ab80c",
                     "expectedControlType": "Vector2",
                     "processors": "",

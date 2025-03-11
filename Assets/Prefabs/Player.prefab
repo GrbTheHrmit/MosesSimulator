@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6552664863931148182}
   - component: {fileID: -3761948380629585370}
   - component: {fileID: -1881061324759539058}
+  - component: {fileID: 7994422909270114457}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -118,7 +119,7 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -165,6 +166,23 @@ MonoBehaviour:
   m_DefaultActionMap: Default
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 3525538841141079306}
+--- !u!114 &7994422909270114457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2064192780827042749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fe1609b3ed89ee408438afdfb4393af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxMoveSpeed: 5
+  MoveSpeedIncrease: 4
+  ReleaseSpeedDecrease: 2
+  RotationSpeed: 60
+  RotationDeadzone: 5
 --- !u!1 &3304151595934838396
 GameObject:
   m_ObjectHideFlags: 0
