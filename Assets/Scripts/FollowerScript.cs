@@ -15,15 +15,18 @@ public class FollowerScript : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        // Avoid other non followers
+        if (!isFollowing && inRange.Count > 0)
+        {
+            // TODO Avoid others
+        }
     }
 
     public void UpdateMovement(Vector3 centerOfMass, Vector3 aveVelocity)
     {
-
+        // TODO Flock
     }
 
     private void StartFollowing()
@@ -53,13 +56,13 @@ public class FollowerScript : MonoBehaviour
             FollowerScript otherFollower = other.gameObject.GetComponent<FollowerScript>();
             if(otherFollower != null)
             {
-                if (isFollowing)
-                {
-                    inRange.Add(otherFollower);
-                }
-                else if (FollowManager.Instance().HasCollectedFollower(otherFollower))
+                if (!isFollowing && FollowManager.Instance().HasCollectedFollower(otherFollower))
                 {
                     StartFollowing();
+                }
+                else
+                {
+                    inRange.Add(otherFollower);
                 }
             }
         }
