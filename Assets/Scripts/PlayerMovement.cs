@@ -51,6 +51,8 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.LogError("Could not find Player Rigidbody");
         }
+
+        FollowManager.Instance().FollowObject = rigidbody;
     }
 
 
