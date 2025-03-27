@@ -12,9 +12,11 @@ GameObject:
   - component: {fileID: 4364965773001762541}
   - component: {fileID: 7269108159138062183}
   - component: {fileID: 6641828386324640668}
+  - component: {fileID: 25157437342015603}
+  - component: {fileID: 182227513377178922}
   m_Layer: 0
   m_Name: Follower
-  m_TagString: Untagged
+  m_TagString: Follower
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -103,5 +105,53 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 4
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &25157437342015603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6115750483238261200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8c54fd429b67c24f8c6ccfe7e063d70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  followerMaxSpeed: 5
+  followerAccel: 3
+  arrivalRadius: 2
+  minAvoidDist: 2
+  maxAvoidDist: 8
+  maxAvoidStrength: 10
+  wanderTargetDistance: 30
+  wanderMaxSpeed: 2
+  maxWanderSeconds: 8
+--- !u!54 &182227513377178922
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6115750483238261200}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

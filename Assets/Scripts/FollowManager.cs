@@ -10,7 +10,7 @@ public class FollowManager : ScriptableObject
     {
         if(instance == null)
         {
-            instance = new FollowManager();
+            instance = CreateInstance<FollowManager>();
         }
         return instance;
     }
@@ -24,17 +24,18 @@ public class FollowManager : ScriptableObject
     private Rigidbody followObject = null;
     public Rigidbody FollowObject { set { followObject = value; } }
 
+    private float followDist = 3f;
     private float followMass = 100f;
     private Vector3 lastCenterOfMass = Vector3.zero;
     private Vector3 lastAveVelocity = Vector3.zero;
 
     // Update is called once per frame
-    void FixedUpdate()
+    public void FixedUpdate()
     {
         if (followObject == null) return;
 
         float totalWeight = followMass;
-        Vector3 nextCenterOfMass = followObject.transform.position * followMass;
+        Vector3 nextCenterOfMass = (followObject.transform.position - followObject.transform.forward * (followDist + collectedFollowers.Count)) * followMass;
         Vector3 nextAveVelocity = followObject.velocity;
 
         foreach (FollowerScript follower in collectedFollowers)
