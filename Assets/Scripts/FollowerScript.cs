@@ -2,12 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Rigidbody))]
 public class FollowerScript : MonoBehaviour
 {
-    
+    [SerializeField]
+    private List<Material> wanderMaterial = new List<Material>();
+    [SerializeField]
+    private List<Material> followMaterial = new List<Material>();
+
     private Rigidbody rb = null;
+    private MeshRenderer renderer = null;
     public Vector3 GetVelocity { get {return Vector3.zero; } }
 
     private List<FollowerScript> inRange = new List<FollowerScript>();
@@ -26,6 +32,8 @@ public class FollowerScript : MonoBehaviour
     private float maxAvoidDist = 4.0f;
     [SerializeField]
     private float maxAvoidStrength = 5.0f;
+    [SerializeField]
+    private float leaderAvoidStrength = 10f;
 
     [SerializeField]
     private float wanderTargetDistance = 30.0f;
@@ -39,6 +47,12 @@ public class FollowerScript : MonoBehaviour
     {
         wanderTimer = maxWanderSeconds;
         rb = GetComponent<Rigidbody>();
+
+        renderer = GetComponent<MeshRenderer>();
+        if(renderer != null)
+        {
+            renderer.SetMaterials(wanderMaterial);
+        }
     }
 
     void FixedUpdate()
@@ -64,6 +78,11 @@ public class FollowerScript : MonoBehaviour
     private void StartFollowing()
     {
         if (isFollowing) return;
+
+        if (renderer != null)
+        {
+            renderer.SetMaterials(followMaterial);
+        }
 
         isFollowing = true;
         rb.excludeLayers = rb.excludeLayers | ~LayerMask.NameToLayer("Player");
@@ -152,7 +171,21 @@ public class FollowerScript : MonoBehaviour
             float dist = Mathf.Clamp((transform.position - follower.transform.position).magnitude, minAvoidDist, maxAvoidDist);
             forceSum -= SeekTarget(follower.transform.position) * (1.0f - ((dist - minAvoidDist) / (maxAvoidDist - minAvoidDist)));
         }
+        
+
         forceSum /= inRange.Count;
+
+        return forceSum;
+    }
+
+    private Vector3 AvoidLeader()
+    {
+        Vector3 forceSum = Vector3.zero;
+        if (isFollowing)
+        {
+            float dist = Mathf.Clamp((transform.position - FollowManager.Instance().LeaderPosition).magnitude, minAvoidDist, maxAvoidDist);
+            forceSum -= SeekTarget(FollowManager.Instance().LeaderPosition) * (1.0f - ((dist - minAvoidDist) / (maxAvoidDist - minAvoidDist)));
+        }
 
         return forceSum;
     }
@@ -168,7 +201,6 @@ public class FollowerScript : MonoBehaviour
         {
             wanderTimer = 0;
             wanderTarget = gameObject.transform.position + (Quaternion.Euler(0, Random.Range(0, 361), 0) * (Random.Range(5, wanderTargetDistance) * Vector3.forward));
-            Debug.Log(wanderTarget);
         }
 
         wanderTimer += Time.fixedDeltaTime;
@@ -190,8 +222,9 @@ public class FollowerScript : MonoBehaviour
         forceSum += MatchVelocity(aveVelocity) * 1.0f;
 
         forceSum += AvoidOthers() * maxAvoidStrength;
+        forceSum += AvoidLeader() * leaderAvoidStrength;
 
-        forceSum /= maxAvoidStrength + 2;
+        forceSum /= leaderAvoidStrength + maxAvoidStrength + 2;
 
         return forceSum;
     }

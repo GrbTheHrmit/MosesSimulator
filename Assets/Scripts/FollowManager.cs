@@ -23,6 +23,7 @@ public class FollowManager : ScriptableObject
 
     private Rigidbody followObject = null;
     public Rigidbody FollowObject { set { followObject = value; } }
+    public Vector3 LeaderPosition { get { return followObject.position; } }
 
     private float followDist = 3f;
     private float followMass = 100f;
