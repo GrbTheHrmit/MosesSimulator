@@ -15,6 +15,8 @@ public class ProceduralTerrainScript : MonoBehaviour
 
     private Mesh myMesh = null;
     public Mesh MyMesh { get { return myMesh; } }
+    
+    private MeshCollider myCollider = null;
 
     // Start is called before the first frame update
     void Start()
@@ -29,10 +31,10 @@ public class ProceduralTerrainScript : MonoBehaviour
         MeshFilter filter = GetComponent<MeshFilter>();
         myMesh = filter.mesh;
 
-        MeshCollider collider = GetComponent<MeshCollider>();
-        if(collider != null )
+        myCollider = GetComponent<MeshCollider>();
+        if(myCollider != null )
         {
-            collider.sharedMesh = myMesh;
+            myCollider.sharedMesh = myMesh;
         }
 
         /*myTerrain = GetComponent<Terrain>();
@@ -45,6 +47,14 @@ public class ProceduralTerrainScript : MonoBehaviour
         GetComponent<TerrainCollider>().terrainData = newTerrainData;*/
 
 
+    }
+
+
+    public void RecomputeMeshCollider()
+    {
+        // Turn it off and back on again lmao (tells it to refresh the collider)
+        myCollider.sharedMesh = null;
+        myCollider.sharedMesh = MyMesh;
     }
 
     // Update is called once per frame

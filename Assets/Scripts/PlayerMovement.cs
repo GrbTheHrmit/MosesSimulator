@@ -23,9 +23,15 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float RotationDeadzone = 5;
 
+    [SerializeField]
+    private float floatHeight = 0.5f;
+
     private Vector2 lastMoveInput;
     private Rigidbody rigidbody;
     private bool runToggle = false;
+
+    private bool grounded = false;
+    private Vector3 groundNormal = Vector3.up;
 
     private void Awake()
     {
@@ -70,6 +76,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        CheckGround(Time.fixedDeltaTime);
         MovePlayer(Time.fixedDeltaTime);
         RotatePlayer(Time.fixedDeltaTime);
     }
@@ -77,6 +84,47 @@ public class PlayerMovement : MonoBehaviour
     Vector3 GetWorldInputDirection()
     {
         return rigidbody.rotation * new Vector3(lastMoveInput.x, 0, lastMoveInput.y);
+    }
+
+    void CheckGround(float dt)
+    {
+        RaycastHit hit;
+        Vector3 start = transform.position;
+        Debug.DrawLine(start, start + 2 * -Vector3.up, Color.red);
+        if (Physics.SphereCast(start, 1, -transform.up, out hit, 5, LayerMask.GetMask("Ground")))
+        {
+            groundNormal = hit.normal;
+
+            if (hit.distance < floatHeight)
+            {
+                rigidbody.transform.position += groundNormal * (floatHeight - hit.distance);
+
+                if(!grounded)
+                {
+                    rigidbody.useGravity = false;
+                }
+                grounded = true;
+            }
+            else
+            {
+                if (grounded)
+                {
+                    rigidbody.useGravity = true;
+                }
+                grounded = false;
+            }
+            
+        }
+        else
+        {
+            if (grounded)
+            {
+                rigidbody.useGravity = true;
+            }
+            grounded = false;
+            groundNormal = Vector3.up;
+        }
+
     }
 
     void MovePlayer(float dt)
@@ -87,13 +135,20 @@ public class PlayerMovement : MonoBehaviour
             velocityChange = -ReleaseSpeedDecrease * dt;
         }
 
-        float newVelocity = runToggle ?
+        float newSpeed = runToggle ?
             Mathf.Clamp(rigidbody.velocity.magnitude + velocityChange, -0.2f * MaxRunSpeed, MaxRunSpeed) :
             Mathf.Clamp(rigidbody.velocity.magnitude + velocityChange, -0.2f * MaxMoveSpeed, MaxMoveSpeed);
 
-        newVelocity = Mathf.MoveTowards(rigidbody.velocity.magnitude, newVelocity, ReleaseSpeedDecrease * dt);
+        newSpeed = Mathf.MoveTowards(rigidbody.velocity.magnitude, newSpeed, ReleaseSpeedDecrease * dt);
 
-        rigidbody.velocity = rigidbody.rotation * Vector3.forward * newVelocity;
+        Vector3 velocityVector = rigidbody.rotation * Vector3.forward * newSpeed;
+
+        if (!grounded)
+        {
+            velocityVector.y = rigidbody.velocity.y;
+        }
+
+        rigidbody.velocity = velocityVector;
     }
 
     void RotatePlayer(float dt)
@@ -103,7 +158,9 @@ public class PlayerMovement : MonoBehaviour
         {
             Vector3 inputDirection = new Vector3(lastMoveInput.x, 0, lastMoveInput.y);
             float rotationChange = Mathf.Clamp(angle, -RotationSpeed * dt, RotationSpeed * dt);
-            rigidbody.MoveRotation(Quaternion.Euler(0, rotationChange, 0) * rigidbody.rotation);
+            Quaternion groundRotation = Quaternion.FromToRotation(transform.up, groundNormal);
+            rigidbody.MoveRotation(Quaternion.Euler(0, rotationChange, 0) * groundRotation * rigidbody.rotation);
         }
     }
+
 }

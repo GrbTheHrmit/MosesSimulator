@@ -11,7 +11,7 @@ public class TerrainManager : MonoBehaviour
     [SerializeField]
     private int TerrainTileDims = 3;
     private Vector3 currentOrigin = Vector3.zero;
-    private float baseHeight = -300;
+    private float baseHeight = -5;
 
     [SerializeField]
     private int pointsPerTile = 50;
@@ -38,7 +38,7 @@ public class TerrainManager : MonoBehaviour
             {
                 float x = (i % TerrainTileDims) - ((TerrainTileDims - 1) * 0.5f);
                 float y = ((int)(i / TerrainTileDims)) - ((TerrainTileDims - 1) * 0.5f);
-                Vector3 position = new Vector3(x * TerrainInterval, 0, y * TerrainInterval);
+                Vector3 position = new Vector3(x * TerrainInterval, baseHeight, y * TerrainInterval);
                 GameObject newTerrain = Instantiate(TerrainPrefab, position, Quaternion.identity);
                 terrainList.Add(newTerrain.GetComponent<ProceduralTerrainScript>());
                 terrainList[i].InitTerrain();
@@ -118,9 +118,9 @@ public class TerrainManager : MonoBehaviour
                 Vector3 relativePos = worldVert - (currentOrigin - new Vector3(centerOffset, 0, centerOffset));
                 int pointCol = Mathf.FloorToInt(relativePos.x / PointInterval);
                 int pointRow = Mathf.FloorToInt(relativePos.z / PointInterval);
-                Debug.Log(worldVert.z + " : " + worldVert.x);
-                Debug.Log(relativePos.z + " : " + relativePos.x);
-                Debug.Log(pointRow + " : " + pointCol);
+                //Debug.Log(worldVert.z + " : " + worldVert.x);
+                //Debug.Log(relativePos.z + " : " + relativePos.x);
+                //Debug.Log(pointRow + " : " + pointCol);
 
                 float interpolatedHeight = 0;
                 int total = 0;
@@ -137,11 +137,11 @@ public class TerrainManager : MonoBehaviour
                     }
                 }
 
-                newVerts[i] = new Vector3(vert.x, 30 * interpolatedHeight, vert.z);
+                newVerts[i] = new Vector3(vert.x, 12 * interpolatedHeight, vert.z);
             }
             Debug.Log(newVerts.Length);
             terrainList[tile].MyMesh.vertices = newVerts;
-            terrainList[tile].MyMesh.RecalculateBounds();
+            terrainList[tile].RecomputeMeshCollider();
         }
 
     }
