@@ -90,7 +90,7 @@ public class PlayerMovement : MonoBehaviour
         RaycastHit hit;
         Vector3 start = transform.position;
         Debug.DrawLine(start, start + 2 * -Vector3.up, Color.red);
-        if (Physics.SphereCast(start, 1, -transform.up, out hit, floatHeight * 10, LayerMask.GetMask("Ground")))
+        if (Physics.SphereCast(start, 2, -transform.up, out hit, floatHeight * 10, LayerMask.GetMask("Ground")))
         {
             groundNormal = hit.normal;
 

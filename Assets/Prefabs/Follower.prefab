@@ -126,7 +126,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: f2ff83c860577f44a9f1d9efe32a3fa2, type: 2}
   savedMaterial:
   - {fileID: 2100000, guid: e17511264cc0ab34db4a9c14f06894bf, type: 2}
-  followerMaxSpeed: 18
+  followerMaxSpeed: 22
   followerAccel: 10
   arrivalRadius: 2
   minAvoidDist: 2
