@@ -11,11 +11,10 @@ GameObject:
   - component: {fileID: 3245155496592002825}
   - component: {fileID: 3509673897207661232}
   - component: {fileID: 7329333345125643232}
-  - component: {fileID: 6552664863931148182}
   - component: {fileID: -3761948380629585370}
   - component: {fileID: -1881061324759539058}
   - component: {fileID: 7994422909270114457}
-  - component: {fileID: 2685300990071012084}
+  - component: {fileID: 6564146773240295876}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -89,27 +88,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &6552664863931148182
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2064192780827042749}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &-3761948380629585370
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -186,8 +164,9 @@ MonoBehaviour:
   ReleaseSpeedDecrease: 2
   RotationSpeed: 60
   RotationDeadzone: 5
---- !u!65 &2685300990071012084
-BoxCollider:
+  floatHeight: 0.5
+--- !u!135 &6564146773240295876
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -201,11 +180,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2, y: 4, z: 2}
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3304151595934838396
 GameObject:

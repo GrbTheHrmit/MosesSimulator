@@ -11,6 +11,8 @@ public class FollowerScript : MonoBehaviour
     private List<Material> wanderMaterial = new List<Material>();
     [SerializeField]
     private List<Material> followMaterial = new List<Material>();
+    [SerializeField]
+    private List<Material> savedMaterial = new List<Material>();
 
     private Rigidbody rb = null;
     private MeshRenderer renderer = null;
@@ -18,6 +20,7 @@ public class FollowerScript : MonoBehaviour
 
     private List<FollowerScript> inRange = new List<FollowerScript>();
     private bool isFollowing = false;
+    private bool isSaved = false;
 
     [SerializeField]
     private float followerMaxSpeed = 5;
@@ -65,19 +68,37 @@ public class FollowerScript : MonoBehaviour
         // Avoid other non followers
         if (!isFollowing)
         {
-            rb.AddForce(Wander(), ForceMode.VelocityChange);
-            rb.velocity = Vector3.ClampMagnitude(rb.velocity, wanderMaxSpeed);
+            Vector3 wanderForce = Wander();
+            wanderForce.y = 0;
+            rb.AddForce(wanderForce, ForceMode.VelocityChange);
+            Vector3 xzVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+            rb.velocity = Vector3.ClampMagnitude(xzVelocity, wanderMaxSpeed) + new Vector3(0, rb.velocity.y, 0);
         }
-        else
+        else if (isSaved)
         {
-            rb.velocity = Vector3.ClampMagnitude(rb.velocity, followerMaxSpeed);
+            rb.velocity = Vector3.MoveTowards(rb.velocity, Vector3.zero, 1f * Time.fixedDeltaTime);
         }
+
+        
         
     }
 
     public void UpdateMovement(Vector3 centerOfMass, Vector3 aveVelocity)
     {
-        rb.AddForce(Flock(centerOfMass, aveVelocity), ForceMode.VelocityChange);
+        Vector3 flockForce = Flock(centerOfMass, aveVelocity);
+        flockForce.y = 0;
+        rb.AddForce(flockForce, ForceMode.VelocityChange);
+        Vector3 xzVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        rb.velocity = Vector3.ClampMagnitude(xzVelocity, followerMaxSpeed) + new Vector3(0, rb.velocity.y, 0);
+    }
+
+    public void SaveFollower()
+    {
+        isSaved = true;
+        if (renderer != null)
+        {
+            renderer.SetMaterials(savedMaterial);
+        }
     }
 
     private void StartFollowing()
@@ -90,7 +111,7 @@ public class FollowerScript : MonoBehaviour
         }
 
         isFollowing = true;
-        rb.excludeLayers = rb.excludeLayers | ~LayerMask.NameToLayer("Player");
+        rb.excludeLayers = LayerMask.GetMask("Player");
         FollowManager.Instance().AddFollower(this);
         foreach (SphereCollider sph in GetComponents<SphereCollider>())
         {

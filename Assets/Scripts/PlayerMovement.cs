@@ -58,7 +58,6 @@ public class PlayerMovement : MonoBehaviour
     public void OnRunToggle(InputAction.CallbackContext context)
     {
         runToggle = context.ReadValueAsButton();
-        Debug.Log(runToggle);
     }
 
     // Start is called before the first frame update
@@ -91,11 +90,11 @@ public class PlayerMovement : MonoBehaviour
         RaycastHit hit;
         Vector3 start = transform.position;
         Debug.DrawLine(start, start + 2 * -Vector3.up, Color.red);
-        if (Physics.SphereCast(start, 1, -transform.up, out hit, 5, LayerMask.GetMask("Ground")))
+        if (Physics.SphereCast(start, 1, -transform.up, out hit, floatHeight * 10, LayerMask.GetMask("Ground")))
         {
             groundNormal = hit.normal;
 
-            if (hit.distance < floatHeight)
+            if (hit.distance < floatHeight * 1.5f)
             {
                 rigidbody.transform.position += groundNormal * (floatHeight - hit.distance);
 
@@ -129,6 +128,7 @@ public class PlayerMovement : MonoBehaviour
 
     void MovePlayer(float dt)
     {
+        float lastVelocity = new Vector3(rigidbody.velocity.x, 0, rigidbody.velocity.z).magnitude;
         float velocityChange = lastMoveInput.y * dt * (runToggle ? RunSpeedIncrease : MoveSpeedIncrease);
         if(lastMoveInput.y == 0)
         {
@@ -136,10 +136,10 @@ public class PlayerMovement : MonoBehaviour
         }
 
         float newSpeed = runToggle ?
-            Mathf.Clamp(rigidbody.velocity.magnitude + velocityChange, -0.2f * MaxRunSpeed, MaxRunSpeed) :
-            Mathf.Clamp(rigidbody.velocity.magnitude + velocityChange, -0.2f * MaxMoveSpeed, MaxMoveSpeed);
+            Mathf.Clamp(lastVelocity + velocityChange, -0.2f * MaxRunSpeed, MaxRunSpeed) :
+            Mathf.Clamp(lastVelocity + velocityChange, -0.2f * MaxMoveSpeed, MaxMoveSpeed);
 
-        newSpeed = Mathf.MoveTowards(rigidbody.velocity.magnitude, newSpeed, ReleaseSpeedDecrease * dt);
+        newSpeed = Mathf.MoveTowards(lastVelocity, newSpeed, ReleaseSpeedDecrease * dt);
 
         Vector3 velocityVector = rigidbody.rotation * Vector3.forward * newSpeed;
 
@@ -159,7 +159,7 @@ public class PlayerMovement : MonoBehaviour
             Vector3 inputDirection = new Vector3(lastMoveInput.x, 0, lastMoveInput.y);
             float rotationChange = Mathf.Clamp(angle, -RotationSpeed * dt, RotationSpeed * dt);
             Quaternion groundRotation = Quaternion.FromToRotation(transform.up, groundNormal);
-            rigidbody.MoveRotation(Quaternion.Euler(0, rotationChange, 0) * groundRotation * rigidbody.rotation);
+            rigidbody.MoveRotation(Quaternion.RotateTowards(rigidbody.rotation, Quaternion.Euler(0, rotationChange, 0) * groundRotation * rigidbody.rotation, RotationSpeed * dt));
         }
     }
 

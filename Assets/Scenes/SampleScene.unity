@@ -286,6 +286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TerrainPrefab: {fileID: 3346664031508845981, guid: 8fcea5e83986adb4bb13402a337b9c49, type: 3}
+  FinishPrefab: {fileID: 6182003461833472563, guid: 4dc419715abf73644b28a80725cd102b, type: 3}
   TerrainTileDims: 2
   pointsPerTile: 11
 --- !u!1001 &3128281513588655924
@@ -318,7 +319,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -351,6 +352,26 @@ PrefabInstance:
     - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7994422909270114457, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
+      propertyPath: MaxRunSpeed
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 7994422909270114457, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
+      propertyPath: MaxMoveSpeed
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7994422909270114457, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
+      propertyPath: RunSpeedIncrease
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 7994422909270114457, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
+      propertyPath: MoveSpeedIncrease
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7994422909270114457, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
+      propertyPath: ReleaseSpeedDecrease
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

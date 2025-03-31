@@ -171,4 +171,20 @@ public class FollowManager : ScriptableObject
 
         }
     }
+
+    public void SaveAllFollowing()
+    {
+        foreach(FollowerScript follower in collectedFollowers)
+        {
+            follower.SaveFollower();
+        }
+        collectedFollowers.Clear();
+    }
+
+    public void SaveFollower(FollowerScript follower)
+    {
+        follower.SaveFollower();
+        collectedFollowers.Remove(follower);
+        uncollectedFollowers.Remove(follower);
+    }
 }

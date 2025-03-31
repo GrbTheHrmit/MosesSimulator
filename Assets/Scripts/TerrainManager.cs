@@ -7,6 +7,7 @@ using UnityEngine;
 public class TerrainManager : MonoBehaviour
 {
     public GameObject TerrainPrefab;
+    public GameObject FinishPrefab;
 
     [SerializeField]
     private int TerrainTileDims = 3;
@@ -25,10 +26,22 @@ public class TerrainManager : MonoBehaviour
     private int voronoiPointsPerTile = 50;
     private List<Vector2> voronoiPoints = new List<Vector2>();
 
+    private static TerrainManager instance = null;
+    public static float GetWorldHeightAtLocation(Vector3 location)
+    {
+        if(instance != null)
+        {
+            return instance.GetHeightAtLocation(location) + instance.baseHeight;
+        }
+
+        return 0;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
+        instance = this;
+
         heightArray = new float[pointsPerTile * TerrainTileDims, pointsPerTile * TerrainTileDims];
         PointInterval = TerrainInterval / pointsPerTile;
 
@@ -43,30 +56,30 @@ public class TerrainManager : MonoBehaviour
                 terrainList.Add(newTerrain.GetComponent<ProceduralTerrainScript>());
                 terrainList[i].InitTerrain();
             }
+
+            float centerOffset = 0.5f * TerrainInterval;
             currentOrigin = new Vector3(-((TerrainTileDims - 1) * 0.5f) * TerrainInterval, baseHeight, -((TerrainTileDims - 1) * 0.5f) * TerrainInterval);
+            currentOrigin -= new Vector3(centerOffset, 0, centerOffset);
 
             Debug.Log(currentOrigin);
 
             //SetTerrainNeighbors();
             GenerateNewHeightMap();
+
+            PlaceFinish();
         }
         
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
-    }
-
-    void GenerateSeedPoints()
-    {
-        
+        // Todo something about moving terrain around
     }
 
     private float CustomRandom(float x)
     {
-        return (Mathf.Sin(x * 53885.7f) * 31841.93f) % 1f;
+        return Mathf.Sin(((Mathf.Sin(x * 53885.7f) * 31841.93f) % 1f) * 19) * 0.5f + 0.5f;
     }
 
     private float GetMappedValue(int tileNum, int pointNum)
@@ -82,6 +95,34 @@ public class TerrainManager : MonoBehaviour
         float y = CustomRandom(position.z);
 
         return x * y;
+    }
+
+    private float GetHeightAtLocation(Vector3 location)
+    {
+        Vector3 relativePos = location - currentOrigin;
+        int pointCol = Mathf.FloorToInt(relativePos.x / PointInterval);
+        int pointRow = Mathf.FloorToInt(relativePos.z / PointInterval);
+
+        float interpolatedHeight = 0;
+        int used = 0;
+        for (int x = 0; x < 2; x++)
+        {
+            for (int y = 0; y < 2; y++)
+            {
+                if ((0 <= pointCol + x) && (TerrainTileDims * pointsPerTile > pointCol + x) &&
+                    (0 <= pointRow + y) && (TerrainTileDims * pointsPerTile > pointRow + y))
+                {
+                    float distRatio = Vector3.Distance(relativePos, new Vector3(pointCol * PointInterval, relativePos.y, pointRow * PointInterval)) / PointInterval;
+                    interpolatedHeight += (1f - distRatio) * heightArray[pointRow + y, pointCol + x];
+                    used++;
+                }
+            }
+        }
+
+        interpolatedHeight *= (5 - used);
+
+        return interpolatedHeight * 40;
+
     }
 
     private void GenerateNewHeightMap()
@@ -114,36 +155,47 @@ public class TerrainManager : MonoBehaviour
                 worldVert.x *= (TerrainInterval / TerrainDefaultScale);
                 worldVert.z *= (TerrainInterval / TerrainDefaultScale);
                 worldVert += terrainList[tile].gameObject.transform.position;
-                float centerOffset = 0.5f * TerrainInterval;
-                Vector3 relativePos = worldVert - (currentOrigin - new Vector3(centerOffset, 0, centerOffset));
-                int pointCol = Mathf.FloorToInt(relativePos.x / PointInterval);
-                int pointRow = Mathf.FloorToInt(relativePos.z / PointInterval);
-                //Debug.Log(worldVert.z + " : " + worldVert.x);
-                //Debug.Log(relativePos.z + " : " + relativePos.x);
-                //Debug.Log(pointRow + " : " + pointCol);
 
-                float interpolatedHeight = 0;
-                int total = 0;
-                for (int x = 0; x < 2; x++)
-                {
-                    for (int y = 0; y < 2; y++)
-                    {
-                        if ((0 <= pointCol + x) && (TerrainTileDims * pointsPerTile > pointCol + x) &&
-                            (0 <= pointRow + y) && (TerrainTileDims * pointsPerTile > pointRow + y))
-                        {
-                            interpolatedHeight += heightArray[pointRow + y, pointCol + x];
-                            total++;
-                        }
-                    }
-                }
+                float interpolatedHeight = GetHeightAtLocation(worldVert);
 
-                newVerts[i] = new Vector3(vert.x, 12 * interpolatedHeight, vert.z);
+                newVerts[i] = new Vector3(vert.x, interpolatedHeight, vert.z);
             }
-            Debug.Log(newVerts.Length);
             terrainList[tile].MyMesh.vertices = newVerts;
             terrainList[tile].RecomputeMeshCollider();
         }
 
+    }
+
+    private void PlaceFinish()
+    {
+        if(FinishPrefab != null)
+        {
+            float tx = Random.Range(0.0f, 1.0f);
+            float ty = Random.Range(0.0f, 1.0f);
+
+            float x = Mathf.Sin((tx * 2 * 3.141f) + 0.5f);
+            float y = Mathf.Cos((ty * 2 * 3.141f) + 0.3f);
+
+            if(Mathf.Abs(x) < 0.2f)
+            {
+                x = Mathf.Sign(x) * 0.2f;
+            }
+
+            if (Mathf.Abs(y) < 0.2f)
+            {
+                y = Mathf.Sign(y) * 0.2f;
+            }
+
+            // Remap from [-1,1] to [0,1]
+            x = x * 0.5f + 0.5f;
+            y = y * 0.5f + 0.5f;
+
+            Debug.Log(x + " , " + y);
+
+            Vector3 position = currentOrigin + new Vector3(x * TerrainTileDims * TerrainInterval, 0, y * TerrainTileDims * TerrainInterval);
+            position.y += GetHeightAtLocation(position) - 5;
+            Instantiate(FinishPrefab, position, Quaternion.identity);
+        }
     }
 
     /*private void SetTerrainNeighbors()
