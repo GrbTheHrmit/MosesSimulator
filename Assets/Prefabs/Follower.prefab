@@ -124,8 +124,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 23020d078f3b66c4da7bb1b9e7287b29, type: 2}
   followMaterial:
   - {fileID: 2100000, guid: f2ff83c860577f44a9f1d9efe32a3fa2, type: 2}
-  followerMaxSpeed: 5
-  followerAccel: 3
+  followerMaxSpeed: 10
+  followerAccel: 6
   arrivalRadius: 2
   minAvoidDist: 2
   maxAvoidDist: 4

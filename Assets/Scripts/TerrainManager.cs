@@ -19,6 +19,7 @@ public class TerrainManager : MonoBehaviour
 
     private List<ProceduralTerrainScript> terrainList = new List<ProceduralTerrainScript>();
     private float TerrainInterval = 1000f;
+    private float TerrainDefaultScale = 10f; // need for vert locations
     private float PointInterval;
 
     private int voronoiPointsPerTile = 50;
@@ -42,9 +43,11 @@ public class TerrainManager : MonoBehaviour
                 terrainList.Add(newTerrain.GetComponent<ProceduralTerrainScript>());
                 terrainList[i].InitTerrain();
             }
-            currentOrigin = new Vector3(-((TerrainTileDims - 1) * 0.5f), baseHeight, -((TerrainTileDims - 1) * 0.5f));
+            currentOrigin = new Vector3(-((TerrainTileDims - 1) * 0.5f) * TerrainInterval, baseHeight, -((TerrainTileDims - 1) * 0.5f) * TerrainInterval);
 
-            SetTerrainNeighbors();
+            Debug.Log(currentOrigin);
+
+            //SetTerrainNeighbors();
             GenerateNewHeightMap();
         }
         
@@ -75,8 +78,8 @@ public class TerrainManager : MonoBehaviour
 
         Vector3 position = currentOrigin + new Vector3(tileCol * TerrainInterval + pointCol * PointInterval, baseHeight, tileRow * TerrainInterval + pointRow * PointInterval);
 
-        float x = Mathf.Sin(CustomRandom(position.x) * 0.5f + 0.5f);
-        float y = Mathf.Cos(CustomRandom(position.z) * 0.5f + 0.5f);
+        float x = CustomRandom(position.x);
+        float y = CustomRandom(position.z);
 
         return x * y;
     }
@@ -88,20 +91,62 @@ public class TerrainManager : MonoBehaviour
             int tileCol = tile % TerrainTileDims;
             int tileRow = tile / TerrainTileDims;
 
+
             for(int point = 0; point < pointsPerTile * pointsPerTile; point++)
             {
                 int pointCol = point % pointsPerTile;
                 int pointRow = point / pointsPerTile;
 
                 float height = GetMappedValue(tile, point);
-                heightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] = height;
 
+                heightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] = height;
             }
+
+        }
+
+        for(int tile = 0; tile < TerrainTileDims * TerrainTileDims; tile++)
+        {
+            Vector3[] newVerts = new Vector3[terrainList[tile].MyMesh.vertexCount];
+            for (int i = 0; i < terrainList[tile].MyMesh.vertexCount; i++)
+            {
+                Vector3 vert = terrainList[tile].MyMesh.vertices[i];
+                Vector3 worldVert = vert;
+                worldVert.x *= (TerrainInterval / TerrainDefaultScale);
+                worldVert.z *= (TerrainInterval / TerrainDefaultScale);
+                worldVert += terrainList[tile].gameObject.transform.position;
+                float centerOffset = 0.5f * TerrainInterval;
+                Vector3 relativePos = worldVert - (currentOrigin - new Vector3(centerOffset, 0, centerOffset));
+                int pointCol = Mathf.FloorToInt(relativePos.x / PointInterval);
+                int pointRow = Mathf.FloorToInt(relativePos.z / PointInterval);
+                Debug.Log(worldVert.z + " : " + worldVert.x);
+                Debug.Log(relativePos.z + " : " + relativePos.x);
+                Debug.Log(pointRow + " : " + pointCol);
+
+                float interpolatedHeight = 0;
+                int total = 0;
+                for (int x = 0; x < 2; x++)
+                {
+                    for (int y = 0; y < 2; y++)
+                    {
+                        if ((0 <= pointCol + x) && (TerrainTileDims * pointsPerTile > pointCol + x) &&
+                            (0 <= pointRow + y) && (TerrainTileDims * pointsPerTile > pointRow + y))
+                        {
+                            interpolatedHeight += heightArray[pointRow + y, pointCol + x];
+                            total++;
+                        }
+                    }
+                }
+
+                newVerts[i] = new Vector3(vert.x, 30 * interpolatedHeight, vert.z);
+            }
+            Debug.Log(newVerts.Length);
+            terrainList[tile].MyMesh.vertices = newVerts;
+            terrainList[tile].MyMesh.RecalculateBounds();
         }
 
     }
 
-    private void SetTerrainNeighbors()
+    /*private void SetTerrainNeighbors()
     {
         for (int i = 0; i < TerrainTileDims * TerrainTileDims; i++)
         {
@@ -133,5 +178,5 @@ public class TerrainManager : MonoBehaviour
 
             terrainList[i].MyTerrain.SetNeighbors(left, top, right, bottom);
         }
-    }
+    }*/
 }

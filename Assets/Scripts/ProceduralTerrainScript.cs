@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 using UnityEngine.TerrainTools;
@@ -9,8 +10,11 @@ public class ProceduralTerrainScript : MonoBehaviour
     [SerializeField]
     private int pointsPerTile = 500;
 
-    private Terrain myTerrain = null;
-    public Terrain MyTerrain { get { return myTerrain; } }
+    //private Terrain myTerrain = null;
+    //public Terrain MyTerrain { get { return myTerrain; } }
+
+    private Mesh myMesh = null;
+    public Mesh MyMesh { get { return myMesh; } }
 
     // Start is called before the first frame update
     void Start()
@@ -22,14 +26,25 @@ public class ProceduralTerrainScript : MonoBehaviour
 
     public void InitTerrain()
     {
-        myTerrain = GetComponent<Terrain>();
+        MeshFilter filter = GetComponent<MeshFilter>();
+        myMesh = filter.mesh;
+
+        MeshCollider collider = GetComponent<MeshCollider>();
+        if(collider != null )
+        {
+            collider.sharedMesh = myMesh;
+        }
+
+        /*myTerrain = GetComponent<Terrain>();
         TerrainData newTerrainData = new TerrainData();
         //newTerrainData.baseMapResolution = pointsPerTile;
         newTerrainData.heightmapResolution = pointsPerTile;
         newTerrainData.SetDetailResolution(1024, 32);
         newTerrainData.size = new Vector3(1000, 10, 1000);
         myTerrain.terrainData = newTerrainData;
-        GetComponent<TerrainCollider>().terrainData = newTerrainData;
+        GetComponent<TerrainCollider>().terrainData = newTerrainData;*/
+
+
     }
 
     // Update is called once per frame

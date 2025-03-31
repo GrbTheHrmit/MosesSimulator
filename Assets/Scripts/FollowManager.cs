@@ -74,13 +74,62 @@ public class FollowManager : ScriptableObject
     private int SpawnCluster(Vector3 location)
     {
         int numToSpawn = Random.Range(1, GameManager.Instance.SpawnSettings.maxCluster + 1);
+
+        if(uncollectedFollowers.Count + numToSpawn > GameManager.Instance.SpawnSettings.maxUncollected)
+        {
+            int toMove = uncollectedFollowers.Count + numToSpawn - GameManager.Instance.SpawnSettings.maxUncollected;
+            float distCutoff = float.MaxValue;
+            int numpicked = 0;
+            FollowerScript[] furthest = new FollowerScript[toMove];
+            foreach(FollowerScript follower in uncollectedFollowers)
+            {
+                if(numpicked < toMove)
+                {
+                    furthest[numpicked] = follower;
+                    // Set this to shortest distance
+                    distCutoff = Mathf.Min(distCutoff, Vector3.Distance(follower.gameObject.transform.position, LeaderPosition));
+                    numpicked++;
+                    continue;
+                }
+                
+                // If this follower is further than the cutoff we should add it
+                if(Vector3.Distance(follower.gameObject.transform.position, LeaderPosition) > distCutoff)
+                {
+                    float newClosest = float.MaxValue;
+                    bool foundClosest = false;
+                    for(int i = 0; i < numpicked; i++)
+                    {
+                        // Using foundClosest to avoid accidentally having 2 with the same distance both be replaced
+                        if (!foundClosest && Vector3.Distance(furthest[i].gameObject.transform.position, LeaderPosition) == distCutoff)
+                        {
+                            foundClosest = true;
+                            furthest[i] = follower;
+                        }
+
+                        newClosest = Mathf.Min(newClosest, Vector3.Distance(furthest[i].gameObject.transform.position, LeaderPosition));
+                    }
+                    // Set new cutoff
+                    distCutoff = newClosest;
+                }
+            }
+
+            // Move the selected followers
+            for(int i = 0; i < numpicked; i++)
+            {
+                // Spawn in reverse circle from the instantiation one below
+                Vector3 spawnPos = location + Quaternion.Euler(0, -(i + 1) * (360f / numToSpawn), 0) * (GameManager.Instance.SpawnSettings.clusterSize * Vector3.forward);
+                furthest[i].gameObject.transform.position = spawnPos;
+            }
+
+            numToSpawn -= toMove;
+        }
+
         for(int i = 0; i < numToSpawn; i++)
         {
             Vector3 spawnPos = location + Quaternion.Euler(0, i * (360f / numToSpawn), 0) * (GameManager.Instance.SpawnSettings.clusterSize * Vector3.forward);
+
             GameObject newFollower = Instantiate(GameManager.Instance.FollowerObject, spawnPos, Quaternion.FromToRotation(Vector3.forward, location - spawnPos));
             uncollectedFollowers.Add(newFollower.GetComponent<FollowerScript>());
-
-            // TODO: Something about moving followers instead of spawning if we are at the limit
         }
 
         return numToSpawn;
@@ -88,8 +137,9 @@ public class FollowManager : ScriptableObject
 
     private void CheckSpawnFollowers()
     {
-
-        if(timeSinceLastCollected > GameManager.Instance.SpawnSettings.spawnRate && timeSinceLastSpawn > GameManager.Instance.SpawnSettings.spawnRate)
+        // Time waited for the player to collect someone goes up with how many followers are in the world
+        float waitTime = GameManager.Instance.SpawnSettings.spawnRate + uncollectedFollowers.Count;
+        if (timeSinceLastCollected > waitTime && timeSinceLastSpawn > GameManager.Instance.SpawnSettings.spawnRate)
         {
             int tries = 0;
             float distance;
