@@ -193,7 +193,7 @@ public class TerrainManager : MonoBehaviour
             Debug.Log(x + " , " + y);
 
             Vector3 position = currentOrigin + new Vector3(x * TerrainTileDims * TerrainInterval, 0, y * TerrainTileDims * TerrainInterval);
-            position.y += GetHeightAtLocation(position) - 5;
+            position.y += GetHeightAtLocation(position) - 15;
             Instantiate(FinishPrefab, position, Quaternion.identity);
         }
     }
