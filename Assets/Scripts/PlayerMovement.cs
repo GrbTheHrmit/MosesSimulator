@@ -10,7 +10,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float MaxMoveSpeed = 10f;
     [SerializeField]
+    private float MaxRunSpeed = 18f;
+    [SerializeField]
     private float MoveSpeedIncrease = 7.5f;
+    [SerializeField]
+    private float RunSpeedIncrease = 10f;
     [SerializeField]
     private float ReleaseSpeedDecrease = 2f;
     [SerializeField]
@@ -21,6 +25,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 lastMoveInput;
     private Rigidbody rigidbody;
+    private bool runToggle = false;
 
     private void Awake()
     {
@@ -34,6 +39,7 @@ public class PlayerMovement : MonoBehaviour
             }
 
             input.currentActionMap.FindAction("Walk").performed += OnWalkAction;
+            input.currentActionMap.FindAction("Run").performed += OnRunToggle;
         }
     }
 
@@ -41,6 +47,12 @@ public class PlayerMovement : MonoBehaviour
     public void OnWalkAction(InputAction.CallbackContext context)
     {
         lastMoveInput = context.ReadValue<Vector2>();
+    }
+
+    public void OnRunToggle(InputAction.CallbackContext context)
+    {
+        runToggle = context.ReadValueAsButton();
+        Debug.Log(runToggle);
     }
 
     // Start is called before the first frame update
@@ -69,13 +81,18 @@ public class PlayerMovement : MonoBehaviour
 
     void MovePlayer(float dt)
     {
-        float velocityChange = lastMoveInput.y * MoveSpeedIncrease * dt;
+        float velocityChange = lastMoveInput.y * dt * (runToggle ? RunSpeedIncrease : MoveSpeedIncrease);
         if(lastMoveInput.y == 0)
         {
             velocityChange = -ReleaseSpeedDecrease * dt;
         }
 
-        float newVelocity = Mathf.Clamp(rigidbody.velocity.magnitude + velocityChange, -0.2f * MaxMoveSpeed, MaxMoveSpeed);
+        float newVelocity = runToggle ?
+            Mathf.Clamp(rigidbody.velocity.magnitude + velocityChange, -0.2f * MaxRunSpeed, MaxRunSpeed) :
+            Mathf.Clamp(rigidbody.velocity.magnitude + velocityChange, -0.2f * MaxMoveSpeed, MaxMoveSpeed);
+
+        newVelocity = Mathf.MoveTowards(rigidbody.velocity.magnitude, newVelocity, ReleaseSpeedDecrease * dt);
+
         rigidbody.velocity = rigidbody.rotation * Vector3.forward * newVelocity;
     }
 

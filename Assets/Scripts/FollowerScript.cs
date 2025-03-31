@@ -45,11 +45,16 @@ public class FollowerScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
+    }
+
+    private void Awake()
+    {
         wanderTimer = maxWanderSeconds;
         rb = GetComponent<Rigidbody>();
 
         renderer = GetComponent<MeshRenderer>();
-        if(renderer != null)
+        if (renderer != null)
         {
             renderer.SetMaterials(wanderMaterial);
         }
