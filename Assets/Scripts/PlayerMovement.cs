@@ -47,11 +47,20 @@ public class PlayerMovement : MonoBehaviour
             input.currentActionMap.FindAction("Walk").performed += OnWalkAction;
             input.currentActionMap.FindAction("Run").performed += OnRunToggle;
         }
+
+        rigidbody = GetComponent<Rigidbody>();
+        if (!rigidbody)
+        {
+            Debug.LogError("Could not find Player Rigidbody");
+        }
+
+        FollowManager.Instance().FollowObject = rigidbody;
     }
 
     // Input Bindings
     public void OnWalkAction(InputAction.CallbackContext context)
     {
+        
         lastMoveInput = context.ReadValue<Vector2>();
     }
 
@@ -62,20 +71,12 @@ public class PlayerMovement : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-    {
-        rigidbody = GetComponent<Rigidbody>();
-        if(!rigidbody)
-        {
-            Debug.LogError("Could not find Player Rigidbody");
-        }
-
-        FollowManager.Instance().FollowObject = rigidbody;
-    }
+    {}
 
 
     void FixedUpdate()
     {
-        //CheckGround(Time.fixedDeltaTime);
+        CheckGround(Time.fixedDeltaTime);
         MovePlayer(Time.fixedDeltaTime);
         RotatePlayer(Time.fixedDeltaTime);
     }
@@ -94,24 +95,24 @@ public class PlayerMovement : MonoBehaviour
         {
             groundNormal = hit.normal;
 
-            /*if (hit.distance < floatHeight * 1.5f)
+            if (hit.distance < floatHeight)
             {
-                rigidbody.transform.position += groundNormal * (floatHeight - hit.distance);
+                //rigidbody.transform.position += groundNormal * (floatHeight - hit.distance);
 
-                if(!grounded)
+                /*if(!grounded)
                 {
                     rigidbody.useGravity = false;
-                }
+                }*/
                 grounded = true;
             }
             else
             {
-                if (grounded)
+                /*if (grounded)
                 {
                     rigidbody.useGravity = true;
-                }
+                }*/
                 grounded = false;
-            }*/
+            }
             
         }
         else
@@ -139,17 +140,22 @@ public class PlayerMovement : MonoBehaviour
             Mathf.Clamp(lastVelocity + velocityChange, -0.2f * MaxRunSpeed, MaxRunSpeed) :
             Mathf.Clamp(lastVelocity + velocityChange, -0.2f * MaxMoveSpeed, MaxMoveSpeed);
 
-        newSpeed = Mathf.MoveTowards(lastVelocity, newSpeed, ReleaseSpeedDecrease * dt);
+        velocityChange = newSpeed - lastVelocity;
+
+        //newSpeed = Mathf.MoveTowards(lastVelocity, newSpeed, ReleaseSpeedDecrease * dt);
 
         Vector3 moveForward = Quaternion.FromToRotation(transform.up, groundNormal) * transform.forward;
-        Vector3 velocityVector = moveForward * newSpeed;
+        Vector3 velocityVector = moveForward * velocityChange;
+        Debug.DrawLine(transform.position, transform.position + velocityVector); ;
 
-        if (!grounded)
+        /*if (!grounded)
         {
             velocityVector.y = rigidbody.velocity.y;
-        }
+        }*/
 
-        rigidbody.velocity = velocityVector;
+        //rigidbody.velocity = velocityVector;
+        Debug.Log(velocityVector);
+        rigidbody.AddForce(velocityVector, ForceMode.VelocityChange);
     }
 
     void RotatePlayer(float dt)

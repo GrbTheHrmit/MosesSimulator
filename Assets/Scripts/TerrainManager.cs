@@ -67,8 +67,17 @@ public class TerrainManager : MonoBehaviour
             GenerateNewHeightMap();
 
             PlaceFinish();
+            SpawnPlayer();
         }
         
+    }
+
+    void SpawnPlayer()
+    {
+        Vector3 location = Vector3.zero;
+        location.y = GetHeightAtLocation(location) + 2;
+
+        GameManager.Instance.SpawnPlayer(location);
     }
 
     // Update is called once per frame

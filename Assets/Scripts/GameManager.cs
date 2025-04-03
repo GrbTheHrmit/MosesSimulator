@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public GameObject playerPrefab;
+
     [System.Serializable]
     public struct FollowerSpawnSettings
     {
@@ -44,5 +46,13 @@ public class GameManager : MonoBehaviour
     void FixedUpdate()
     {
         FollowManager.Instance().FixedUpdate();
+    }
+
+    public void SpawnPlayer(Vector3 spawnPos)
+    {
+        if (playerPrefab != null)
+        {
+            Instantiate(playerPrefab, spawnPos, Quaternion.identity);
+        }
     }
 }

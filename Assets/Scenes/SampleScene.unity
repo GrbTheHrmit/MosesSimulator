@@ -246,6 +246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 517b657dfad1e5645a651a88b752debd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 2064192780827042749, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
   FollowerPrefab: {fileID: 6115750483238261200, guid: 744547d362b3b0247991c3ae1f2d0480, type: 3}
   spawnSettings:
     minSpawnDist: 50
@@ -289,99 +290,9 @@ MonoBehaviour:
   FinishPrefab: {fileID: 6182003461833472563, guid: 4dc419715abf73644b28a80725cd102b, type: 3}
   TerrainTileDims: 2
   pointsPerTile: 11
---- !u!1001 &3128281513588655924
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -3761948380629585370, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_UseGravity
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2064192780827042749, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_Name
-      value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 2064192780827042749, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_TagString
-      value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3245155496592002825, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3509673897207661232, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
-    - target: {fileID: 7994422909270114457, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: MaxRunSpeed
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 7994422909270114457, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: MaxMoveSpeed
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7994422909270114457, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: RunSpeedIncrease
-      value: 18
-      objectReference: {fileID: 0}
-    - target: {fileID: 7994422909270114457, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: MoveSpeedIncrease
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 7994422909270114457, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
-      propertyPath: ReleaseSpeedDecrease
-      value: 8
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 705507995}
-  - {fileID: 3128281513588655924}
   - {fileID: 1655544156}
