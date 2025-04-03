@@ -289,7 +289,7 @@ MonoBehaviour:
   TerrainPrefab: {fileID: 3346664031508845981, guid: 8fcea5e83986adb4bb13402a337b9c49, type: 3}
   FinishPrefab: {fileID: 6182003461833472563, guid: 4dc419715abf73644b28a80725cd102b, type: 3}
   TerrainTileDims: 2
-  pointsPerTile: 11
+  pointsPerTile: 5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
