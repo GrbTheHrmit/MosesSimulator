@@ -302,8 +302,12 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -3761948380629585370, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
+      propertyPath: m_AngularDrag
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3761948380629585370, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
       propertyPath: m_Constraints
-      value: 80
+      value: 112
       objectReference: {fileID: 0}
     - target: {fileID: 2064192780827042749, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
       propertyPath: m_Name
@@ -353,6 +357,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3509673897207661232, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
     - target: {fileID: 7994422909270114457, guid: b562fb2025c7e2a43a8f4841d249585f, type: 3}
       propertyPath: MaxRunSpeed
       value: 30

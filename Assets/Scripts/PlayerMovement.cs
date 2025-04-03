@@ -75,7 +75,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        CheckGround(Time.fixedDeltaTime);
+        //CheckGround(Time.fixedDeltaTime);
         MovePlayer(Time.fixedDeltaTime);
         RotatePlayer(Time.fixedDeltaTime);
     }
@@ -94,7 +94,7 @@ public class PlayerMovement : MonoBehaviour
         {
             groundNormal = hit.normal;
 
-            if (hit.distance < floatHeight * 1.5f)
+            /*if (hit.distance < floatHeight * 1.5f)
             {
                 rigidbody.transform.position += groundNormal * (floatHeight - hit.distance);
 
@@ -111,15 +111,15 @@ public class PlayerMovement : MonoBehaviour
                     rigidbody.useGravity = true;
                 }
                 grounded = false;
-            }
+            }*/
             
         }
         else
         {
-            if (grounded)
+            /*if (grounded)
             {
                 rigidbody.useGravity = true;
-            }
+            }*/
             grounded = false;
             groundNormal = Vector3.up;
         }
@@ -141,7 +141,8 @@ public class PlayerMovement : MonoBehaviour
 
         newSpeed = Mathf.MoveTowards(lastVelocity, newSpeed, ReleaseSpeedDecrease * dt);
 
-        Vector3 velocityVector = rigidbody.rotation * Vector3.forward * newSpeed;
+        Vector3 moveForward = Quaternion.FromToRotation(transform.up, groundNormal) * transform.forward;
+        Vector3 velocityVector = moveForward * newSpeed;
 
         if (!grounded)
         {
@@ -158,8 +159,8 @@ public class PlayerMovement : MonoBehaviour
         {
             Vector3 inputDirection = new Vector3(lastMoveInput.x, 0, lastMoveInput.y);
             float rotationChange = Mathf.Clamp(angle, -RotationSpeed * dt, RotationSpeed * dt);
-            Quaternion groundRotation = Quaternion.FromToRotation(transform.up, groundNormal);
-            rigidbody.MoveRotation(Quaternion.RotateTowards(rigidbody.rotation, Quaternion.Euler(0, rotationChange, 0) * groundRotation * rigidbody.rotation, RotationSpeed * dt));
+            //Quaternion groundRotation = Quaternion.FromToRotation(transform.up, groundNormal);
+            rigidbody.MoveRotation(Quaternion.RotateTowards(rigidbody.rotation, Quaternion.Euler(0, rotationChange, 0) * rigidbody.rotation, RotationSpeed * dt));
         }
     }
 
