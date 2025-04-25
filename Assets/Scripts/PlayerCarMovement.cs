@@ -19,6 +19,9 @@ public class PlayerCarMovement : MonoBehaviour
     [SerializeField]
     private float DamperStrength = 0.95f;
 
+    [SerializeField]
+    private float MaxTurnAngle = 30f;
+
     private static int WHEEL_FR = 0;
     private static int WHEEL_FL = 1;
     private static int WHEEL_BR = 2;
@@ -122,7 +125,7 @@ public class PlayerCarMovement : MonoBehaviour
     void FixedUpdate()
     {
 
-        for (int i = 0; i < m_wheels.Length; i++)
+        for (int i = m_wheels.Length - 1; i >= 0; i--)
         {
             Vector3 newPosition = m_wheels[i].transform.localPosition;
 
@@ -133,21 +136,56 @@ public class PlayerCarMovement : MonoBehaviour
                 float newWheelVelocity = (wheelSpringVelocity[i] * DamperStrength) + springForce * Time.fixedDeltaTime;
                 wheelSpringVelocity[i] = newWheelVelocity;
 
-                Debug.Log(newWheelVelocity);
-
                 newPosition += new Vector3(0, newWheelVelocity * Time.fixedDeltaTime, 0);
             }
 
-            m_wheels[i].transform.SetLocalPositionAndRotation(newPosition, Quaternion.Euler(0, lastMoveInput.x * 30, 0));
+            if(i < 2)
+            {
+                m_wheels[i].transform.SetLocalPositionAndRotation(newPosition, Quaternion.Euler(0, lastMoveInput.x * MaxTurnAngle, 0));
+            }
+            else
+            {
+                m_wheels[i].transform.localPosition = newPosition;
+            }
+            
+
+            // Rotate input by car and wheel orientation
+            Vector3 moveInput = new Vector3(0, 0, lastMoveInput.y) * MoveSpeedIncrease;
+
+            Vector3 pointVelocity = rb.GetPointVelocity(m_wheels[i].transform.position);
+            if (moveInput.sqrMagnitude  > 0)
+            {
+                if (i < 2)
+                {
+                    moveInput = gameObject.transform.rotation * Quaternion.Euler(0, lastMoveInput.x * MaxTurnAngle, 0) * moveInput;
+
+                }
+                else
+                {
+                    moveInput *= 0.25f;
+                    moveInput = gameObject.transform.rotation * moveInput;
+                }
+                moveInput.y = 0;
+            }
+            
+
+            //Vector3 wheelVelocity = Vector3.MoveTowards(pointVelocity, pointVelocity + moveInput, MoveSpeedIncrease * Time.fixedDeltaTime);
+
+            //Vector3 velocityDiff = wheelVelocity - pointVelocity;
+            Vector3 XZOffset = m_wheels[i].transform.localPosition;
+            XZOffset.y = 0;
+            rb.AddForceAtPosition(moveInput, m_wheels[i].transform.position, ForceMode.Force);
+            Debug.DrawLine(m_wheels[i].transform.position, m_wheels[i].transform.position + moveInput, Color.red, 2);
         }
         
-
+/*
         Vector3 moveInput = gameObject.transform.rotation * new Vector3(lastMoveInput.x, 0, lastMoveInput.y) * 5;
         Vector3 carVelocity = Vector3.MoveTowards(rb.velocity, rb.velocity + moveInput, MoveSpeedIncrease * Time.fixedDeltaTime);
         carVelocity = Vector3.ClampMagnitude(carVelocity, MaxSpeed);
 
         Vector3 velocityDiff = carVelocity - rb.velocity;
         rb.AddForce(velocityDiff, ForceMode.VelocityChange);
+*/
     }
 
     private void OnCollisionEnter(Collision collision)
