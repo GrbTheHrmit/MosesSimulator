@@ -1,0 +1,142 @@
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+
+public class PlayerCarMovement : MonoBehaviour
+{
+    [SerializeField]
+    private float MaxSpeed = 40f;
+    [SerializeField]
+    private float MoveSpeedIncrease = 20f;
+
+    [SerializeField]
+    private float SpringStrength = 10f;
+    [SerializeField]
+    private float DamperStrength = 0.95f;
+
+    private static int WHEEL_FR = 0;
+    private static int WHEEL_FL = 1;
+    private static int WHEEL_BR = 2;
+    private static int WHEEL_BL = 3;
+
+
+    private Vector2 lastMoveInput;
+    private bool runToggle = false;
+
+    private Rigidbody rb;
+    private Collider[] m_wheels;
+    private float[] wheelSpringVelocity;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+
+
+        Collider[] children = GetComponentsInChildren<Collider>();
+        m_wheels = new Collider[children.Length];
+        wheelSpringVelocity = new float[children.Length];
+
+        for(int i = 0;  i < children.Length; i++)
+        {
+            string name = children[i].name;
+            if(name == "WheelFR")
+            {
+                m_wheels[WHEEL_FR] = children[i];
+            }
+            else if (name == "WheelFL")
+            {
+                m_wheels[WHEEL_FL] = children[i];
+            }
+            else if (name == "WheelBR")
+            {
+                m_wheels[WHEEL_BR] = children[i];
+            }
+            else if (name == "WheelBL")
+            {
+                m_wheels[WHEEL_BL] = children[i];
+            }
+            else
+            {
+                Debug.LogWarning("Unexpected Collider Found on Player: " + name);
+            }
+        }
+
+        PlayerInput input = GetComponent<PlayerInput>();
+        if (input)
+        {
+            input.ActivateInput();
+            if (input.currentActionMap == null)
+            {
+                input.SwitchCurrentActionMap("Default");
+            }
+
+            input.currentActionMap.FindAction("Walk").performed += OnWalkAction;
+            input.currentActionMap.FindAction("Run").performed += OnRunToggle;
+        }
+
+    }
+
+    // Input Bindings
+    public void OnWalkAction(InputAction.CallbackContext context)
+    {
+
+        lastMoveInput = context.ReadValue<Vector2>();
+    }
+
+    public void OnRunToggle(InputAction.CallbackContext context)
+    {
+        runToggle = context.ReadValueAsButton();
+    }
+
+
+
+    void FixedUpdate()
+    {
+
+        for (int i = 0; i < m_wheels.Length; i++)
+        {
+            Vector3 newPosition = m_wheels[i].transform.localPosition;
+
+            if (Mathf.Abs(wheelSpringVelocity[i]) > 0.001f)
+            {
+                float wheelHeight = m_wheels[i].transform.localPosition.y;
+                float springForce = -wheelHeight * SpringStrength; // Replace with variable later
+                float newWheelVelocity = (wheelSpringVelocity[i] * DamperStrength) + springForce * Time.fixedDeltaTime;
+                wheelSpringVelocity[i] = newWheelVelocity;
+
+                Debug.Log(newWheelVelocity);
+
+                newPosition += new Vector3(0, newWheelVelocity * Time.fixedDeltaTime, 0);
+            }
+
+            m_wheels[i].transform.SetLocalPositionAndRotation(newPosition, Quaternion.Euler(0, lastMoveInput.x * 30, 0));
+        }
+        
+
+        Vector3 moveInput = gameObject.transform.rotation * new Vector3(lastMoveInput.x, 0, lastMoveInput.y) * 5;
+        Vector3 carVelocity = Vector3.MoveTowards(rb.velocity, rb.velocity + moveInput, MoveSpeedIncrease * Time.fixedDeltaTime);
+        carVelocity = Vector3.ClampMagnitude(carVelocity, MaxSpeed);
+
+        Vector3 velocityDiff = carVelocity - rb.velocity;
+        rb.AddForce(velocityDiff, ForceMode.VelocityChange);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        AddWheelImpulse(collision.impulse, name);
+    }
+
+    public void AddWheelImpulse(Vector3 impulse, string wheelName)
+    {
+        for (int i = 0; i < m_wheels.Length; i++)
+        {
+            wheelSpringVelocity[i] += impulse.y * 0.2f;
+        }
+    }
+
+}

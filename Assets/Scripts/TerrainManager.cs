@@ -185,6 +185,7 @@ public class TerrainManager : MonoBehaviour
             float x = Mathf.Sin((tx * 2 * 3.141f) + 0.5f);
             float y = Mathf.Cos((ty * 2 * 3.141f) + 0.3f);
 
+            // dont spawn too close to the center
             if(Mathf.Abs(x) < 0.2f)
             {
                 x = Mathf.Sign(x) * 0.2f;
@@ -196,8 +197,8 @@ public class TerrainManager : MonoBehaviour
             }
 
             // Remap from [-1,1] to [0,1]
-            x = x * 0.5f + 0.5f;
-            y = y * 0.5f + 0.5f;
+            x = x * 0.1f + 0.5f;
+            y = y * 0.1f + 0.5f;
 
             Debug.Log(x + " , " + y);
 
