@@ -11,9 +11,4 @@ public class WheelScript : MonoBehaviour
         my_movement = GetComponentInParent<PlayerCarMovement>();
     }
 
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        my_movement.AddWheelImpulse(collision.impulse, name);
-    }
 }

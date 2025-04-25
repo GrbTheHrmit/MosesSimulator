@@ -32,6 +32,30 @@ public class PlayerCarMovement : MonoBehaviour
     private Collider[] m_wheels;
     private float[] wheelSpringVelocity;
 
+    private int StringToWheelIndex(string str)
+    {
+        if (str == "WheelFR")
+        {
+            return WHEEL_FR;
+        }
+        else if (str == "WheelFL")
+        {
+            return WHEEL_FL;
+        }
+        else if (str == "WheelBR")
+        {
+            return WHEEL_BR;
+        }
+        else if (str == "WheelBL")
+        {
+            return WHEEL_BL;
+        }
+
+        Debug.LogWarning("Could not find index for: " + str);
+
+        return -1;
+    }
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -102,7 +126,7 @@ public class PlayerCarMovement : MonoBehaviour
         {
             Vector3 newPosition = m_wheels[i].transform.localPosition;
 
-            if (Mathf.Abs(wheelSpringVelocity[i]) > 0.001f)
+            if (Mathf.Abs(wheelSpringVelocity[i]) > 0.001f || Mathf.Abs(newPosition.y) > 0.001f)
             {
                 float wheelHeight = m_wheels[i].transform.localPosition.y;
                 float springForce = -wheelHeight * SpringStrength; // Replace with variable later
@@ -128,15 +152,9 @@ public class PlayerCarMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        AddWheelImpulse(collision.impulse, name);
-    }
+        int idx = StringToWheelIndex(collision.contacts[0].thisCollider.name);
 
-    public void AddWheelImpulse(Vector3 impulse, string wheelName)
-    {
-        for (int i = 0; i < m_wheels.Length; i++)
-        {
-            wheelSpringVelocity[i] += impulse.y * 0.2f;
-        }
+        wheelSpringVelocity[idx] += collision.impulse.y * 0.2f;
     }
 
 }

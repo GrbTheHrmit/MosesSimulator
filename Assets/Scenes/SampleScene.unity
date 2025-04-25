@@ -886,6 +886,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxSpeed: 40
   MoveSpeedIncrease: 20
+  SpringStrength: 30
+  DamperStrength: 0.96
 --- !u!4 &5120761659305850216
 Transform:
   m_ObjectHideFlags: 0
