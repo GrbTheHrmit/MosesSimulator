@@ -885,10 +885,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxSpeed: 50
-  MoveSpeedIncrease: 8
+  MoveSpeedIncrease: 20
   SpringStrength: 30
   DamperStrength: 0.96
-  MaxTurnAngle: 30
+  MaxTurnAngle: 60
 --- !u!4 &5120761659305850216
 Transform:
   m_ObjectHideFlags: 0
