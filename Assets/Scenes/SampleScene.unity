@@ -562,6 +562,42 @@ PrefabInstance:
       propertyPath: MoveSpeedIncrease
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].turnAngle
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].turnAngle
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].engineTorque
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].engineTorque
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].brakeStrength
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].brakeStrength
+      value: 100
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5624626859039686509, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
     m_RemovedGameObjects: []

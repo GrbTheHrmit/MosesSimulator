@@ -6,6 +6,33 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[Serializable]
+public class WheelProperties
+{
+    [HideInInspector] public TrailRenderer skidTrail;
+
+    [HideInInspector] public Vector3 localPosition;
+    public float turnAngle = 30f;
+
+    public float lastSuspensionLength = 0.0f;
+    public float mass = 16f;
+    public float size = 0.5f;
+    public float engineTorque = 40f; // Engine power in Nm to wheel
+    public float brakeStrength = 0.5f; // Brake torque
+    public bool slidding = false;
+    [HideInInspector] public Vector3 worldSlipDirection;
+    [HideInInspector] public Vector3 suspensionForceDirection;
+    [HideInInspector] public Vector3 wheelWorldPosition;
+    [HideInInspector] public float wheelCircumference;
+    [HideInInspector] public float torque = 0.0f;
+    public GameObject wheelObject;
+    [HideInInspector] public Vector3 localVelocity;
+    [HideInInspector] public float normalForce;
+    [HideInInspector] public float angularVelocity; // rad/sec
+    [HideInInspector] public float slip;
+    [HideInInspector] public Vector2 input = Vector2.zero;// horizontal=steering, vertical=gas/brake
+    [HideInInspector] public float braking = 0;
+}
 
 public class PlayerCarMovement : MonoBehaviour
 {
@@ -35,10 +62,19 @@ public class PlayerCarMovement : MonoBehaviour
     private bool runToggle = false;
 
     private Rigidbody rb;
-    private Collider[] m_wheels;
-    private float[] wheelSpringVelocity;
+    private GameObject[] m_wheelObjs;
+    public WheelProperties[] m_wheels;
 
-    private float currentWheelSpeed = 0;
+    public GameObject skidMarkPrefab; // Assign a prefab with a TrailRenderer in the inspector
+
+    public float smoothTurn = 0.03f;
+    float coefStaticFriction = 2.95f;
+    float coefKineticFriction = 0.85f;
+    public float wheelGripX = 8f;
+    public float wheelGripZ = 42f;
+    public float suspensionForce = 90f;// spring constant
+    public float dampAmount = 2.5f;// damping constant
+    public float suspensionForceClamp = 200f;// cap on total suspension force
 
     private int StringToWheelIndex(string str)
     {
@@ -64,39 +100,70 @@ public class PlayerCarMovement : MonoBehaviour
         return -1;
     }
 
-    private void Awake()
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
 
-
         Collider[] children = GetComponentsInChildren<Collider>();
-        m_wheels = new Collider[children.Length];
-        wheelSpringVelocity = new float[children.Length];
+        m_wheelObjs = new GameObject[children.Length];
+        m_wheels = new WheelProperties[children.Length];
 
-        for(int i = 0;  i < children.Length; i++)
+        for (int i = 0; i < children.Length; i++)
         {
             string name = children[i].name;
-            if(name == "WheelFR")
+            if (name == "WheelFR")
             {
-                m_wheels[WHEEL_FR] = children[i];
+                m_wheelObjs[WHEEL_FR] = children[i].gameObject;
             }
             else if (name == "WheelFL")
             {
-                m_wheels[WHEEL_FL] = children[i];
+                m_wheelObjs[WHEEL_FL] = children[i].gameObject;
             }
             else if (name == "WheelBR")
             {
-                m_wheels[WHEEL_BR] = children[i];
+                m_wheelObjs[WHEEL_BR] = children[i].gameObject;
             }
             else if (name == "WheelBL")
             {
-                m_wheels[WHEEL_BL] = children[i];
+                m_wheelObjs[WHEEL_BL] = children[i].gameObject;
             }
             else
             {
                 Debug.LogWarning("Unexpected Collider Found on Player: " + name);
             }
         }
+
+        int wheelIdx = 0;
+        foreach (WheelProperties wheel in m_wheels)
+        {
+            //wheel.wheelObject = m_wheelObjs[wheelIdx]; // Assign the object we found earlier
+            wheelIdx++;
+            wheel.wheelObject.transform.eulerAngles = transform.eulerAngles;
+            wheel.wheelObject.transform.localScale = 2f * new Vector3(wheel.size, wheel.size, wheel.size);
+            wheel.wheelCircumference = 2f * Mathf.PI * wheel.size; // Calculate wheel circumference for rotation logic
+
+            wheel.localPosition = wheel.wheelObject.transform.localPosition; // Setup visual match then translate to this
+
+            /*
+            // Instantiate and setup the skid trail (if a prefab is assigned)
+            if (skidMarkPrefab != null)
+            {
+                GameObject skidTrailObj = Instantiate(skidMarkPrefab, transform);
+                // Parent it to the wheel so its position can be updated relative to it
+                skidTrailObj.transform.SetParent(w.wheelObject.transform);
+                // Optionally, reset local position if needed
+                skidTrailObj.transform.localPosition = Vector3.zero;
+                w.skidTrail = skidTrailObj.GetComponent<TrailRenderer>();
+                if (w.skidTrail != null)
+                {
+                    w.skidTrail.emitting = false; // start with emission off
+                }
+            }
+            */
+        }
+        rb.centerOfMass = rb.centerOfMass + new Vector3(0, -0.5f, 0); // Adjust center of mass for better handling
+
+        
 
         PlayerInput input = GetComponent<PlayerInput>();
         if (input)
@@ -125,75 +192,130 @@ public class PlayerCarMovement : MonoBehaviour
         runToggle = context.ReadValueAsButton();
     }
 
+    private void Update()
+    {
+        Debug.Log(rb.velocity.magnitude);
 
+    }
 
     void FixedUpdate()
     {
+        // Credit to https://github.com/SimonVutov/SimpleCar2.git for basic setup
+        rb.AddForce(-transform.up * rb.velocity.magnitude * 0.2f, ForceMode.Force);  // downforce
 
-        for (int i = m_wheels.Length - 1; i >= 0; i--)
+        foreach(WheelProperties w in m_wheels)
         {
-            // Spring Height
+            Transform wheelTransform = w.wheelObject.transform;
+
+            wheelTransform.localRotation = Quaternion.Euler(0, w.turnAngle * w.input.x, 0);
+
+            // Get velocity in wheel space
+            w.wheelWorldPosition = transform.TransformPoint(w.localPosition);
+            Vector3 velocityAtWheel = rb.GetPointVelocity(w.wheelWorldPosition);
+            w.localVelocity = wheelTransform.InverseTransformDirection(velocityAtWheel);
+
+            w.torque = w.engineTorque * w.input.y;
+
+            float inertia = w.mass * w.size * w.size / 2f;
+
+            float lateralFriction = -wheelGripX * w.localVelocity.x;
+            float longitudinalFriction = -wheelGripZ * (w.localVelocity.z - w.angularVelocity * w.size);
+
+            w.angularVelocity += (w.torque - longitudinalFriction * w.size) / inertia * Time.fixedDeltaTime;
+            w.angularVelocity *= 1 - w.braking * w.brakeStrength * Time.fixedDeltaTime;
+            
+
+            // Theoretical force we can apply if this wheel is on the ground
+            Vector3 totalLocalForce = new Vector3(
+                lateralFriction,
+                0f,
+                longitudinalFriction
+            ) * w.normalForce * coefStaticFriction * Time.fixedDeltaTime;
+            float currentMaxFrictionForce = w.normalForce * coefStaticFriction;
+
+            // Calculate effect of friction
+            w.slidding = totalLocalForce.magnitude > currentMaxFrictionForce;
+            w.slip = totalLocalForce.magnitude / currentMaxFrictionForce;
+            totalLocalForce = Vector3.ClampMagnitude(totalLocalForce, currentMaxFrictionForce);
+            totalLocalForce *= w.slidding ? (coefKineticFriction / coefStaticFriction) : 1;
+
+            Vector3 totalWorldForce = wheelTransform.TransformDirection(totalLocalForce);
+            w.worldSlipDirection = totalWorldForce;
+
+
+            RaycastHit hit;
+            if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f))
             {
-                Vector3 newPosition = m_wheels[i].transform.localPosition;
+                float rayLen = w.size * 2f; 
+                float compression = rayLen - hit.distance; // how much the spring is compressed
+                float damping = (w.lastSuspensionLength - hit.distance) * dampAmount; // damping is difference from last frame
+                w.normalForce = (compression + damping) * suspensionForce;
+                w.normalForce = Mathf.Clamp(w.normalForce, 0f, suspensionForceClamp); // clamp it
 
-                if (Mathf.Abs(wheelSpringVelocity[i]) > 0.001f || Mathf.Abs(newPosition.y) > 0.001f)
+                Vector3 springDir = hit.normal * w.normalForce; // direction is the surface normal
+                w.suspensionForceDirection = springDir;
+
+                rb.AddForceAtPosition(springDir + totalWorldForce, hit.point); // Apply total forces at contact
+
+                w.lastSuspensionLength = hit.distance; // store for damping next frame
+                wheelTransform.position = hit.point + transform.up * w.size; // Move wheel visuals to the contact point + offset
+
+                /*
+                // ---- Skid marks ----
+                if (w.slidding)
                 {
-                    float wheelHeight = m_wheels[i].transform.localPosition.y;
-                    float springForce = -wheelHeight * SpringStrength; // Replace with variable later
-                    float newWheelVelocity = (wheelSpringVelocity[i] * DamperStrength) + springForce * Time.fixedDeltaTime;
-                    wheelSpringVelocity[i] = newWheelVelocity;
-
-                    newPosition += new Vector3(0, newWheelVelocity * Time.fixedDeltaTime, 0);
-
-                    if (Mathf.Abs(newPosition.y) > MaxSpringExtension)
+                    // If no skid trail exists or if it was detached previously, instantiate a new one.
+                    if (w.skidTrail == null && skidMarkPrefab != null)
                     {
-                        newPosition.y = Mathf.Clamp(newPosition.y, -MaxSpringExtension, MaxSpringExtension);
-                        wheelSpringVelocity[i] = 0;
+                        GameObject skidTrailObj = Instantiate(skidMarkPrefab, transform);
+                        skidTrailObj.transform.SetParent(w.wheelObject.transform);
+                        skidTrailObj.transform.localPosition = Vector3.zero;
+                        w.skidTrail = skidTrailObj.GetComponent<TrailRenderer>();
+                        if (w.skidTrail != null)
+                        {
+                            w.skidTrail.emitting = true;
+                        }
+                    }
+                    else if (w.skidTrail != null)
+                    {
+                        // Continue emitting and update its position to the contact point.
+                        w.skidTrail.emitting = true;
+                        w.skidTrail.transform.position = hit.point;
+                        // Align the skid trail so its up vector is the road normal.
+                        // This projects the wheel's forward direction onto the road plane to preserve skid direction.
+                        Vector3 projectedForward = Vector3.ProjectOnPlane(wheelTransform.transform.forward, hit.normal).normalized;
+                        w.skidTrail.transform.rotation = Quaternion.LookRotation(projectedForward, hit.normal);
                     }
                 }
-
-                if (i < 2)
+                else if (w.skidTrail != null && w.skidTrail.emitting)
                 {
-                    m_wheels[i].transform.SetLocalPositionAndRotation(newPosition, Quaternion.Euler(0, lastMoveInput.x * MaxTurnAngle, 0));
+                    // Stop emitting and detach the skid trail so it remains in the scene to fade out.
+                    w.skidTrail.emitting = false;
+                    w.skidTrail.transform.parent = null;
+                    // Optionally, destroy the skid trail after its lifetime has elapsed.
+                    Destroy(w.skidTrail.gameObject, w.skidTrail.time);
+                    w.skidTrail = null;
                 }
-                else
-                {
-                    m_wheels[i].transform.localPosition = newPosition;
-                }
+                */
             }
-
-            // Movement Input
+            else
             {
-                // Rotate input by car and wheel orientation
-                Vector3 moveInput = new Vector3(0, 0, lastMoveInput.y) * MoveSpeedIncrease;
-                //Vector3 moveInput = velocityChange;
-
-                //Vector3 pointVelocity = rb.GetPointVelocity(m_wheels[i].transform.position);
-                if (moveInput.sqrMagnitude > 0)
+                wheelTransform.position = w.wheelWorldPosition - transform.up * w.size; // If not hitting anything, just position the wheel under the local anchor
+                /*
+                // If wheel is off ground, detach skid trail if needed.
+                if (w.skidTrail != null && w.skidTrail.emitting)
                 {
-                    if (i < 2)
-                    {
-                        moveInput = gameObject.transform.rotation * Quaternion.Euler(0, lastMoveInput.x * MaxTurnAngle, 0) * moveInput;
-
-                    }
-                    else
-                    {
-                        moveInput *= 0.25f;
-                        moveInput = gameObject.transform.rotation * moveInput;
-                    }
-                    moveInput.y = 0;
+                    w.skidTrail.emitting = false;
+                    w.skidTrail.transform.parent = null;
+                    Destroy(w.skidTrail.gameObject, w.skidTrail.time);
+                    w.skidTrail = null;
                 }
+                */
+            } // End physics raycast section
 
+            w.wheelObject.transform.Rotate(Vector3.right, w.angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime, Space.Self);
 
-                //Vector3 wheelVelocity = Vector3.MoveTowards(pointVelocity, pointVelocity + moveInput, MoveSpeedIncrease * Time.fixedDeltaTime);
-
-                //Vector3 velocityDiff = wheelVelocity - pointVelocity;
-                Vector3 XZOffset = m_wheels[i].transform.localPosition;
-                XZOffset.y = 0;
-                rb.AddForceAtPosition(moveInput, m_wheels[i].transform.position, ForceMode.Acceleration);
-                Debug.DrawLine(m_wheels[i].transform.position, m_wheels[i].transform.position + moveInput, Color.red, 2);
-            }
-        }
+        } 
         
 /*
         Vector3 moveInput = gameObject.transform.rotation * new Vector3(lastMoveInput.x, 0, lastMoveInput.y) * 5;
@@ -203,13 +325,6 @@ public class PlayerCarMovement : MonoBehaviour
         Vector3 velocityDiff = carVelocity - rb.velocity;
         rb.AddForce(velocityDiff, ForceMode.VelocityChange);
 */
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        int idx = StringToWheelIndex(collision.contacts[0].thisCollider.name);
-
-        wheelSpringVelocity[idx] += collision.impulse.y;
     }
 
 }

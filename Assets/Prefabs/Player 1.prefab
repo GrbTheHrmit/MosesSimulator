@@ -313,6 +313,99 @@ MonoBehaviour:
   SpringStrength: 10
   DamperStrength: 0.94
   MaxTurnAngle: 60
+  MaxSpringExtension: 1
+  m_wheels:
+  - skidTrail: {fileID: 0}
+    localPosition: {x: 0, y: 0, z: 0}
+    turnAngle: 0
+    lastSuspensionLength: 0
+    mass: 0
+    size: 0
+    engineTorque: 0
+    brakeStrength: 0
+    slidding: 0
+    worldSlipDirection: {x: 0, y: 0, z: 0}
+    suspensionForceDirection: {x: 0, y: 0, z: 0}
+    wheelWorldPosition: {x: 0, y: 0, z: 0}
+    wheelCircumference: 0
+    torque: 0
+    wheelObject: {fileID: 2752632386352314739}
+    localVelocity: {x: 0, y: 0, z: 0}
+    normalForce: 0
+    angularVelocity: 0
+    slip: 0
+    input: {x: 0, y: 0}
+    braking: 0
+  - skidTrail: {fileID: 0}
+    localPosition: {x: 0, y: 0, z: 0}
+    turnAngle: 0
+    lastSuspensionLength: 0
+    mass: 0
+    size: 0
+    engineTorque: 0
+    brakeStrength: 0
+    slidding: 0
+    worldSlipDirection: {x: 0, y: 0, z: 0}
+    suspensionForceDirection: {x: 0, y: 0, z: 0}
+    wheelWorldPosition: {x: 0, y: 0, z: 0}
+    wheelCircumference: 0
+    torque: 0
+    wheelObject: {fileID: 239427153138176127}
+    localVelocity: {x: 0, y: 0, z: 0}
+    normalForce: 0
+    angularVelocity: 0
+    slip: 0
+    input: {x: 0, y: 0}
+    braking: 0
+  - skidTrail: {fileID: 0}
+    localPosition: {x: 0, y: 0, z: 0}
+    turnAngle: 0
+    lastSuspensionLength: 0
+    mass: 0
+    size: 0
+    engineTorque: 0
+    brakeStrength: 0
+    slidding: 0
+    worldSlipDirection: {x: 0, y: 0, z: 0}
+    suspensionForceDirection: {x: 0, y: 0, z: 0}
+    wheelWorldPosition: {x: 0, y: 0, z: 0}
+    wheelCircumference: 0
+    torque: 0
+    wheelObject: {fileID: 6104150104375496035}
+    localVelocity: {x: 0, y: 0, z: 0}
+    normalForce: 0
+    angularVelocity: 0
+    slip: 0
+    input: {x: 0, y: 0}
+    braking: 0
+  - skidTrail: {fileID: 0}
+    localPosition: {x: 0, y: 0, z: 0}
+    turnAngle: 0
+    lastSuspensionLength: 0
+    mass: 0
+    size: 0
+    engineTorque: 0
+    brakeStrength: 0
+    slidding: 0
+    worldSlipDirection: {x: 0, y: 0, z: 0}
+    suspensionForceDirection: {x: 0, y: 0, z: 0}
+    wheelWorldPosition: {x: 0, y: 0, z: 0}
+    wheelCircumference: 0
+    torque: 0
+    wheelObject: {fileID: 7696409689112543347}
+    localVelocity: {x: 0, y: 0, z: 0}
+    normalForce: 0
+    angularVelocity: 0
+    slip: 0
+    input: {x: 0, y: 0}
+    braking: 0
+  skidMarkPrefab: {fileID: 0}
+  smoothTurn: 0.03
+  wheelGripX: 8
+  wheelGripZ: 42
+  suspensionForce: 90
+  dampAmount: 2.5
+  suspensionForceClamp: 200
 --- !u!54 &4652825583138632287
 Rigidbody:
   m_ObjectHideFlags: 0
