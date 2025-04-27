@@ -310,8 +310,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxSpeed: 50
   MoveSpeedIncrease: 20
-  SpringStrength: 30
-  DamperStrength: 0.96
+  SpringStrength: 10
+  DamperStrength: 0.94
   MaxTurnAngle: 60
 --- !u!54 &4652825583138632287
 Rigidbody:
