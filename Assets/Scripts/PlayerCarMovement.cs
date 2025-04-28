@@ -28,7 +28,7 @@ public class WheelProperties
     [HideInInspector] public GameObject wheelObject;
     [HideInInspector] public Vector3 localVelocity;
     [HideInInspector] public float normalForce;
-    [HideInInspector] public float angularVelocity; // rad/sec
+    [HideInInspector] public float angularVelocity = 0; // rad/sec
     [HideInInspector] public float slip;
     [HideInInspector] public Vector2 input = Vector2.zero;// horizontal=steering, vertical=gas/brake
     [HideInInspector] public float braking = 0;
@@ -142,7 +142,7 @@ public class PlayerCarMovement : MonoBehaviour
             wheel.size = wheel.wheelObject.transform.localScale.magnitude * 0.5f;
             //wheel.wheelObject.transform.localScale = 2f * new Vector3(wheel.size, wheel.size, wheel.size);
             wheel.wheelCircumference = 2f * Mathf.PI * wheel.size; // Calculate wheel circumference for rotation logic
-
+            wheel.angularVelocity = 0;
             wheel.localPosition = wheel.wheelObject.transform.localPosition; // Setup visual match then translate to this
 
             /*
@@ -195,7 +195,7 @@ public class PlayerCarMovement : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(rb.velocity.magnitude);
+        //Debug.Log(rb.velocity.magnitude);
 
     }
 
@@ -204,6 +204,7 @@ public class PlayerCarMovement : MonoBehaviour
         // Credit to https://github.com/SimonVutov/SimpleCar2.git for basic setup
         rb.AddForce(-transform.up * rb.velocity.magnitude * 0.2f, ForceMode.Force);  // downforce
 
+        Vector3 lateralImpulse = Vector3.zero;
         foreach(WheelProperties w in m_wheels)
         {
             Transform wheelTransform = w.wheelObject.transform;
@@ -218,33 +219,40 @@ public class PlayerCarMovement : MonoBehaviour
 
             w.torque = w.engineTorque * lastMoveInput.y;
 
-            float inertia = w.mass * w.size * w.size / 2f;
+            float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 0.1f);
 
-            float lateralFriction = -wheelGripX * w.localVelocity.x;
-            float longitudinalFriction = -wheelGripZ * (w.localVelocity.z - w.angularVelocity * w.size);
+            Vector3 targetLocalVelocity = Vector3.zero;
+            targetLocalVelocity.y = w.localVelocity.y;
+            targetLocalVelocity.z = w.angularVelocity * w.wheelCircumference;
 
-            w.angularVelocity += (w.torque - longitudinalFriction * w.size) / inertia * Time.fixedDeltaTime;
-            w.angularVelocity *= 1 - w.braking * w.brakeStrength * Time.fixedDeltaTime;
-            
+
+            Vector3 idealLocalImpulse = rb.mass * (targetLocalVelocity - w.localVelocity);
+            float aveForceMagnitude = idealLocalImpulse.magnitude / Time.fixedDeltaTime;
 
             // Theoretical force we can apply if this wheel is on the ground
-            Vector3 totalLocalForce = new Vector3(
+            /*Vector3 totalLocalForce = new Vector3(
                 lateralFriction,
                 0f,
                 longitudinalFriction
-            ) * w.normalForce * coefStaticFriction * Time.fixedDeltaTime;
-            float currentMaxFrictionForce = w.normalForce * coefStaticFriction;
-            Debug.Log(currentMaxFrictionForce);
+            ) * w.normalForce * coefStaticFriction * Time.fixedDeltaTime;*/
+            float currentMaxFrictionForce = w.normalForce * (w.slidding ? coefKineticFriction : coefStaticFriction);
+            //Debug.Log(currentMaxFrictionForce);
 
             // Calculate effect of friction
-            w.slidding = totalLocalForce.magnitude > currentMaxFrictionForce;
-            w.slip = totalLocalForce.magnitude / currentMaxFrictionForce;
-            totalLocalForce = Vector3.ClampMagnitude(totalLocalForce, currentMaxFrictionForce);
-            totalLocalForce *= w.slidding ? (coefKineticFriction / coefStaticFriction) : 1;
+            w.slidding = aveForceMagnitude > currentMaxFrictionForce;
+            w.slip = aveForceMagnitude / currentMaxFrictionForce;
 
-            Vector3 totalWorldForce = wheelTransform.TransformDirection(totalLocalForce);
-            w.worldSlipDirection = totalWorldForce;
+            Vector3 appliedLocalImpulse = Vector3.ClampMagnitude(idealLocalImpulse, currentMaxFrictionForce);
+            
 
+            Vector3 appliedWorldImpulse = wheelTransform.TransformDirection(appliedLocalImpulse);
+            w.worldSlipDirection = appliedWorldImpulse;
+
+            //float lateralFriction = -wheelGripX * w.localVelocity.x;
+            //float longitudinalFriction = -wheelGripZ * (w.localVelocity.z - w.angularVelocity * w.size);
+
+            w.angularVelocity += ((w.torque + appliedLocalImpulse.z * w.size) / inertia) * Time.fixedDeltaTime;
+            w.angularVelocity *= 1 - w.braking * w.brakeStrength * Time.fixedDeltaTime;
 
             RaycastHit hit;
             if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f, ~LayerMask.GetMask("Player")))
@@ -258,7 +266,9 @@ public class PlayerCarMovement : MonoBehaviour
                 Vector3 springDir = hit.normal * w.normalForce; // direction is the surface normal
                 w.suspensionForceDirection = springDir;
 
-                rb.AddForceAtPosition(springDir + totalWorldForce, hit.point); // Apply total forces at contact
+                //rb.AddForceAtPosition(springDir + totalWorldForce, hit.point); // Apply total forces at contact
+                rb.AddForceAtPosition(springDir, hit.point);
+                lateralImpulse += w.wheelObject.transform.TransformDirection(appliedLocalImpulse);
 
                 w.lastSuspensionLength = hit.distance; // store for damping next frame
                 wheelTransform.position = hit.point + transform.up * w.size; // Move wheel visuals to the contact point + offset
@@ -316,7 +326,9 @@ public class PlayerCarMovement : MonoBehaviour
                 */
             } // End physics raycast section
 
+            rb.AddForce(lateralImpulse * 0.25f, ForceMode.Impulse);
             w.wheelObject.transform.Rotate(Vector3.right, w.angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime, Space.Self);
+            //Debug.Log(lateralImpulse);
 
         } 
         

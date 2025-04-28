@@ -317,11 +317,11 @@ MonoBehaviour:
   m_wheels:
   - skidTrail: {fileID: 0}
     localPosition: {x: 0, y: 0, z: 0}
-    turnAngle: 0
+    turnAngle: 30
     lastSuspensionLength: 0
     mass: 0
     size: 0
-    engineTorque: 0
+    engineTorque: 100
     brakeStrength: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
@@ -338,11 +338,11 @@ MonoBehaviour:
     braking: 0
   - skidTrail: {fileID: 0}
     localPosition: {x: 0, y: 0, z: 0}
-    turnAngle: 0
+    turnAngle: 30
     lastSuspensionLength: 0
     mass: 0
     size: 0
-    engineTorque: 0
+    engineTorque: 100
     brakeStrength: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
@@ -363,7 +363,7 @@ MonoBehaviour:
     lastSuspensionLength: 0
     mass: 0
     size: 0
-    engineTorque: 0
+    engineTorque: 100
     brakeStrength: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
@@ -384,7 +384,7 @@ MonoBehaviour:
     lastSuspensionLength: 0
     mass: 0
     size: 0
-    engineTorque: 0
+    engineTorque: 100
     brakeStrength: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
@@ -401,6 +401,8 @@ MonoBehaviour:
     braking: 0
   skidMarkPrefab: {fileID: 0}
   smoothTurn: 0.03
+  coefStaticFriction: 2.95
+  coefKineticFriction: 0.85
   wheelGripX: 8
   wheelGripZ: 42
   suspensionForce: 90
