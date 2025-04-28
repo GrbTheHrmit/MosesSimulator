@@ -15,8 +15,8 @@ public class WheelProperties
     public float turnAngle = 30f;
 
     public float lastSuspensionLength = 0.0f;
-    public float mass = 16f;
-    public float size = 0.5f;
+    [HideInInspector] public float mass = 16f;
+    [HideInInspector] public float size = 0.5f;
     public float engineTorque = 40f; // Engine power in Nm to wheel
     public float brakeStrength = 0.5f; // Brake torque
     public bool slidding = false;
@@ -25,7 +25,7 @@ public class WheelProperties
     [HideInInspector] public Vector3 wheelWorldPosition;
     [HideInInspector] public float wheelCircumference;
     [HideInInspector] public float torque = 0.0f;
-    public GameObject wheelObject;
+    [HideInInspector] public GameObject wheelObject;
     [HideInInspector] public Vector3 localVelocity;
     [HideInInspector] public float normalForce;
     [HideInInspector] public float angularVelocity; // rad/sec
@@ -62,14 +62,14 @@ public class PlayerCarMovement : MonoBehaviour
     private bool runToggle = false;
 
     private Rigidbody rb;
-    private GameObject[] m_wheelObjs;
+    private Collider[] m_wheelObjs;
     public WheelProperties[] m_wheels;
 
     public GameObject skidMarkPrefab; // Assign a prefab with a TrailRenderer in the inspector
 
     public float smoothTurn = 0.03f;
-    float coefStaticFriction = 2.95f;
-    float coefKineticFriction = 0.85f;
+    public float coefStaticFriction = 2.95f;
+    public float coefKineticFriction = 0.85f;
     public float wheelGripX = 8f;
     public float wheelGripZ = 42f;
     public float suspensionForce = 90f;// spring constant
@@ -105,27 +105,27 @@ public class PlayerCarMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         Collider[] children = GetComponentsInChildren<Collider>();
-        m_wheelObjs = new GameObject[children.Length];
-        m_wheels = new WheelProperties[children.Length];
+        m_wheelObjs = new Collider[children.Length];
+        //m_wheels = new WheelProperties[children.Length];
 
         for (int i = 0; i < children.Length; i++)
         {
             string name = children[i].name;
             if (name == "WheelFR")
             {
-                m_wheelObjs[WHEEL_FR] = children[i].gameObject;
+                m_wheelObjs[WHEEL_FR] = children[i];
             }
             else if (name == "WheelFL")
             {
-                m_wheelObjs[WHEEL_FL] = children[i].gameObject;
+                m_wheelObjs[WHEEL_FL] = children[i];
             }
             else if (name == "WheelBR")
             {
-                m_wheelObjs[WHEEL_BR] = children[i].gameObject;
+                m_wheelObjs[WHEEL_BR] = children[i];
             }
             else if (name == "WheelBL")
             {
-                m_wheelObjs[WHEEL_BL] = children[i].gameObject;
+                m_wheelObjs[WHEEL_BL] = children[i];
             }
             else
             {
@@ -137,9 +137,10 @@ public class PlayerCarMovement : MonoBehaviour
         foreach (WheelProperties wheel in m_wheels)
         {
             //wheel.wheelObject = m_wheelObjs[wheelIdx]; // Assign the object we found earlier
+            wheel.wheelObject = m_wheelObjs[wheelIdx].gameObject;
             wheelIdx++;
-            wheel.wheelObject.transform.eulerAngles = transform.eulerAngles;
-            wheel.wheelObject.transform.localScale = 2f * new Vector3(wheel.size, wheel.size, wheel.size);
+            wheel.size = wheel.wheelObject.transform.localScale.magnitude * 0.5f;
+            //wheel.wheelObject.transform.localScale = 2f * new Vector3(wheel.size, wheel.size, wheel.size);
             wheel.wheelCircumference = 2f * Mathf.PI * wheel.size; // Calculate wheel circumference for rotation logic
 
             wheel.localPosition = wheel.wheelObject.transform.localPosition; // Setup visual match then translate to this
@@ -161,7 +162,7 @@ public class PlayerCarMovement : MonoBehaviour
             }
             */
         }
-        rb.centerOfMass = rb.centerOfMass + new Vector3(0, -0.5f, 0); // Adjust center of mass for better handling
+        rb.centerOfMass = rb.centerOfMass + new Vector3(0, -1.5f, 0); // Adjust center of mass for better handling
 
         
 
@@ -207,14 +208,15 @@ public class PlayerCarMovement : MonoBehaviour
         {
             Transform wheelTransform = w.wheelObject.transform;
 
-            wheelTransform.localRotation = Quaternion.Euler(0, w.turnAngle * w.input.x, 0);
+            wheelTransform.localRotation = Quaternion.Euler(0, w.turnAngle * lastMoveInput.x, 0);
 
             // Get velocity in wheel space
             w.wheelWorldPosition = transform.TransformPoint(w.localPosition);
             Vector3 velocityAtWheel = rb.GetPointVelocity(w.wheelWorldPosition);
+
             w.localVelocity = wheelTransform.InverseTransformDirection(velocityAtWheel);
 
-            w.torque = w.engineTorque * w.input.y;
+            w.torque = w.engineTorque * lastMoveInput.y;
 
             float inertia = w.mass * w.size * w.size / 2f;
 
@@ -232,6 +234,7 @@ public class PlayerCarMovement : MonoBehaviour
                 longitudinalFriction
             ) * w.normalForce * coefStaticFriction * Time.fixedDeltaTime;
             float currentMaxFrictionForce = w.normalForce * coefStaticFriction;
+            Debug.Log(currentMaxFrictionForce);
 
             // Calculate effect of friction
             w.slidding = totalLocalForce.magnitude > currentMaxFrictionForce;
@@ -244,7 +247,7 @@ public class PlayerCarMovement : MonoBehaviour
 
 
             RaycastHit hit;
-            if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f))
+            if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f, ~LayerMask.GetMask("Player")))
             {
                 float rayLen = w.size * 2f; 
                 float compression = rayLen - hit.distance; // how much the spring is compressed
