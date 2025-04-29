@@ -708,7 +708,7 @@ Transform:
   m_GameObject: {fileID: 1800582410}
   serializedVersion: 2
   m_LocalRotation: {x: 0.09027054, y: 0.70132107, z: 0.09027054, w: 0.70132107}
-  m_LocalPosition: {x: 0.57, y: 5.7, z: 96.5}
+  m_LocalPosition: {x: 0.57, y: 5.7, z: 143.2}
   m_LocalScale: {x: 5, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -886,11 +886,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: DamperStrength
-      value: 12
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: SpringStrength
-      value: 250
+      value: 280
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: suspensionForce
