@@ -310,19 +310,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxSpeed: 50
   MoveSpeedIncrease: 20
-  SpringStrength: 10
-  DamperStrength: 0.94
+  SpringStrength: 300
+  SpringClamp: 2000
+  DamperStrength: 16
   MaxTurnAngle: 60
   MaxSpringExtension: 1
   m_wheels:
   - skidTrail: {fileID: 0}
     localPosition: {x: 0, y: 0, z: 0}
-    turnAngle: 30
+    turnAngle: 45
     lastSuspensionLength: 0
     mass: 0
-    size: 0
-    engineTorque: 100
-    brakeStrength: 0
+    size: 2
+    engineTorque: 50
+    brakeStrength: 100
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
     suspensionForceDirection: {x: 0, y: 0, z: 0}
@@ -338,12 +339,12 @@ MonoBehaviour:
     braking: 0
   - skidTrail: {fileID: 0}
     localPosition: {x: 0, y: 0, z: 0}
-    turnAngle: 30
+    turnAngle: 45
     lastSuspensionLength: 0
     mass: 0
-    size: 0
-    engineTorque: 100
-    brakeStrength: 0
+    size: 2
+    engineTorque: 50
+    brakeStrength: 100
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
     suspensionForceDirection: {x: 0, y: 0, z: 0}
@@ -363,7 +364,7 @@ MonoBehaviour:
     lastSuspensionLength: 0
     mass: 0
     size: 0
-    engineTorque: 100
+    engineTorque: 120
     brakeStrength: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
@@ -384,7 +385,7 @@ MonoBehaviour:
     lastSuspensionLength: 0
     mass: 0
     size: 0
-    engineTorque: 100
+    engineTorque: 120
     brakeStrength: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
@@ -401,13 +402,10 @@ MonoBehaviour:
     braking: 0
   skidMarkPrefab: {fileID: 0}
   smoothTurn: 0.03
-  coefStaticFriction: 2.95
-  coefKineticFriction: 0.85
+  coefStaticFriction: 12
+  coefKineticFriction: 4
   wheelGripX: 8
   wheelGripZ: 42
-  suspensionForce: 90
-  dampAmount: 2.5
-  suspensionForceClamp: 200
 --- !u!54 &4652825583138632287
 Rigidbody:
   m_ObjectHideFlags: 0
