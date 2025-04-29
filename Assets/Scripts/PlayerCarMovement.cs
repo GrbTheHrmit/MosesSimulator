@@ -44,6 +44,8 @@ public class PlayerCarMovement : MonoBehaviour
     [SerializeField]
     private float SpringStrength = 10f;
     [SerializeField]
+    private float SpringClamp = 200f;
+    [SerializeField]
     private float DamperStrength = 0.95f;
 
     [SerializeField]
@@ -72,9 +74,6 @@ public class PlayerCarMovement : MonoBehaviour
     public float coefKineticFriction = 0.85f;
     public float wheelGripX = 8f;
     public float wheelGripZ = 42f;
-    public float suspensionForce = 90f;// spring constant
-    public float dampAmount = 2.5f;// damping constant
-    public float suspensionForceClamp = 200f;// cap on total suspension force
 
     private int StringToWheelIndex(string str)
     {
@@ -201,7 +200,6 @@ public class PlayerCarMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Credit to https://github.com/SimonVutov/SimpleCar2.git for basic setup
         rb.AddForce(-transform.up * rb.velocity.magnitude * 0.2f, ForceMode.Force);  // downforce
 
         Vector3 lateralImpulse = Vector3.zero;
@@ -217,58 +215,57 @@ public class PlayerCarMovement : MonoBehaviour
 
             w.localVelocity = wheelTransform.InverseTransformDirection(velocityAtWheel);
 
-            w.torque = w.engineTorque * lastMoveInput.y;
+            float lateralVelocity = Vector3.Dot(velocityAtWheel, w.wheelObject.transform.right);
+            float travelVelocity = Vector3.Dot(velocityAtWheel, w.wheelObject.transform.forward);
 
-            float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 0.1f);
+            float idealLateralForce = rb.mass * (-lateralVelocity / Time.fixedDeltaTime);
+            float idealTravelForce = rb.mass * (w.localVelocity.z - w.angularVelocity * w.wheelCircumference) / Time.fixedDeltaTime;
 
-            Vector3 targetLocalVelocity = Vector3.zero;
-            targetLocalVelocity.y = w.localVelocity.y;
-            targetLocalVelocity.z = w.angularVelocity * w.wheelCircumference;
-
-
-            Vector3 idealLocalImpulse = rb.mass * (targetLocalVelocity - w.localVelocity);
-            float aveForceMagnitude = idealLocalImpulse.magnitude / Time.fixedDeltaTime;
-
-            // Theoretical force we can apply if this wheel is on the ground
-            /*Vector3 totalLocalForce = new Vector3(
-                lateralFriction,
+            // Theoretical force we can apply if this wheel is on the ground with no slipping
+            Vector3 idealLocalForce = new Vector3(
+                idealLateralForce,
                 0f,
-                longitudinalFriction
-            ) * w.normalForce * coefStaticFriction * Time.fixedDeltaTime;*/
+                idealTravelForce
+            ) * Time.fixedDeltaTime;
+
             float currentMaxFrictionForce = w.normalForce * (w.slidding ? coefKineticFriction : coefStaticFriction);
-            //Debug.Log(currentMaxFrictionForce);
+            float idealForceMagnitude = idealLocalForce.magnitude;
+            Debug.Log("MAX: " + currentMaxFrictionForce + " Ideal: " + idealForceMagnitude);
 
             // Calculate effect of friction
-            w.slidding = aveForceMagnitude > currentMaxFrictionForce;
-            w.slip = aveForceMagnitude / currentMaxFrictionForce;
+            w.slidding = idealForceMagnitude > currentMaxFrictionForce;
+            w.slip = idealForceMagnitude / currentMaxFrictionForce;
 
-            Vector3 appliedLocalImpulse = Vector3.ClampMagnitude(idealLocalImpulse, currentMaxFrictionForce);
+            Vector3 appliedLocalForce = Vector3.ClampMagnitude(idealLocalForce, currentMaxFrictionForce);
             
 
-            Vector3 appliedWorldImpulse = wheelTransform.TransformDirection(appliedLocalImpulse);
-            w.worldSlipDirection = appliedWorldImpulse;
+            Vector3 appliedWorldForce = wheelTransform.TransformDirection(appliedLocalForce);
+            w.worldSlipDirection = appliedWorldForce;
 
-            //float lateralFriction = -wheelGripX * w.localVelocity.x;
-            //float longitudinalFriction = -wheelGripZ * (w.localVelocity.z - w.angularVelocity * w.size);
-
-            w.angularVelocity += ((w.torque + appliedLocalImpulse.z * w.size) / inertia) * Time.fixedDeltaTime;
+            // Torque calculations for next frame
+            w.torque = w.engineTorque * lastMoveInput.y;
+            float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
+            w.angularVelocity += ((-w.torque + appliedLocalForce.z * w.size) / inertia) * Time.fixedDeltaTime;
             w.angularVelocity *= 1 - w.braking * w.brakeStrength * Time.fixedDeltaTime;
 
             RaycastHit hit;
             if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f, ~LayerMask.GetMask("Player")))
             {
-                float rayLen = w.size * 2f; 
-                float compression = rayLen - hit.distance; // how much the spring is compressed
-                float damping = (w.lastSuspensionLength - hit.distance) * dampAmount; // damping is difference from last frame
-                w.normalForce = (compression + damping) * suspensionForce;
-                w.normalForce = Mathf.Clamp(w.normalForce, 0f, suspensionForceClamp); // clamp it
+                // Spring Force
+                { 
+                    float rayDist = w.size * 2f;
+                    float compression = rayDist - hit.distance; // how much the spring is compressed
+                    float damping = (w.lastSuspensionLength - hit.distance) * DamperStrength; // damping is difference from last frame
+                    w.normalForce = (compression + damping) * SpringStrength;
+                    w.normalForce = Mathf.Clamp(w.normalForce, 0f, SpringClamp); // clamp it
 
-                Vector3 springDir = hit.normal * w.normalForce; // direction is the surface normal
-                w.suspensionForceDirection = springDir;
+                    Vector3 springDir = hit.normal * w.normalForce; // direction is the surface normal
+                    w.suspensionForceDirection = springDir;
 
-                //rb.AddForceAtPosition(springDir + totalWorldForce, hit.point); // Apply total forces at contact
-                rb.AddForceAtPosition(springDir, hit.point);
-                lateralImpulse += w.wheelObject.transform.TransformDirection(appliedLocalImpulse);
+                    rb.AddForceAtPosition(springDir + appliedWorldForce, hit.point); // Apply total forces at contact
+                }
+
+                lateralImpulse += w.wheelObject.transform.TransformDirection(appliedLocalForce);
 
                 w.lastSuspensionLength = hit.distance; // store for damping next frame
                 wheelTransform.position = hit.point + transform.up * w.size; // Move wheel visuals to the contact point + offset
@@ -326,8 +323,7 @@ public class PlayerCarMovement : MonoBehaviour
                 */
             } // End physics raycast section
 
-            rb.AddForce(lateralImpulse * 0.25f, ForceMode.Impulse);
-            w.wheelObject.transform.Rotate(Vector3.right, w.angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime, Space.Self);
+            //w.wheelObject.transform.Rotate(Vector3.right, w.angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime, Space.Self);
             //Debug.Log(lateralImpulse);
 
         } 
