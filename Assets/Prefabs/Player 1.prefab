@@ -317,13 +317,23 @@ MonoBehaviour:
   MaxSpringExtension: 1
   m_wheels:
   - skidTrail: {fileID: 0}
+    skidParticles: {fileID: 0}
     localPosition: {x: 0, y: 0, z: 0}
+    canTurn: 0
     turnAngle: 45
     lastSuspensionLength: 0
     mass: 0
     size: 2
     engineTorque: 50
     brakeStrength: 100
+    gripValue: 0
+    gripFactor:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    maxSidewaysVelocity: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
     suspensionForceDirection: {x: 0, y: 0, z: 0}
@@ -338,13 +348,23 @@ MonoBehaviour:
     input: {x: 0, y: 0}
     braking: 0
   - skidTrail: {fileID: 0}
+    skidParticles: {fileID: 0}
     localPosition: {x: 0, y: 0, z: 0}
+    canTurn: 0
     turnAngle: 45
     lastSuspensionLength: 0
     mass: 0
     size: 2
     engineTorque: 50
     brakeStrength: 100
+    gripValue: 0
+    gripFactor:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    maxSidewaysVelocity: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
     suspensionForceDirection: {x: 0, y: 0, z: 0}
@@ -359,13 +379,23 @@ MonoBehaviour:
     input: {x: 0, y: 0}
     braking: 0
   - skidTrail: {fileID: 0}
+    skidParticles: {fileID: 0}
     localPosition: {x: 0, y: 0, z: 0}
+    canTurn: 0
     turnAngle: 0
     lastSuspensionLength: 0
     mass: 0
     size: 0
     engineTorque: 120
     brakeStrength: 0
+    gripValue: 0
+    gripFactor:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    maxSidewaysVelocity: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
     suspensionForceDirection: {x: 0, y: 0, z: 0}
@@ -380,13 +410,23 @@ MonoBehaviour:
     input: {x: 0, y: 0}
     braking: 0
   - skidTrail: {fileID: 0}
+    skidParticles: {fileID: 0}
     localPosition: {x: 0, y: 0, z: 0}
+    canTurn: 0
     turnAngle: 0
     lastSuspensionLength: 0
     mass: 0
     size: 0
     engineTorque: 120
     brakeStrength: 0
+    gripValue: 0
+    gripFactor:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    maxSidewaysVelocity: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
     suspensionForceDirection: {x: 0, y: 0, z: 0}
@@ -400,7 +440,7 @@ MonoBehaviour:
     slip: 0
     input: {x: 0, y: 0}
     braking: 0
-  skidMarkPrefab: {fileID: 0}
+  skidMarkPrefab: {fileID: 822059341325472217, guid: 161bb058daca7e44ea4df293dfcb91ca, type: 3}
   smoothTurn: 0.03
   coefStaticFriction: 12
   coefKineticFriction: 4

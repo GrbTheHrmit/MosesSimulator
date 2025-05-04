@@ -893,6 +893,10 @@ PrefabInstance:
       value: 280
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: skidMarkPrefab
+      value: 
+      objectReference: {fileID: 822059341325472217, guid: 161bb058daca7e44ea4df293dfcb91ca, type: 3}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: suspensionForce
       value: 100
       objectReference: {fileID: 0}

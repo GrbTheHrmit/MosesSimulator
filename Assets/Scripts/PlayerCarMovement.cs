@@ -10,6 +10,7 @@ using UnityEngine.InputSystem;
 public class WheelProperties
 {
     [HideInInspector] public TrailRenderer skidTrail;
+    [HideInInspector] public ParticleSystem skidParticles;
 
     [HideInInspector] public Vector3 localPosition;
     public bool canTurn = false;
@@ -151,22 +152,26 @@ public class PlayerCarMovement : MonoBehaviour
             wheel.angularVelocity = 0;
             wheel.localPosition = wheel.wheelObject.transform.localPosition; // Setup visual match then translate to this
 
-            /*
+            
             // Instantiate and setup the skid trail (if a prefab is assigned)
             if (skidMarkPrefab != null)
             {
-                GameObject skidTrailObj = Instantiate(skidMarkPrefab, transform);
-                // Parent it to the wheel so its position can be updated relative to it
-                skidTrailObj.transform.SetParent(w.wheelObject.transform);
-                // Optionally, reset local position if needed
+                GameObject skidTrailObj = Instantiate(skidMarkPrefab, wheel.wheelObject.transform);
+                // Reset local position if needed
                 skidTrailObj.transform.localPosition = Vector3.zero;
-                w.skidTrail = skidTrailObj.GetComponent<TrailRenderer>();
-                if (w.skidTrail != null)
+                wheel.skidTrail = skidTrailObj.GetComponent<TrailRenderer>();
+                if (wheel.skidTrail != null)
                 {
-                    w.skidTrail.emitting = false; // start with emission off
+                    wheel.skidTrail.emitting = false; // start with emission off
+                }
+
+                wheel.skidParticles = skidTrailObj.GetComponent<ParticleSystem>();
+                if(wheel.skidParticles)
+                {
+                    wheel.skidParticles.Stop();
                 }
             }
-            */
+            
         }
         rb.centerOfMass = rb.centerOfMass + new Vector3(0, -1.5f, 0); // Adjust center of mass for better handling
 
@@ -239,6 +244,8 @@ public class PlayerCarMovement : MonoBehaviour
             {
                 w.gripValue = Mathf.Clamp(idealLocalForce.magnitude / w.maxSidewaysVelocity, 0, 1);
                 idealLocalForce *= w.gripFactor.Evaluate(w.gripValue);
+
+                w.slidding = w.gripValue > 0.5f;
             }
             
             //idealLocalForce *= ()
@@ -285,58 +292,37 @@ public class PlayerCarMovement : MonoBehaviour
                 w.lastSuspensionLength = hit.distance; // store for damping next frame
                 wheelTransform.position = hit.point + transform.up * w.size; // Move wheel visuals to the contact point + offset
 
-                /*
+                
                 // ---- Skid marks ----
                 if (w.slidding)
                 {
-                    // If no skid trail exists or if it was detached previously, instantiate a new one.
-                    if (w.skidTrail == null && skidMarkPrefab != null)
-                    {
-                        GameObject skidTrailObj = Instantiate(skidMarkPrefab, transform);
-                        skidTrailObj.transform.SetParent(w.wheelObject.transform);
-                        skidTrailObj.transform.localPosition = Vector3.zero;
-                        w.skidTrail = skidTrailObj.GetComponent<TrailRenderer>();
-                        if (w.skidTrail != null)
-                        {
-                            w.skidTrail.emitting = true;
-                        }
-                    }
-                    else if (w.skidTrail != null)
+                    if (w.skidTrail != null && w.skidParticles != null && !w.skidTrail.emitting)
                     {
                         // Continue emitting and update its position to the contact point.
                         w.skidTrail.emitting = true;
-                        w.skidTrail.transform.position = hit.point;
-                        // Align the skid trail so its up vector is the road normal.
-                        // This projects the wheel's forward direction onto the road plane to preserve skid direction.
-                        Vector3 projectedForward = Vector3.ProjectOnPlane(wheelTransform.transform.forward, hit.normal).normalized;
-                        w.skidTrail.transform.rotation = Quaternion.LookRotation(projectedForward, hit.normal);
+                        w.skidParticles.Play();
                     }
                 }
-                else if (w.skidTrail != null && w.skidTrail.emitting)
+                else if (w.skidTrail != null && w.skidParticles != null && w.skidTrail.emitting)
                 {
                     // Stop emitting and detach the skid trail so it remains in the scene to fade out.
                     w.skidTrail.emitting = false;
-                    w.skidTrail.transform.parent = null;
-                    // Optionally, destroy the skid trail after its lifetime has elapsed.
-                    Destroy(w.skidTrail.gameObject, w.skidTrail.time);
-                    w.skidTrail = null;
+                    w.skidParticles.Stop();
                 }
-                */
+                
             }
             else
             {
                 wheelTransform.position = w.wheelWorldPosition - transform.up * w.size; // If not hitting anything, just position the wheel under the local anchor
                 w.normalForce = 0;
-                /*
-                // If wheel is off ground, detach skid trail if needed.
-                if (w.skidTrail != null && w.skidTrail.emitting)
+                
+                // If wheel is off ground stop skid effects
+                if (w.skidTrail != null && w.skidParticles != null && w.skidTrail.emitting)
                 {
                     w.skidTrail.emitting = false;
-                    w.skidTrail.transform.parent = null;
-                    Destroy(w.skidTrail.gameObject, w.skidTrail.time);
-                    w.skidTrail = null;
+                    w.skidParticles.Stop();
                 }
-                */
+                
             } // End physics raycast section
 
             //w.wheelObject.transform.Rotate(Vector3.right, w.angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime, Space.Self);
