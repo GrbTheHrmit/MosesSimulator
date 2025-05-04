@@ -881,12 +881,24 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: wheelGripX
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: wheelGripZ
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: SpringClamp
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: MaxTurnAngle
       value: 45
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: DamperStrength
-      value: 14
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: SpringStrength
@@ -899,6 +911,14 @@ PrefabInstance:
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: suspensionForce
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: coefStaticFriction
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: coefKineticFriction
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[0].canTurn

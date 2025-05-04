@@ -21,7 +21,6 @@ public class WheelProperties
     [HideInInspector] public float size = 0.5f;
     public float engineTorque = 40f; // Engine power in Nm to wheel
     public float brakeStrength = 0.5f; // Brake torque
-    public float gripValue; // for display debug
     [Tooltip("This is the percentage of grip you can apply based on % of the max sideways velocity")]
     public AnimationCurve gripFactor;
     [Tooltip("Maximum sideways velocity for above curve")]
@@ -140,6 +139,7 @@ public class PlayerCarMovement : MonoBehaviour
         }
 
         int wheelIdx = 0;
+        Vector3 aveLocalPos = Vector3.zero;
         foreach (WheelProperties wheel in m_wheels)
         {
             //wheel.wheelObject = m_wheelObjs[wheelIdx]; // Assign the object we found earlier
@@ -151,8 +151,8 @@ public class PlayerCarMovement : MonoBehaviour
             wheel.wheelCircumference = 2f * Mathf.PI * wheel.size; // Calculate wheel circumference for rotation logic
             wheel.angularVelocity = 0;
             wheel.localPosition = wheel.wheelObject.transform.localPosition; // Setup visual match then translate to this
+            aveLocalPos += wheel.localPosition;
 
-            
             // Instantiate and setup the skid trail (if a prefab is assigned)
             if (skidMarkPrefab != null)
             {
@@ -173,7 +173,8 @@ public class PlayerCarMovement : MonoBehaviour
             }
             
         }
-        rb.centerOfMass = rb.centerOfMass + new Vector3(0, -1.5f, 0); // Adjust center of mass for better handling
+        aveLocalPos /= m_wheels.Length;
+        rb.centerOfMass = rb.centerOfMass + new Vector3(0, -1.5f, 0); // + aveLocalPos; // Adjust center of mass for better handling
 
         
 
@@ -230,8 +231,8 @@ public class PlayerCarMovement : MonoBehaviour
             float lateralVelocity = Vector3.Dot(velocityAtWheel, w.wheelObject.transform.right);
             float travelVelocity = Vector3.Dot(velocityAtWheel, w.wheelObject.transform.forward);
 
-            float idealLateralForce = rb.mass * (-lateralVelocity / Time.fixedDeltaTime);
-            float idealTravelForce = rb.mass * (w.localVelocity.z - w.angularVelocity * w.wheelCircumference) / Time.fixedDeltaTime;
+            float idealLateralForce = wheelGripX * rb.mass * (-lateralVelocity / Time.fixedDeltaTime);
+            float idealTravelForce = wheelGripZ * rb.mass * (travelVelocity - w.angularVelocity * w.wheelCircumference) / Time.fixedDeltaTime;
 
             // Theoretical force we can apply if this wheel is on the ground with no slipping
             Vector3 idealLocalForce = new Vector3(
@@ -240,26 +241,17 @@ public class PlayerCarMovement : MonoBehaviour
                 idealTravelForce
             ) * Time.fixedDeltaTime;
 
-            if(idealLocalForce.magnitude > 0f)
-            {
-                w.gripValue = Mathf.Clamp(idealLocalForce.magnitude / w.maxSidewaysVelocity, 0, 1);
-                idealLocalForce *= w.gripFactor.Evaluate(w.gripValue);
-
-                w.slidding = w.gripValue > 0.5f;
-            }
-            
-            //idealLocalForce *= ()
-
-            //float currentMaxFrictionForce = w.normalForce * (w.slidding ? coefKineticFriction : coefStaticFriction);
-            //float idealForceMagnitude = idealLocalForce.magnitude;
+            float currentMaxFrictionForce = w.normalForce * (w.slidding ? coefKineticFriction : coefStaticFriction);
+            float idealForceMagnitude = idealLocalForce.magnitude;
             //Debug.Log("MAX: " + currentMaxFrictionForce + " Ideal: " + idealForceMagnitude);
 
             // Calculate effect of friction
-            //w.slidding = idealForceMagnitude > currentMaxFrictionForce;
-            //w.slip = idealForceMagnitude / currentMaxFrictionForce;
+            w.slidding = idealForceMagnitude > currentMaxFrictionForce;
+            w.slip = w.slidding ? Mathf.Clamp(idealLocalForce.magnitude / currentMaxFrictionForce, 0, 1) : 0;
 
+            //Vector3 appliedLocalForce = Vector3.zero;
             //Vector3 appliedLocalForce = Vector3.ClampMagnitude(idealLocalForce, currentMaxFrictionForce);
-            Vector3 appliedLocalForce = idealLocalForce;
+            Vector3 appliedLocalForce = idealLocalForce * w.gripFactor.Evaluate(w.slip);
 
            Vector3 appliedWorldForce = wheelTransform.TransformDirection(appliedLocalForce);
             w.worldSlipDirection = appliedWorldForce;
@@ -269,6 +261,8 @@ public class PlayerCarMovement : MonoBehaviour
             float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
             w.angularVelocity += ((-w.torque + appliedLocalForce.z / w.wheelCircumference) / inertia) * Time.fixedDeltaTime;
             w.angularVelocity *= 1 - w.braking * w.brakeStrength * Time.fixedDeltaTime;
+
+            w.angularVelocity = Mathf.Clamp(w.angularVelocity, -MaxSpeed / w.wheelCircumference, MaxSpeed / w.wheelCircumference);
 
             RaycastHit hit;
             if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f, ~LayerMask.GetMask("Player")))
