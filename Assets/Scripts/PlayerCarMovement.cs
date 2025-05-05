@@ -232,7 +232,7 @@ public class PlayerCarMovement : MonoBehaviour
             float travelVelocity = Vector3.Dot(velocityAtWheel, w.wheelObject.transform.forward);
 
             float idealLateralForce = wheelGripX * rb.mass * (-lateralVelocity / Time.fixedDeltaTime);
-            float idealTravelForce = wheelGripZ * rb.mass * (travelVelocity - w.angularVelocity * w.wheelCircumference) / Time.fixedDeltaTime;
+            float idealTravelForce = wheelGripZ * rb.mass * (-travelVelocity - w.angularVelocity * w.wheelCircumference) / Time.fixedDeltaTime;
 
             // Theoretical force we can apply if this wheel is on the ground with no slipping
             Vector3 idealLocalForce = new Vector3(
