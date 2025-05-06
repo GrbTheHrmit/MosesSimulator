@@ -114,27 +114,6 @@ public class PlayerCarMovement : MonoBehaviour
         for (int i = 0; i < children.Length; i++)
         {
             m_wheelObjs[i] = children[i];
-           /* string name = children[i].name;
-            if (name == "WheelFR")
-            {
-                m_wheelObjs[WHEEL_FR] = children[i];
-            }
-            else if (name == "WheelFL")
-            {
-                m_wheelObjs[WHEEL_FL] = children[i];
-            }
-            else if (name == "WheelBR")
-            {
-                m_wheelObjs[WHEEL_BR] = children[i];
-            }
-            else if (name == "WheelBL")
-            {
-                m_wheelObjs[WHEEL_BL] = children[i];
-            }
-            else
-            {
-                Debug.LogWarning("Unexpected Collider Found on Player: " + name);
-            }*/
         }
 
         int wheelIdx = 0;
@@ -175,7 +154,6 @@ public class PlayerCarMovement : MonoBehaviour
         aveLocalPos /= m_wheels.Length;
         rb.centerOfMass = rb.centerOfMass + new Vector3(0, -1.5f, 0); // + aveLocalPos; // Adjust center of mass for better handling
 
-        
 
         PlayerInput input = GetComponent<PlayerInput>();
         if (input)
@@ -189,6 +167,8 @@ public class PlayerCarMovement : MonoBehaviour
             input.currentActionMap.FindAction("Walk").performed += OnWalkAction;
             input.currentActionMap.FindAction("Run").performed += OnRunToggle;
         }
+
+        FollowManager.Instance().FollowObject = rb;
 
     }
 
@@ -268,7 +248,7 @@ public class PlayerCarMovement : MonoBehaviour
             w.angularVelocity = Mathf.Clamp(w.angularVelocity, -MaxSpeed / w.wheelCircumference, MaxSpeed / w.wheelCircumference);
 
             RaycastHit hit;
-            if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f, ~LayerMask.GetMask("Player")))
+            if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f, (~LayerMask.GetMask("Player") & ~LayerMask.GetMask("NonCollidable")) ))
             {
                 // Spring Force
                 { 
