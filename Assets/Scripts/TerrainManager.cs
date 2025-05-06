@@ -67,7 +67,7 @@ public class TerrainManager : MonoBehaviour
             GenerateNewHeightMap();
 
             PlaceFinish();
-            SpawnPlayer();
+            //SpawnPlayer();
         }
         
     }

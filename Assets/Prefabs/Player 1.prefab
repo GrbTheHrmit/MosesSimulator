@@ -93,13 +93,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2022083636330055456}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.13052616, y: 0, z: 0, w: 0.9914449}
-  m_LocalPosition: {x: 0, y: 4, z: -11.61}
+  m_LocalRotation: {x: 0.10452846, y: 0, z: 0, w: 0.9945219}
+  m_LocalPosition: {x: 0, y: 8, z: -25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6503413759995862816}
-  m_LocalEulerAnglesHint: {x: 15, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 12, y: 0, z: 0}
 --- !u!20 &7102235059771920925
 Camera:
   m_ObjectHideFlags: 0
@@ -308,32 +308,75 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc302e6a0a150a34293ca226deeefa93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxSpeed: 50
+  MaxSpeed: 120
   MoveSpeedIncrease: 20
-  SpringStrength: 300
-  SpringClamp: 2000
+  SpringStrength: 250
+  SpringClamp: 25000
   DamperStrength: 16
-  MaxTurnAngle: 60
+  MaxTurnAngle: 45
   MaxSpringExtension: 1
   m_wheels:
   - skidTrail: {fileID: 0}
     skidParticles: {fileID: 0}
     localPosition: {x: 0, y: 0, z: 0}
-    canTurn: 0
+    canTurn: 1
     turnAngle: 45
     lastSuspensionLength: 0
     mass: 0
     size: 2
-    engineTorque: 50
+    engineTorque: 40
     brakeStrength: 100
-    gripValue: 0
     gripFactor:
       serializedVersion: 2
-      m_Curve: []
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.00000025518239
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.5280386
+        value: 0.92904836
+        inSlope: -0.5722572
+        outSlope: -0.5722572
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.7778903
+      - serializedVersion: 3
+        time: 0.6961535
+        value: 0.75251466
+        inSlope: -1.4537181
+        outSlope: -1.4537181
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.665832
+      - serializedVersion: 3
+        time: 0.8282217
+        value: 0.57187474
+        inSlope: -0.12416049
+        outSlope: -0.12416049
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 1.0153198
+        value: 0.47653198
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    maxSidewaysVelocity: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
     suspensionForceDirection: {x: 0, y: 0, z: 0}
@@ -350,21 +393,64 @@ MonoBehaviour:
   - skidTrail: {fileID: 0}
     skidParticles: {fileID: 0}
     localPosition: {x: 0, y: 0, z: 0}
-    canTurn: 0
+    canTurn: 1
     turnAngle: 45
     lastSuspensionLength: 0
     mass: 0
     size: 2
-    engineTorque: 50
+    engineTorque: 40
     brakeStrength: 100
-    gripValue: 0
     gripFactor:
       serializedVersion: 2
-      m_Curve: []
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.00000025518239
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.5280386
+        value: 0.92904836
+        inSlope: -0.5722572
+        outSlope: -0.5722572
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.7778903
+      - serializedVersion: 3
+        time: 0.6961535
+        value: 0.75251466
+        inSlope: -1.4537181
+        outSlope: -1.4537181
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.665832
+      - serializedVersion: 3
+        time: 0.8282217
+        value: 0.57187474
+        inSlope: -0.12416049
+        outSlope: -0.12416049
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 1.0153198
+        value: 0.47653198
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    maxSidewaysVelocity: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
     suspensionForceDirection: {x: 0, y: 0, z: 0}
@@ -386,16 +472,59 @@ MonoBehaviour:
     lastSuspensionLength: 0
     mass: 0
     size: 0
-    engineTorque: 120
-    brakeStrength: 0
-    gripValue: 0
+    engineTorque: 50
+    brakeStrength: 100
     gripFactor:
       serializedVersion: 2
-      m_Curve: []
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.00000025518239
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.5280386
+        value: 0.92904836
+        inSlope: -0.5722572
+        outSlope: -0.5722572
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.7778903
+      - serializedVersion: 3
+        time: 0.6961535
+        value: 0.75251466
+        inSlope: -1.4537181
+        outSlope: -1.4537181
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.665832
+      - serializedVersion: 3
+        time: 0.8282217
+        value: 0.57187474
+        inSlope: -0.12416049
+        outSlope: -0.12416049
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 1.0153198
+        value: 0.47653198
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    maxSidewaysVelocity: 0
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
     suspensionForceDirection: {x: 0, y: 0, z: 0}
@@ -417,16 +546,207 @@ MonoBehaviour:
     lastSuspensionLength: 0
     mass: 0
     size: 0
-    engineTorque: 120
-    brakeStrength: 0
-    gripValue: 0
+    engineTorque: 50
+    brakeStrength: 100
     gripFactor:
       serializedVersion: 2
-      m_Curve: []
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.00000025518239
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.5280386
+        value: 0.92904836
+        inSlope: -0.5722572
+        outSlope: -0.5722572
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.7778903
+      - serializedVersion: 3
+        time: 0.6961535
+        value: 0.75251466
+        inSlope: -1.4537181
+        outSlope: -1.4537181
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.665832
+      - serializedVersion: 3
+        time: 0.8282217
+        value: 0.57187474
+        inSlope: -0.12416049
+        outSlope: -0.12416049
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 1.0153198
+        value: 0.47653198
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    maxSidewaysVelocity: 0
+    slidding: 0
+    worldSlipDirection: {x: 0, y: 0, z: 0}
+    suspensionForceDirection: {x: 0, y: 0, z: 0}
+    wheelWorldPosition: {x: 0, y: 0, z: 0}
+    wheelCircumference: 0
+    torque: 0
+    wheelObject: {fileID: 7696409689112543347}
+    localVelocity: {x: 0, y: 0, z: 0}
+    normalForce: 0
+    angularVelocity: 0
+    slip: 0
+    input: {x: 0, y: 0}
+    braking: 0
+  - skidTrail: {fileID: 0}
+    skidParticles: {fileID: 0}
+    localPosition: {x: 0, y: 0, z: 0}
+    canTurn: 0
+    turnAngle: 0
+    lastSuspensionLength: 0
+    mass: 0
+    size: 0
+    engineTorque: 50
+    brakeStrength: 100
+    gripFactor:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.00000025518239
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.5280386
+        value: 0.92904836
+        inSlope: -0.5722572
+        outSlope: -0.5722572
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.7778903
+      - serializedVersion: 3
+        time: 0.6961535
+        value: 0.75251466
+        inSlope: -1.4537181
+        outSlope: -1.4537181
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.665832
+      - serializedVersion: 3
+        time: 0.8282217
+        value: 0.57187474
+        inSlope: -0.12416049
+        outSlope: -0.12416049
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 1.0153198
+        value: 0.47653198
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    slidding: 0
+    worldSlipDirection: {x: 0, y: 0, z: 0}
+    suspensionForceDirection: {x: 0, y: 0, z: 0}
+    wheelWorldPosition: {x: 0, y: 0, z: 0}
+    wheelCircumference: 0
+    torque: 0
+    wheelObject: {fileID: 7696409689112543347}
+    localVelocity: {x: 0, y: 0, z: 0}
+    normalForce: 0
+    angularVelocity: 0
+    slip: 0
+    input: {x: 0, y: 0}
+    braking: 0
+  - skidTrail: {fileID: 0}
+    skidParticles: {fileID: 0}
+    localPosition: {x: 0, y: 0, z: 0}
+    canTurn: 0
+    turnAngle: 0
+    lastSuspensionLength: 0
+    mass: 0
+    size: 0
+    engineTorque: 50
+    brakeStrength: 100
+    gripFactor:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.00000025518239
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.5280386
+        value: 0.92904836
+        inSlope: -0.5722572
+        outSlope: -0.5722572
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.7778903
+      - serializedVersion: 3
+        time: 0.6961535
+        value: 0.75251466
+        inSlope: -1.4537181
+        outSlope: -1.4537181
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.665832
+      - serializedVersion: 3
+        time: 0.8282217
+        value: 0.57187474
+        inSlope: -0.12416049
+        outSlope: -0.12416049
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 1.0153198
+        value: 0.47653198
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
     slidding: 0
     worldSlipDirection: {x: 0, y: 0, z: 0}
     suspensionForceDirection: {x: 0, y: 0, z: 0}
@@ -442,10 +762,10 @@ MonoBehaviour:
     braking: 0
   skidMarkPrefab: {fileID: 822059341325472217, guid: 161bb058daca7e44ea4df293dfcb91ca, type: 3}
   smoothTurn: 0.03
-  coefStaticFriction: 12
-  coefKineticFriction: 4
-  wheelGripX: 8
-  wheelGripZ: 42
+  coefStaticFriction: 8
+  coefKineticFriction: 3
+  wheelGripX: 0.8
+  wheelGripZ: 5
 --- !u!54 &4652825583138632287
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -454,7 +774,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5206145035262871849}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 12
   m_Drag: 0
   m_AngularDrag: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}

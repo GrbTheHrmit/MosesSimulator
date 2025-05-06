@@ -21,10 +21,10 @@ public class WheelProperties
     [HideInInspector] public float size = 0.5f;
     public float engineTorque = 40f; // Engine power in Nm to wheel
     public float brakeStrength = 0.5f; // Brake torque
+    public float coefStaticFriction = 6f;
+    public float coefKineticFriction = 2.5f;
     [Tooltip("This is the percentage of grip you can apply based on % of the max sideways velocity")]
     public AnimationCurve gripFactor;
-    [Tooltip("Maximum sideways velocity for above curve")]
-    public float maxSidewaysVelocity;
     public bool slidding = false;
     [HideInInspector] public Vector3 worldSlipDirection;
     [HideInInspector] public Vector3 suspensionForceDirection;
@@ -76,8 +76,6 @@ public class PlayerCarMovement : MonoBehaviour
     public GameObject skidMarkPrefab; // Assign a prefab with a TrailRenderer in the inspector
 
     public float smoothTurn = 0.03f;
-    public float coefStaticFriction = 2.95f;
-    public float coefKineticFriction = 0.85f;
     public float wheelGripX = 8f;
     public float wheelGripZ = 42f;
 
@@ -115,7 +113,8 @@ public class PlayerCarMovement : MonoBehaviour
 
         for (int i = 0; i < children.Length; i++)
         {
-            string name = children[i].name;
+            m_wheelObjs[i] = children[i];
+           /* string name = children[i].name;
             if (name == "WheelFR")
             {
                 m_wheelObjs[WHEEL_FR] = children[i];
@@ -135,7 +134,7 @@ public class PlayerCarMovement : MonoBehaviour
             else
             {
                 Debug.LogWarning("Unexpected Collider Found on Player: " + name);
-            }
+            }*/
         }
 
         int wheelIdx = 0;
@@ -241,19 +240,23 @@ public class PlayerCarMovement : MonoBehaviour
                 idealTravelForce
             ) * Time.fixedDeltaTime;
 
-            float currentMaxFrictionForce = w.normalForce * (w.slidding ? coefKineticFriction : coefStaticFriction);
+            float currentMaxFrictionForce = w.normalForce * (w.slidding ? w.coefKineticFriction : w.coefStaticFriction);
             float idealForceMagnitude = idealLocalForce.magnitude;
             //Debug.Log("MAX: " + currentMaxFrictionForce + " Ideal: " + idealForceMagnitude);
 
             // Calculate effect of friction
             w.slidding = idealForceMagnitude > currentMaxFrictionForce;
-            w.slip = w.slidding ? Mathf.Clamp(idealLocalForce.magnitude / currentMaxFrictionForce, 0, 1) : 0;
+            w.slip = 0;
 
-            //Vector3 appliedLocalForce = Vector3.zero;
-            //Vector3 appliedLocalForce = Vector3.ClampMagnitude(idealLocalForce, currentMaxFrictionForce);
-            Vector3 appliedLocalForce = idealLocalForce * w.gripFactor.Evaluate(w.slip);
+            Vector3 appliedLocalForce = idealLocalForce;
 
-           Vector3 appliedWorldForce = wheelTransform.TransformDirection(appliedLocalForce);
+            if(w.slidding)
+            {
+                w.slip = Mathf.Clamp(idealLocalForce.magnitude / currentMaxFrictionForce, 0, 1);
+                appliedLocalForce *= w.gripFactor.Evaluate(w.slip);
+            }
+
+            Vector3 appliedWorldForce = wheelTransform.TransformDirection(appliedLocalForce);
             w.worldSlipDirection = appliedWorldForce;
 
             // Torque calculations for next frame
