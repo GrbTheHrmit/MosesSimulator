@@ -61,7 +61,7 @@ public class TerrainManager : MonoBehaviour
             currentOrigin = new Vector3(-((TerrainTileDims - 1) * 0.5f) * TerrainInterval, baseHeight, -((TerrainTileDims - 1) * 0.5f) * TerrainInterval);
             currentOrigin -= new Vector3(centerOffset, 0, centerOffset);
 
-            Debug.Log(currentOrigin);
+            //Debug.Log(currentOrigin);
 
             //SetTerrainNeighbors();
             GenerateNewHeightMap();
@@ -200,7 +200,7 @@ public class TerrainManager : MonoBehaviour
             x = x * 0.1f + 0.5f;
             y = y * 0.1f + 0.5f;
 
-            Debug.Log(x + " , " + y);
+            //Debug.Log(x + " , " + y);
 
             Vector3 position = currentOrigin + new Vector3(x * TerrainTileDims * TerrainInterval, 0, y * TerrainTileDims * TerrainInterval);
             position.y += GetHeightAtLocation(position) - 15;

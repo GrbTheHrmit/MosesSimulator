@@ -70,7 +70,7 @@ public class PlayerCarMovement : MonoBehaviour
     private bool runToggle = false;
 
     private Rigidbody rb;
-    private Collider[] m_wheelObjs;
+    private SphereCollider[] m_wheelObjs;
     public WheelProperties[] m_wheels;
 
     public GameObject skidMarkPrefab; // Assign a prefab with a TrailRenderer in the inspector
@@ -107,8 +107,8 @@ public class PlayerCarMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
 
-        Collider[] children = GetComponentsInChildren<Collider>();
-        m_wheelObjs = new Collider[children.Length];
+        SphereCollider[] children = GetComponentsInChildren<SphereCollider>();
+        m_wheelObjs = new SphereCollider[children.Length];
         //m_wheels = new WheelProperties[children.Length];
 
         for (int i = 0; i < children.Length; i++)
@@ -302,8 +302,7 @@ public class PlayerCarMovement : MonoBehaviour
                 
             } // End physics raycast section
 
-            //w.wheelObject.transform.Rotate(Vector3.right, w.angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime, Space.Self);
-            //Debug.Log(lateralImpulse);
+            w.wheelObject.transform.GetChild(0).Rotate(Vector3.right, -w.angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime, Space.Self);
 
         } 
         
