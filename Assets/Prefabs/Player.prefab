@@ -264,6 +264,7 @@ Transform:
   - {fileID: 1857965853209866703}
   - {fileID: 6192515056809723438}
   - {fileID: 3224758672686811890}
+  - {fileID: 3840951681780871408}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1761495573077216322
@@ -315,6 +316,11 @@ MonoBehaviour:
   DamperStrength: 18
   MaxTurnAngle: 45
   MaxSpringExtension: 1
+  leaveGroundCoyoteTime: 0.1
+  hitGroundCoyoteTime: 0.1
+  airControlCoyoteTime: 0.25
+  airRollForce: 1
+  airPitchForce: 1
   m_wheels:
   - skidTrail: {fileID: 0}
     skidParticles: {fileID: 0}
@@ -326,9 +332,62 @@ MonoBehaviour:
     size: 2
     engineTorque: 30
     brakeStrength: 100
-    coefStaticFriction: 6
-    coefKineticFriction: 3
-    gripFactor:
+    lateralStaticFriction: 6
+    travelStaticFriction: 6
+    lateralKineticFriction: 6
+    travelKineticFriction: 6
+    lateralGripCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.00000025518239
+        value: 1
+        inSlope: -0.028317323
+        outSlope: -0.028317323
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 1
+      - serializedVersion: 3
+        time: 0.16420805
+        value: 0.686426
+        inSlope: -1.0499253
+        outSlope: -1.0499253
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.30155596
+        outWeight: 0.7778903
+      - serializedVersion: 3
+        time: 0.51847255
+        value: 0.5422327
+        inSlope: -0.038297642
+        outSlope: -0.038297642
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.19528966
+        outWeight: 0.665832
+      - serializedVersion: 3
+        time: 0.81552637
+        value: 0.5308286
+        inSlope: -0.12416049
+        outSlope: -0.12416049
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 1.0153198
+        value: 0.47653198
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    travelGripCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -389,7 +448,8 @@ MonoBehaviour:
     localVelocity: {x: 0, y: 0, z: 0}
     normalForce: 0
     angularVelocity: 0
-    slip: 0
+    lateralSlip: 0
+    travelSlip: 0
     input: {x: 0, y: 0}
     braking: 0
   - skidTrail: {fileID: 0}
@@ -402,9 +462,62 @@ MonoBehaviour:
     size: 2
     engineTorque: 30
     brakeStrength: 100
-    coefStaticFriction: 6
-    coefKineticFriction: 3
-    gripFactor:
+    lateralStaticFriction: 6
+    travelStaticFriction: 6
+    lateralKineticFriction: 6
+    travelKineticFriction: 6
+    lateralGripCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.00000025518239
+        value: 1
+        inSlope: -0.028317323
+        outSlope: -0.028317323
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 1
+      - serializedVersion: 3
+        time: 0.16420805
+        value: 0.686426
+        inSlope: -1.0499253
+        outSlope: -1.0499253
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.30155596
+        outWeight: 0.7778903
+      - serializedVersion: 3
+        time: 0.51847255
+        value: 0.5422327
+        inSlope: -0.038297642
+        outSlope: -0.038297642
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.19528966
+        outWeight: 0.665832
+      - serializedVersion: 3
+        time: 0.81552637
+        value: 0.5308286
+        inSlope: -0.12416049
+        outSlope: -0.12416049
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 1.0153198
+        value: 0.47653198
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    travelGripCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -465,7 +578,8 @@ MonoBehaviour:
     localVelocity: {x: 0, y: 0, z: 0}
     normalForce: 0
     angularVelocity: 0
-    slip: 0
+    lateralSlip: 0
+    travelSlip: 0
     input: {x: 0, y: 0}
     braking: 0
   - skidTrail: {fileID: 0}
@@ -478,9 +592,62 @@ MonoBehaviour:
     size: 0
     engineTorque: 30
     brakeStrength: 100
-    coefStaticFriction: 8
-    coefKineticFriction: 1.2
-    gripFactor:
+    lateralStaticFriction: 6
+    travelStaticFriction: 6
+    lateralKineticFriction: 6
+    travelKineticFriction: 6
+    lateralGripCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.00000025518239
+        value: 1
+        inSlope: -0.028317323
+        outSlope: -0.028317323
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 1
+      - serializedVersion: 3
+        time: 0.16420805
+        value: 0.686426
+        inSlope: -1.0499253
+        outSlope: -1.0499253
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.30155596
+        outWeight: 0.7778903
+      - serializedVersion: 3
+        time: 0.51847255
+        value: 0.5422327
+        inSlope: -0.038297642
+        outSlope: -0.038297642
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.19528966
+        outWeight: 0.665832
+      - serializedVersion: 3
+        time: 0.81552637
+        value: 0.5308286
+        inSlope: -0.12416049
+        outSlope: -0.12416049
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 1.0153198
+        value: 0.47653198
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    travelGripCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -541,7 +708,8 @@ MonoBehaviour:
     localVelocity: {x: 0, y: 0, z: 0}
     normalForce: 0
     angularVelocity: 0
-    slip: 0
+    lateralSlip: 0
+    travelSlip: 0
     input: {x: 0, y: 0}
     braking: 0
   - skidTrail: {fileID: 0}
@@ -554,9 +722,62 @@ MonoBehaviour:
     size: 0
     engineTorque: 30
     brakeStrength: 100
-    coefStaticFriction: 8
-    coefKineticFriction: 1.2
-    gripFactor:
+    lateralStaticFriction: 6
+    travelStaticFriction: 6
+    lateralKineticFriction: 6
+    travelKineticFriction: 6
+    lateralGripCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.00000025518239
+        value: 1
+        inSlope: -0.028317323
+        outSlope: -0.028317323
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 1
+      - serializedVersion: 3
+        time: 0.16420805
+        value: 0.686426
+        inSlope: -1.0499253
+        outSlope: -1.0499253
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.30155596
+        outWeight: 0.7778903
+      - serializedVersion: 3
+        time: 0.51847255
+        value: 0.5422327
+        inSlope: -0.038297642
+        outSlope: -0.038297642
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.19528966
+        outWeight: 0.665832
+      - serializedVersion: 3
+        time: 0.81552637
+        value: 0.5308286
+        inSlope: -0.12416049
+        outSlope: -0.12416049
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 1.0153198
+        value: 0.47653198
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    travelGripCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -617,7 +838,8 @@ MonoBehaviour:
     localVelocity: {x: 0, y: 0, z: 0}
     normalForce: 0
     angularVelocity: 0
-    slip: 0
+    lateralSlip: 0
+    travelSlip: 0
     input: {x: 0, y: 0}
     braking: 0
   skidMarkPrefab: {fileID: 822059341325472217, guid: 161bb058daca7e44ea4df293dfcb91ca, type: 3}
@@ -651,6 +873,37 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!1 &5643809634438923351
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3840951681780871408}
+  m_Layer: 3
+  m_Name: CoM
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3840951681780871408
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5643809634438923351}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.25, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6503413759995862816}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6104150104375496035
 GameObject:
   m_ObjectHideFlags: 0
@@ -1083,20 +1336,71 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1594431057854152371, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2995759242064274137, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 2995759242064274137, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3677774081251082376, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7029590021052688553, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
       propertyPath: m_Name
       value: BuggyBody
       objectReference: {fileID: 0}
+    - target: {fileID: 8025637199718784639, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8362472520012006690, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 1160857108532302369, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7029590021052688553, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5731556424001959313}
   m_SourcePrefab: {fileID: 100100000, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
+--- !u!1 &208228918733355292 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7029590021052688553, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
+  m_PrefabInstance: {fileID: 7164622241733890485}
+  m_PrefabAsset: {fileID: 0}
+--- !u!136 &5731556424001959313
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208228918733355292}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.8
+  m_Height: 4
+  m_Direction: 2
+  m_Center: {x: 0.25, y: 1, z: 0.2}
 --- !u!4 &7312990668574462808 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 437183125249442541, guid: 8969f669f8b64fc47a272820312fa76f, type: 3}
