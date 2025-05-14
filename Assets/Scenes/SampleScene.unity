@@ -840,6 +840,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -0.43
       objectReference: {fileID: 0}
+    - target: {fileID: 4652825583138632287, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_Mass
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 4652825583138632287, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_AngularDrag
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5206145035262871849, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_Name
       value: Player
@@ -897,6 +905,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: smoothTurn
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: wheelGripZ
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: airRollForce
       value: 30
       objectReference: {fileID: 0}
@@ -910,11 +926,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[0].engineTorque
-      value: 22
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[1].engineTorque
-      value: 22
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[2].engineTorque
@@ -925,36 +941,324 @@ PrefabInstance:
       value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].brakeStrength
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].brakeStrength
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].brakeStrength
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].brakeStrength
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[0].travelStaticFriction
-      value: 15
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[1].travelStaticFriction
-      value: 12
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[2].travelStaticFriction
-      value: 12
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[3].travelStaticFriction
-      value: 15
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[0].lateralStaticFriction
-      value: 10
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelKineticFriction
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[1].lateralStaticFriction
-      value: 10
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelKineticFriction
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[2].lateralStaticFriction
-      value: 10
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelKineticFriction
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[3].lateralStaticFriction
-      value: 10
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelKineticFriction
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].lateralKineticFriction
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].lateralKineticFriction
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].lateralKineticFriction
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].lateralKineticFriction
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[1].time
+      value: 0.16420805
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[2].time
+      value: 0.51847255
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[3].time
+      value: 0.81552637
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[1].time
+      value: 0.16420805
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[2].time
+      value: 0.51847255
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[3].time
+      value: 0.81552637
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[1].time
+      value: 0.16420805
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[2].time
+      value: 0.51847255
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[3].time
+      value: 0.81552637
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[1].time
+      value: 0.16420805
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[2].time
+      value: 0.51847255
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[3].time
+      value: 0.81552637
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[1].value
+      value: 0.686426
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[2].value
+      value: 0.5422327
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[3].value
+      value: 0.5308286
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[1].value
+      value: 0.686426
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[2].value
+      value: 0.5422327
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[3].value
+      value: 0.5308286
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[1].value
+      value: 0.686426
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[2].value
+      value: 0.5422327
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[3].value
+      value: 0.5308286
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[1].value
+      value: 0.686426
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[2].value
+      value: 0.5422327
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[3].value
+      value: 0.5308286
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[0].inSlope
+      value: -0.028317323
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[1].inSlope
+      value: -1.0499253
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[2].inSlope
+      value: -0.038297642
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[0].inSlope
+      value: -0.028317323
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[1].inSlope
+      value: -1.0499253
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[2].inSlope
+      value: -0.038297642
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[0].inSlope
+      value: -0.028317323
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[1].inSlope
+      value: -1.0499253
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[2].inSlope
+      value: -0.038297642
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[0].inSlope
+      value: -0.028317323
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[1].inSlope
+      value: -1.0499253
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[2].inSlope
+      value: -0.038297642
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[0].outSlope
+      value: -0.028317323
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[1].inWeight
+      value: 0.30155596
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[1].outSlope
+      value: -1.0499253
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[2].inWeight
+      value: 0.19528966
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[2].outSlope
+      value: -0.038297642
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[0].outSlope
+      value: -0.028317323
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[1].inWeight
+      value: 0.30155596
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[1].outSlope
+      value: -1.0499253
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[2].inWeight
+      value: 0.19528966
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[2].outSlope
+      value: -0.038297642
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[0].outSlope
+      value: -0.028317323
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[1].inWeight
+      value: 0.30155596
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[1].outSlope
+      value: -1.0499253
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[2].inWeight
+      value: 0.19528966
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[2].outSlope
+      value: -0.038297642
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[0].outSlope
+      value: -0.028317323
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[1].inWeight
+      value: 0.30155596
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[1].outSlope
+      value: -1.0499253
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[2].inWeight
+      value: 0.19528966
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[2].outSlope
+      value: -0.038297642
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].travelGripCurve.m_Curve.Array.data[0].outWeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].travelGripCurve.m_Curve.Array.data[0].outWeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].travelGripCurve.m_Curve.Array.data[0].outWeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelGripCurve.m_Curve.Array.data[0].outWeight
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8452508151417564934, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_Layer

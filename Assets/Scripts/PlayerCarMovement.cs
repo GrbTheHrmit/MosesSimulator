@@ -88,6 +88,8 @@ public class PlayerCarMovement : MonoBehaviour
 
 
     private Vector2 lastMoveInput;
+    private float steerAngle = 0;
+    private float brakeInput;
     private bool runToggle = false;
 
     private Rigidbody rb;
@@ -209,6 +211,15 @@ public class PlayerCarMovement : MonoBehaviour
     {
 
         lastMoveInput = context.ReadValue<Vector2>();
+
+        if(Mathf.Abs(lastMoveInput.y) < 0.01f)
+        {
+            brakeInput = 0.2f;
+        }
+        else
+        {
+            brakeInput = 0;
+        }
     }
 
     public void OnRunToggle(InputAction.CallbackContext context)
@@ -254,6 +265,8 @@ public class PlayerCarMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        steerAngle = Mathf.MoveTowards(steerAngle, lastMoveInput.x, smoothTurn * Time.fixedDeltaTime);
+
         rb.AddForce(-transform.up * rb.velocity.magnitude * 0.2f, ForceMode.Force);  // downforce
 
         grounded = false;
@@ -262,7 +275,7 @@ public class PlayerCarMovement : MonoBehaviour
         {
             Transform wheelTransform = w.wheelObject.transform;
 
-            wheelTransform.localRotation = Quaternion.Euler(0, w.turnAngle * lastMoveInput.x, 0);
+            wheelTransform.localRotation = Quaternion.Euler(0, w.turnAngle * steerAngle, 0);
 
             // Get velocity in wheel space
             w.wheelWorldPosition = transform.TransformPoint(w.localPosition);
@@ -297,10 +310,14 @@ public class PlayerCarMovement : MonoBehaviour
 
             if (w.slidding)
             {
-                w.lateralSlip = Mathf.Clamp(idealLateralForce/ currentMaxLateralForce, 0, 1);
+                w.lateralSlip = Mathf.Clamp(idealLateralForce / currentMaxLateralForce, 0, 1);
                 w.travelSlip = Mathf.Clamp(idealTravelForce / currentMaxTravelForce, 0, 1);
-                appliedLocalForce.x *= w.lateralGripCurve.Evaluate(w.lateralSlip);
-                appliedLocalForce.z *= w.travelGripCurve.Evaluate(w.travelSlip);
+
+                float slipFactor = Mathf.Max(w.lateralSlip, w.travelSlip);
+                appliedLocalForce *= w.lateralGripCurve.Evaluate(slipFactor);
+
+                //appliedLocalForce.x = Mathf.Sign(appliedLocalForce.x) * Mathf.Min(Mathf.Abs(appliedLocalForce.x), currentMaxLateralForce);// * w.lateralGripCurve.Evaluate(w.lateralSlip);
+                //appliedLocalForce.z = Mathf.Sign(appliedLocalForce.z) * Mathf.Min(Mathf.Abs(appliedLocalForce.z), currentMaxTravelForce);// * w.travelGripCurve.Evaluate(w.travelSlip);
             }
             
 
@@ -311,6 +328,7 @@ public class PlayerCarMovement : MonoBehaviour
             w.torque = w.engineTorque * lastMoveInput.y;
             float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
             w.angularVelocity += ((-w.torque + appliedLocalForce.z / w.wheelCircumference) / inertia) * Time.fixedDeltaTime;
+            w.braking = brakeInput;
             w.angularVelocity *= 1 - w.braking * w.brakeStrength * Time.fixedDeltaTime;
 
             w.angularVelocity = Mathf.Clamp(w.angularVelocity, -MaxSpeed / w.wheelCircumference, MaxSpeed / w.wheelCircumference);
