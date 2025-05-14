@@ -314,7 +314,7 @@ public class PlayerCarMovement : MonoBehaviour
                 w.travelSlip = Mathf.Clamp(idealTravelForce / currentMaxTravelForce, 0, 1);
 
                 float slipFactor = Mathf.Max(w.lateralSlip, w.travelSlip);
-                appliedLocalForce *= w.lateralGripCurve.Evaluate(slipFactor);
+                appliedLocalForce *= slipFactor;// w.lateralGripCurve.Evaluate(slipFactor);
 
                 //appliedLocalForce.x = Mathf.Sign(appliedLocalForce.x) * Mathf.Min(Mathf.Abs(appliedLocalForce.x), currentMaxLateralForce);// * w.lateralGripCurve.Evaluate(w.lateralSlip);
                 //appliedLocalForce.z = Mathf.Sign(appliedLocalForce.z) * Mathf.Min(Mathf.Abs(appliedLocalForce.z), currentMaxTravelForce);// * w.travelGripCurve.Evaluate(w.travelSlip);
