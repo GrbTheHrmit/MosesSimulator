@@ -48,6 +48,7 @@ public class PlayerCarMovement : MonoBehaviour
 {
     [SerializeField]
     private float MaxSpeed = 40f;
+    public float GetMaxSpeed {  get { return MaxSpeed; } }
     [SerializeField]
     private float MoveSpeedIncrease = 20f;
     [SerializeField]
@@ -106,6 +107,7 @@ public class PlayerCarMovement : MonoBehaviour
     private bool runToggle = false;
 
     private Rigidbody rb;
+    public Vector3 GetCurrentVelocity { get { return rb.velocity; } }
     private SphereCollider[] m_wheelObjs;
     public WheelProperties[] m_wheels;
 
