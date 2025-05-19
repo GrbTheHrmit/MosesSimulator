@@ -311,6 +311,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxSpeed: 120
   MoveSpeedIncrease: 20
+  ReleaseBrake: 0.2
+  MaxStaticLateralForce: 15000
+  MaxStaticTravelForce: 25000
+  MinKineticLateralForce: 2500
+  MinKineticTravelForce: 8000
   SpringStrength: 550
   SpringClamp: 25000
   DamperStrength: 18
@@ -843,7 +848,7 @@ MonoBehaviour:
     input: {x: 0, y: 0}
     braking: 0
   skidMarkPrefab: {fileID: 822059341325472217, guid: 161bb058daca7e44ea4df293dfcb91ca, type: 3}
-  smoothTurn: 0.03
+  smoothTurn: 0.8
   wheelGripX: 1.5
   wheelGripZ: 3
 --- !u!54 &4652825583138632287

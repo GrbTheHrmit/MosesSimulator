@@ -50,6 +50,18 @@ public class PlayerCarMovement : MonoBehaviour
     private float MaxSpeed = 40f;
     [SerializeField]
     private float MoveSpeedIncrease = 20f;
+    [SerializeField]
+    [Tooltip("Brake factor when accel and brake inputs are 0")]
+    private float ReleaseBrake = 0.2f;
+
+    [SerializeField]
+    private float MaxStaticLateralForce = 15000;
+    [SerializeField]
+    private float MaxStaticTravelForce = 25000;
+    [SerializeField]
+    private float MinKineticLateralForce = 2500;
+    [SerializeField]
+    private float MinKineticTravelForce = 5000;
 
     [SerializeField]
     private float SpringStrength = 10f;
@@ -88,8 +100,9 @@ public class PlayerCarMovement : MonoBehaviour
 
 
     private Vector2 lastMoveInput;
+    private float lastBrakeInput;
     private float steerAngle = 0;
-    private float brakeInput;
+    private float effectiveBrakeInput;
     private bool runToggle = false;
 
     private Rigidbody rb;
@@ -198,8 +211,9 @@ public class PlayerCarMovement : MonoBehaviour
                 input.SwitchCurrentActionMap("Default");
             }
 
-            input.currentActionMap.FindAction("Walk").performed += OnWalkAction;
-            input.currentActionMap.FindAction("Run").performed += OnRunToggle;
+            input.currentActionMap.FindAction("Steer").performed += OnSteerAction;
+            input.currentActionMap.FindAction("Accelerate").performed += OnAccelerateAction;
+            input.currentActionMap.FindAction("Brake").performed += OnBrakeAction;
         }
 
         FollowManager.Instance().FollowObject = rb;
@@ -207,24 +221,20 @@ public class PlayerCarMovement : MonoBehaviour
     }
 
     // Input Bindings
-    public void OnWalkAction(InputAction.CallbackContext context)
+    public void OnSteerAction(InputAction.CallbackContext context)
     {
-
-        lastMoveInput = context.ReadValue<Vector2>();
-
-        if(Mathf.Abs(lastMoveInput.y) < 0.01f)
-        {
-            brakeInput = 0.2f;
-        }
-        else
-        {
-            brakeInput = 0;
-        }
+        lastMoveInput.x = context.ReadValue<float>();
     }
 
-    public void OnRunToggle(InputAction.CallbackContext context)
+    public void OnAccelerateAction(InputAction.CallbackContext context)
     {
-        runToggle = context.ReadValueAsButton();
+
+        lastMoveInput.y = context.ReadValue<float>();
+    }
+
+    public void OnBrakeAction(InputAction.CallbackContext context)
+    {
+        lastBrakeInput = context.ReadValue<float>();
     }
 
     /*public void OnAirRollAction(InputAction.CallbackContext context)
@@ -267,6 +277,15 @@ public class PlayerCarMovement : MonoBehaviour
     {
         steerAngle = Mathf.MoveTowards(steerAngle, lastMoveInput.x, smoothTurn * Time.fixedDeltaTime);
 
+        if (Mathf.Abs(lastMoveInput.y) <= 0.01f && Mathf.Abs(lastBrakeInput) < 0.01f)
+        {
+            effectiveBrakeInput = 0.2f;
+        }
+        else
+        {
+            effectiveBrakeInput = lastBrakeInput;
+        }
+
         rb.AddForce(-transform.up * rb.velocity.magnitude * 0.2f, ForceMode.Force);  // downforce
 
         grounded = false;
@@ -296,13 +315,16 @@ public class PlayerCarMovement : MonoBehaviour
                 idealTravelForce
             ) * Time.fixedDeltaTime;
 
-            float currentMaxLateralForce = wheelGripX * w.normalForce * (w.slidding ? w.lateralKineticFriction : w.lateralStaticFriction);
-            float currentMaxTravelForce = wheelGripZ * w.normalForce * (w.slidding ? w.travelKineticFriction : w.travelStaticFriction);
+            //float currentMaxLateralForce = wheelGripX * w.normalForce * (w.slidding ? w.lateralKineticFriction : w.lateralStaticFriction);
+            //float currentMaxTravelForce = wheelGripZ * w.normalForce * (w.slidding ? w.travelKineticFriction : w.travelStaticFriction);
+            float currentMaxLateralForce = w.slidding ? MinKineticLateralForce : MaxStaticLateralForce;
+            float currentMaxTravelForce = w.slidding ? MinKineticTravelForce : MaxStaticTravelForce;
+
             //float idealForceMagnitude = idealLocalForce.magnitude;
             //Debug.Log("MAX: " + currentMaxFrictionForce + " Ideal: " + idealForceMagnitude);
 
             // Calculate effect of friction
-            w.slidding = (idealLateralForce > currentMaxLateralForce) || (idealTravelForce > currentMaxTravelForce);
+            w.slidding = (Mathf.Abs(idealLateralForce) > currentMaxLateralForce) || (Mathf.Abs(idealTravelForce) > currentMaxTravelForce);
             w.lateralSlip = 0;
             w.travelSlip = 0;
 
@@ -314,7 +336,8 @@ public class PlayerCarMovement : MonoBehaviour
                 w.travelSlip = Mathf.Clamp(idealTravelForce / currentMaxTravelForce, 0, 1);
 
                 float slipFactor = Mathf.Max(w.lateralSlip, w.travelSlip);
-                appliedLocalForce *= slipFactor;// w.lateralGripCurve.Evaluate(slipFactor);
+                //appliedLocalForce *= slipFactor;// w.lateralGripCurve.Evaluate(slipFactor);
+                appliedLocalForce *= 0.5f;
 
                 //appliedLocalForce.x = Mathf.Sign(appliedLocalForce.x) * Mathf.Min(Mathf.Abs(appliedLocalForce.x), currentMaxLateralForce);// * w.lateralGripCurve.Evaluate(w.lateralSlip);
                 //appliedLocalForce.z = Mathf.Sign(appliedLocalForce.z) * Mathf.Min(Mathf.Abs(appliedLocalForce.z), currentMaxTravelForce);// * w.travelGripCurve.Evaluate(w.travelSlip);
@@ -328,9 +351,9 @@ public class PlayerCarMovement : MonoBehaviour
             w.torque = w.engineTorque * lastMoveInput.y;
             float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
             w.angularVelocity += ((-w.torque + appliedLocalForce.z / w.wheelCircumference) / inertia) * Time.fixedDeltaTime;
-            w.braking = brakeInput;
+            w.braking = effectiveBrakeInput;
             w.angularVelocity *= 1 - w.braking * w.brakeStrength * Time.fixedDeltaTime;
-
+            // Clamp to max speed
             w.angularVelocity = Mathf.Clamp(w.angularVelocity, -MaxSpeed / w.wheelCircumference, MaxSpeed / w.wheelCircumference);
 
             RaycastHit hit;
