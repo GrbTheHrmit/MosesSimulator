@@ -180,7 +180,15 @@ PrefabInstance:
       objectReference: {fileID: 559876035}
     - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
       propertyPath: CameraHeight
-      value: 10
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
+      propertyPath: MinMoveSpeed
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
+      propertyPath: VSwivelSpeed
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
       propertyPath: MaxSwivelAngle
