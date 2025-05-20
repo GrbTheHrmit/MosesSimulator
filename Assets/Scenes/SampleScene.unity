@@ -183,8 +183,16 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
+      propertyPath: MaxSwivelAngle
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
       propertyPath: MaxDistToPlayer
       value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
+      propertyPath: MaxVSwivelAngle
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
       propertyPath: MinDistToPlayer
