@@ -179,12 +179,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 559876035}
     - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
+      propertyPath: CameraHeight
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
       propertyPath: MaxDistToPlayer
-      value: 42
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
       propertyPath: MinDistToPlayer
-      value: 28
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 8024083148813376100, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
       propertyPath: m_Name
@@ -952,7 +956,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 2.94
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -987,10 +991,6 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: wheelGripZ
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: airRollForce
       value: 30
       objectReference: {fileID: 0}
@@ -1000,7 +1000,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: DamperStrength
-      value: 14
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: MaxStaticLateralForce
+      value: 22000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: MinKineticTravelForce
+      value: 7200
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: MinKineticLateralForce
+      value: 2800
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[0].engineTorque

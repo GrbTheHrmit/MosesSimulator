@@ -788,8 +788,8 @@ MonoBehaviour:
     braking: 0
   skidMarkPrefab: {fileID: 822059341325472217, guid: 161bb058daca7e44ea4df293dfcb91ca, type: 3}
   smoothTurn: 0.8
-  wheelGripX: 1.5
-  wheelGripZ: 3
+  wheelGripX: 1
+  wheelGripZ: 1
 --- !u!54 &4652825583138632287
 Rigidbody:
   m_ObjectHideFlags: 0

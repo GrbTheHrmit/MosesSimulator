@@ -319,8 +319,8 @@ public class PlayerCarMovement : MonoBehaviour
 
             //float currentMaxLateralForce = wheelGripX * w.normalForce * (w.slidding ? w.lateralKineticFriction : w.lateralStaticFriction);
             //float currentMaxTravelForce = wheelGripZ * w.normalForce * (w.slidding ? w.travelKineticFriction : w.travelStaticFriction);
-            float currentMaxLateralForce = w.slidding ? MinKineticLateralForce : MaxStaticLateralForce;
-            float currentMaxTravelForce = w.slidding ? MinKineticTravelForce : MaxStaticTravelForce;
+            float currentMaxLateralForce = wheelGripX * (w.slidding ? MinKineticLateralForce : MaxStaticLateralForce);
+            float currentMaxTravelForce = wheelGripZ * (w.slidding ? MinKineticTravelForce : MaxStaticTravelForce);
 
             //float idealForceMagnitude = idealLocalForce.magnitude;
             //Debug.Log("MAX: " + currentMaxFrictionForce + " Ideal: " + idealForceMagnitude);
@@ -334,13 +334,13 @@ public class PlayerCarMovement : MonoBehaviour
 
             if (w.slidding)
             {
-                w.lateralSlip = Mathf.Clamp(idealLateralForce / currentMaxLateralForce, 0, 1);
-                w.travelSlip = Mathf.Clamp(idealTravelForce / currentMaxTravelForce, 0, 1);
+                w.lateralSlip = Mathf.Abs(idealLateralForce) / currentMaxLateralForce;
+                w.travelSlip = Mathf.Abs(idealTravelForce) / currentMaxTravelForce;
 
                 float slipFactor = Mathf.Max(w.lateralSlip, w.travelSlip);
                 //appliedLocalForce *= slipFactor;// w.lateralGripCurve.Evaluate(slipFactor);
-                appliedLocalForce *= 0.5f;
-
+                appliedLocalForce.x *= 1 / Mathf.Clamp(w.lateralSlip * 0.1f, 1, 3);
+                appliedLocalForce.z *= 1 / Mathf.Clamp(w.travelSlip * 0.1f, 1, 3);
                 //appliedLocalForce.x = Mathf.Sign(appliedLocalForce.x) * Mathf.Min(Mathf.Abs(appliedLocalForce.x), currentMaxLateralForce);// * w.lateralGripCurve.Evaluate(w.lateralSlip);
                 //appliedLocalForce.z = Mathf.Sign(appliedLocalForce.z) * Mathf.Min(Mathf.Abs(appliedLocalForce.z), currentMaxTravelForce);// * w.travelGripCurve.Evaluate(w.travelSlip);
             }
