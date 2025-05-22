@@ -111,8 +111,8 @@ public class CameraControl : MonoBehaviour
         transform.LookAt(FocusObject.transform);
         float pitch = transform.eulerAngles.x; // Record pitch for later
         transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0); // Only rotate around Y
-        float interpValue = (HSwivelSpeed * Time.fixedDeltaTime) / Mathf.Max(Quaternion.Angle(transform.rotation, lastRotation), HSwivelSpeed * Time.fixedDeltaTime);
-        transform.rotation = Quaternion.Lerp(lastRotation, transform.rotation, interpValue); // Make sure we dont rotate further than time allows
+        // interpValue = (HSwivelSpeed * Time.fixedDeltaTime) / Mathf.Max(Quaternion.Angle(transform.rotation, lastRotation), HSwivelSpeed * Time.fixedDeltaTime);
+        //transform.rotation = Quaternion.Lerp(lastRotation, transform.rotation, interpValue); // Make sure we dont rotate further than time allows
 
         // Set Camera Object location and rotation based on inputs and recorded pitch
         cameraInput = Vector2.MoveTowards(cameraInput, lastInput, 3 * Mathf.Abs(lastInput.magnitude - cameraInput.magnitude) * Time.fixedDeltaTime);
@@ -122,10 +122,10 @@ public class CameraControl : MonoBehaviour
         Vector3 targetLocalPos = localOffset + Quaternion.Euler(rotationVector) * -localOffset;
         CameraObject.transform.localPosition = targetLocalPos;
 
-        if(Mathf.Abs(pitch - lastCameraPitch) > VSwivelSpeed * Time.fixedDeltaTime)
+        /*if(Mathf.Abs(pitch - lastCameraPitch) > VSwivelSpeed * Time.fixedDeltaTime)
         {
             pitch = lastCameraPitch + Mathf.Sign(pitch - lastCameraPitch) * VSwivelSpeed * Time.fixedDeltaTime;
-        }
+        }*/
 
         CameraObject.transform.localRotation = Quaternion.Euler(rotationVector) * Quaternion.Euler(pitch, 0, 0);
         lastCameraPitch = pitch;

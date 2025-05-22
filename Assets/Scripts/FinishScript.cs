@@ -24,7 +24,7 @@ public class FinishScript : MonoBehaviour
         }
         else if (other.gameObject.tag == "Follower")
         {
-            FollowerScript follower = other.gameObject.GetComponent<FollowerScript>();
+            AnimatedFollowerScript follower = other.gameObject.GetComponent<AnimatedFollowerScript>();
             if (follower != null)
             {
                 FollowManager.Instance().SaveFollower(follower);

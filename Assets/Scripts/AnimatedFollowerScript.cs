@@ -4,8 +4,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-[RequireComponent(typeof(Rigidbody))]
-public class FollowerScript : MonoBehaviour
+//[RequireComponent(typeof(Rigidbody))]
+public class AnimatedFollowerScript : MonoBehaviour
 {
     [SerializeField]
     private List<Material> wanderMaterial = new List<Material>();
@@ -18,8 +18,10 @@ public class FollowerScript : MonoBehaviour
     private MeshRenderer renderer = null;
     public Vector3 GetVelocity { get {return Vector3.zero; } }
 
-    private List<FollowerScript> inRange = new List<FollowerScript>();
+    private List<AnimatedFollowerScript> inRange = new List<AnimatedFollowerScript>();
     private bool isFollowing = false;
+    private bool isClimbing = false;
+    private bool isRiding = false;
     private bool isSaved = false;
 
     [SerializeField]
@@ -47,6 +49,8 @@ public class FollowerScript : MonoBehaviour
 
     private Animator animator;
 
+    Vector3 lastVehiclePosition;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -55,14 +59,14 @@ public class FollowerScript : MonoBehaviour
 
     private void Awake()
     {
-        wanderTimer = maxWanderSeconds;
+        //wanderTimer = maxWanderSeconds;
         rb = GetComponent<Rigidbody>();
 
-        renderer = GetComponent<MeshRenderer>();
+        /*renderer = GetComponent<MeshRenderer>();
         if (renderer != null)
         {
             renderer.SetMaterials(wanderMaterial);
-        }
+        }*/
 
         animator = GetComponent<Animator>();
         if(animator == null)
@@ -74,53 +78,76 @@ public class FollowerScript : MonoBehaviour
     void FixedUpdate()
     {
         // Avoid other non followers
-        if (!isFollowing)
-        {
-            Vector3 wanderForce = Wander();
-            wanderForce.y = 0;
-            rb.AddForce(wanderForce, ForceMode.VelocityChange);
-            Vector3 xzVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-            rb.velocity = Vector3.ClampMagnitude(xzVelocity, wanderMaxSpeed) + new Vector3(0, rb.velocity.y, 0);
-        }
-        else if (isSaved)
-        {
-            rb.velocity = Vector3.MoveTowards(rb.velocity, Vector3.zero, 1f * Time.fixedDeltaTime);
-        }
+        /*if (!isFollowing)
+         {
+             Vector3 wanderForce = Wander();
+             wanderForce.y = 0;
+             rb.AddForce(wanderForce, ForceMode.VelocityChange);
+             Vector3 xzVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+             rb.velocity = Vector3.ClampMagnitude(xzVelocity, wanderMaxSpeed) + new Vector3(0, rb.velocity.y, 0);
+         }
+         else if (isSaved)
+         {
+             rb.velocity = Vector3.MoveTowards(rb.velocity, Vector3.zero, 1f * Time.fixedDeltaTime);
+         }*/
 
-        
-        
+        Vector3 lookDir = FollowManager.Instance().LeaderPosition - rb.position;
+        lookDir.y = 0;
+        rb.MoveRotation(Quaternion.FromToRotation(rb.transform.forward, lookDir.normalized) * rb.rotation);
+        Debug.DrawRay(rb.position, lookDir);
+
+        if(isClimbing || isRiding)
+        {
+            Vector3 diff = FollowManager.Instance().LeaderPosition - lastVehiclePosition;
+            rb.position += diff;
+            lastVehiclePosition = FollowManager.Instance().LeaderPosition;
+        }
     }
 
     public void UpdateMovement(Vector3 centerOfMass, Vector3 aveVelocity)
     {
-        Vector3 flockForce = Flock(centerOfMass, aveVelocity);
+        /*Vector3 flockForce = Flock(centerOfMass, aveVelocity);
         flockForce.y = 0;
+
+        
         rb.AddForce(flockForce, ForceMode.VelocityChange);
         Vector3 xzVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-        rb.velocity = Vector3.ClampMagnitude(xzVelocity, followerMaxSpeed) + new Vector3(0, rb.velocity.y, 0);
+        rb.velocity = Vector3.ClampMagnitude(xzVelocity, followerMaxSpeed) + new Vector3(0, rb.velocity.y, 0);*/
+    }
+
+    public void StartClimbing()
+    {
+        isClimbing = true;
+        rb.useGravity = false;
+        rb.isKinematic = true;
+        lastVehiclePosition = FollowManager.Instance().LeaderPosition;
+        animator.SetBool("Climbing", true);
+    }
+
+    public void StartRiding(Vector3 localPosition)
+    {
+        isRiding = true;
+        isClimbing = false;
+        animator.SetBool("Climbing", false);
+        animator.SetBool("Riding", true);
+        //transform.localPosition = localPosition;
     }
 
     public void SaveFollower()
     {
         isSaved = true;
-        if (renderer != null)
-        {
-            renderer.SetMaterials(savedMaterial);
-        }
+
     }
 
     private void StartFollowing()
     {
         if (isFollowing) return;
 
-        if (renderer != null)
-        {
-            renderer.SetMaterials(followMaterial);
-        }
+        animator.SetBool("Following", true);
 
         isFollowing = true;
         rb.excludeLayers = LayerMask.GetMask("Player");
-        //FollowManager.Instance().AddFollower(this);
+        FollowManager.Instance().AddFollower(this);
         foreach (SphereCollider sph in GetComponents<SphereCollider>())
         {
             if (sph.isTrigger)
@@ -132,17 +159,31 @@ public class FollowerScript : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Player" && !isFollowing)
+        Debug.Log(other.gameObject.layer);
+
+        if (other.gameObject.tag == "Roof" && isClimbing)
         {
+            StartRiding(other.gameObject.transform.position);
+        }
+
+        if (other.gameObject.tag == "Ladder" && !isClimbing && isFollowing)
+        {
+            StartClimbing();
+        }
+        
+
+        if (other.gameObject.tag == "Player" && !isFollowing)
+        {
+            
             StartFollowing();
         }
 
-        if(other.gameObject.tag == "Follower")
+        if (other.gameObject.tag == "Follower")
         {
-            FollowerScript otherFollower = other.gameObject.GetComponent<FollowerScript>();
-            if(otherFollower != null)
+            AnimatedFollowerScript otherFollower = other.gameObject.GetComponent<AnimatedFollowerScript>();
+            if (otherFollower != null)
             {
-                if (!isFollowing )//&& FollowManager.Instance().HasCollectedFollower(otherFollower))
+                if (!isFollowing && FollowManager.Instance().HasCollectedFollower(otherFollower))
                 {
                     StartFollowing();
                 }
@@ -158,7 +199,7 @@ public class FollowerScript : MonoBehaviour
     {
         if (other.gameObject.tag == "Follower")
         {
-            FollowerScript otherFollower = other.gameObject.GetComponent<FollowerScript>();
+            AnimatedFollowerScript otherFollower = other.gameObject.GetComponent<AnimatedFollowerScript>();
             if (otherFollower != null && inRange.Contains(otherFollower))
             {
                 inRange.Remove(otherFollower);
@@ -200,7 +241,7 @@ public class FollowerScript : MonoBehaviour
         }
 
         Vector3 forceSum = Vector3.zero;
-        foreach (FollowerScript follower in inRange)
+        foreach (AnimatedFollowerScript follower in inRange)
         {
             float dist = Mathf.Clamp((transform.position - follower.transform.position).magnitude, minAvoidDist, maxAvoidDist);
             forceSum -= SeekTarget(follower.transform.position) * (1.0f - ((dist - minAvoidDist) / (maxAvoidDist - minAvoidDist)));

@@ -21,10 +21,8 @@ public class WheelProperties
     [HideInInspector] public float size = 0.5f;
     public float engineTorque = 40f; // Engine power in Nm to wheel
     public float brakeStrength = 0.5f; // Brake torque
-    public float lateralStaticFriction = 6f;
-    public float travelStaticFriction = 6f;
-    public float lateralKineticFriction = 6f;
-    public float travelKineticFriction = 6f;
+    public float lateralSlipFactor = 4f;
+    public float travelSlipFactor = 1f;
     [Tooltip("This is the percentage of grip you can apply based on slip %")]
     public AnimationCurve lateralGripCurve;
     public AnimationCurve travelGripCurve;
@@ -104,7 +102,7 @@ public class PlayerCarMovement : MonoBehaviour
     private float lastBrakeInput;
     private float steerAngle = 0;
     private float effectiveBrakeInput;
-    private bool runToggle = false;
+    private int gear = 0;
 
     private Rigidbody rb;
     public Vector3 GetCurrentVelocity { get { return rb.velocity; } }
@@ -216,6 +214,7 @@ public class PlayerCarMovement : MonoBehaviour
             input.currentActionMap.FindAction("Steer").performed += OnSteerAction;
             input.currentActionMap.FindAction("Accelerate").performed += OnAccelerateAction;
             input.currentActionMap.FindAction("Brake").performed += OnBrakeAction;
+            input.currentActionMap.FindAction("Shift").performed += OnShiftAction;
         }
 
         FollowManager.Instance().FollowObject = rb;
@@ -237,6 +236,12 @@ public class PlayerCarMovement : MonoBehaviour
     public void OnBrakeAction(InputAction.CallbackContext context)
     {
         lastBrakeInput = context.ReadValue<float>();
+    }
+
+    public void OnShiftAction(InputAction.CallbackContext context)
+    {
+        gear += Mathf.RoundToInt(context.ReadValue<float>());
+        Debug.Log("Shift to gear" + gear);
     }
 
     /*public void OnAirRollAction(InputAction.CallbackContext context)
@@ -339,7 +344,7 @@ public class PlayerCarMovement : MonoBehaviour
 
                 float slipFactor = Mathf.Max(w.lateralSlip, w.travelSlip);
                 //appliedLocalForce *= slipFactor;// w.lateralGripCurve.Evaluate(slipFactor);
-                appliedLocalForce.x *= 1 / Mathf.Clamp(w.lateralSlip * 0.1f, 1, 3);
+                appliedLocalForce.x *= w.lateralSlipFactor / Mathf.Clamp(w.lateralSlip * 0.1f, 1, 3);
                 appliedLocalForce.z *= 1 / Mathf.Clamp(w.travelSlip * 0.1f, 1, 3);
                 //appliedLocalForce.x = Mathf.Sign(appliedLocalForce.x) * Mathf.Min(Mathf.Abs(appliedLocalForce.x), currentMaxLateralForce);// * w.lateralGripCurve.Evaluate(w.lateralSlip);
                 //appliedLocalForce.z = Mathf.Sign(appliedLocalForce.z) * Mathf.Min(Mathf.Abs(appliedLocalForce.z), currentMaxTravelForce);// * w.travelGripCurve.Evaluate(w.travelSlip);

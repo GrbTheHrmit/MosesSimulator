@@ -18,12 +18,12 @@ public class FollowManager : ScriptableObject
     private FollowManager()
     {}
 
-    private List<FollowerScript> uncollectedFollowers = new List<FollowerScript>();
-    private List<FollowerScript> collectedFollowers = new List<FollowerScript>();
-    public bool HasCollectedFollower(FollowerScript follower) { return collectedFollowers.Contains(follower); }
+    private List<AnimatedFollowerScript> uncollectedFollowers = new List<AnimatedFollowerScript>();
+    private List<AnimatedFollowerScript> collectedFollowers = new List<AnimatedFollowerScript>();
+    public bool HasCollectedFollower(AnimatedFollowerScript follower) { return collectedFollowers.Contains(follower); }
 
     private Rigidbody followObject = null;
-    public Rigidbody FollowObject { set { followObject = value; } }
+    public Rigidbody FollowObject { set { followObject = value; } get { return followObject; } }
     public Vector3 LeaderPosition { get { return followObject.position; } }
 
     private float followDist = 3f;
@@ -44,7 +44,7 @@ public class FollowManager : ScriptableObject
         Vector3 nextCenterOfMass = (followObject.transform.position - followObject.transform.forward * (followDist + collectedFollowers.Count)) * followMass;
         Vector3 nextAveVelocity = followObject.velocity;
 
-        foreach (FollowerScript follower in collectedFollowers)
+        foreach (AnimatedFollowerScript follower in collectedFollowers)
         {
             follower.UpdateMovement(lastCenterOfMass, lastAveVelocity);
             totalWeight++;
@@ -63,7 +63,7 @@ public class FollowManager : ScriptableObject
 
     }
 
-    public void AddFollower(FollowerScript follower)
+    public void AddFollower(AnimatedFollowerScript follower)
     {
         uncollectedFollowers.Remove(follower);
         collectedFollowers.Add(follower);
@@ -80,8 +80,8 @@ public class FollowManager : ScriptableObject
             int toMove = uncollectedFollowers.Count + numToSpawn - GameManager.Instance.SpawnSettings.maxUncollected;
             float distCutoff = float.MaxValue;
             int numpicked = 0;
-            FollowerScript[] furthest = new FollowerScript[toMove];
-            foreach(FollowerScript follower in uncollectedFollowers)
+            AnimatedFollowerScript[] furthest = new AnimatedFollowerScript[toMove];
+            foreach(AnimatedFollowerScript follower in uncollectedFollowers)
             {
                 if(numpicked < toMove)
                 {
@@ -129,7 +129,7 @@ public class FollowManager : ScriptableObject
             Vector3 spawnPos = location + Quaternion.Euler(0, i * (360f / numToSpawn), 0) * (GameManager.Instance.SpawnSettings.clusterSize * Vector3.forward);
 
             GameObject newFollower = Instantiate(GameManager.Instance.FollowerObject, spawnPos, Quaternion.FromToRotation(Vector3.forward, location - spawnPos));
-            uncollectedFollowers.Add(newFollower.GetComponent<FollowerScript>());
+            uncollectedFollowers.Add(newFollower.GetComponent<AnimatedFollowerScript>());
         }
 
         return numToSpawn;
@@ -155,7 +155,7 @@ public class FollowManager : ScriptableObject
                 tries++;
 
                 distToOthers = Mathf.Min(distance, Vector3.Distance(position, lastCenterOfMass) - lastBlobRadius);
-                foreach(FollowerScript uncollected in uncollectedFollowers)
+                foreach(AnimatedFollowerScript uncollected in uncollectedFollowers)
                 {
                     distToOthers = Mathf.Min(distToOthers, Vector3.Distance(uncollected.gameObject.transform.position, position));
                 }
@@ -174,14 +174,14 @@ public class FollowManager : ScriptableObject
 
     public void SaveAllFollowing()
     {
-        foreach(FollowerScript follower in collectedFollowers)
+        foreach(AnimatedFollowerScript follower in collectedFollowers)
         {
             follower.SaveFollower();
         }
         collectedFollowers.Clear();
     }
 
-    public void SaveFollower(FollowerScript follower)
+    public void SaveFollower(AnimatedFollowerScript follower)
     {
         follower.SaveFollower();
         collectedFollowers.Remove(follower);

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 20330039ae7be1a4cac50638d32ced9e
+guid: 0e131d1136d709d40b14a83f47249f50
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -33,21 +33,21 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Climbing
+      name: Jogging
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 60
+      lastFrame: 77
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
-      loopBlendPositionY: 0
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
