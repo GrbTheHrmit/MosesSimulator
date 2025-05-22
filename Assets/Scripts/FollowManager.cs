@@ -132,7 +132,7 @@ public class FollowManager : ScriptableObject
         {
             Vector3 spawnPos = location + Quaternion.Euler(0, i * (360f / numToSpawn), 0) * (GameManager.Instance.SpawnSettings.clusterSize * Vector3.forward);
 
-            GameObject newFollower = Instantiate(GameManager.Instance.FollowerObject, spawnPos, Quaternion.FromToRotation(Vector3.forward, location - spawnPos));
+            GameObject newFollower = Instantiate(GameManager.Instance.FollowerObject, spawnPos, Quaternion.Euler(0, -i * (360f / numToSpawn), 0));
             uncollectedFollowers.Add(newFollower.GetComponent<AnimatedFollowerScript>());
         }
 

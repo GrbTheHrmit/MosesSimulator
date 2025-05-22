@@ -99,9 +99,9 @@ public class PlayerCarMovement : MonoBehaviour
     private float airControlCoyoteTime = 0.25f;
 
     [SerializeField]
-    private float airRollForce = 1;
+    private float releaseRotateFriction = 0.02f;
     [SerializeField]
-    private float airPitchForce = 1;
+    private float steerRotateFriction = 1f;
 
     private static int WHEEL_FR = 0;
     private static int WHEEL_FL = 1;
@@ -113,7 +113,9 @@ public class PlayerCarMovement : MonoBehaviour
     private float lastBrakeInput;
     private float steerAngle = 0;
     private float effectiveBrakeInput;
-    private int gear = 0;
+    private int gear = 1;
+    [SerializeField]
+    private List<float> gearRatios = new List<float>();
 
     private Rigidbody rb;
     public Vector3 GetCurrentVelocity { get { return rb.velocity; } }
@@ -160,6 +162,11 @@ public class PlayerCarMovement : MonoBehaviour
         SphereCollider[] children = GetComponentsInChildren<SphereCollider>();
         m_wheelObjs = new SphereCollider[children.Length];
         //m_wheels = new WheelProperties[children.Length];
+
+        if(gearRatios.Count == 0)
+        {
+            gearRatios.Add(1);
+        }
 
         for (int i = 0; i < children.Length; i++)
         {
@@ -252,6 +259,8 @@ public class PlayerCarMovement : MonoBehaviour
     public void OnShiftAction(InputAction.CallbackContext context)
     {
         gear += Mathf.RoundToInt(context.ReadValue<float>());
+
+        gear = Mathf.Clamp(gear, -1, gearRatios.Count);
         
         if(uiController != null)
         {
@@ -271,24 +280,6 @@ public class PlayerCarMovement : MonoBehaviour
         lastMoveInput = context.ReadValue<Vector2>();
     */
 
-
-    public void ApplyRotationalInput()
-    {
-        if(groundTimer < (leaveGroundCoyoteTime - airControlCoyoteTime) )
-        {
-            if (lastMoveInput.sqrMagnitude > 0)
-            {
-                Vector3 input = new Vector3(lastMoveInput.y * airPitchForce, 0, -lastMoveInput.x * airRollForce);
-                rb.AddRelativeTorque(input, ForceMode.Force);
-            }
-            else
-            {
-                rb.angularVelocity *= 0.99f;
-            }
-
-            Debug.Log("airing");
-        }
-    }
 
     void FixedUpdate()
     {
@@ -367,7 +358,21 @@ public class PlayerCarMovement : MonoBehaviour
 
             // Torque calculations for next frame
             float dragTorque = drag * Vector3.Dot(rb.velocity, w.wheelObject.transform.forward); // Apply drag as negative torque relative to velocity in wheel direction
-            w.torque = (w.torqueFactor * engineTorque * lastMoveInput.y);
+            float gearRatio = 1;
+            if(gear == -1)
+            {
+                gearRatio = -gearRatios[0];
+            }
+            else if(gear == 0)
+            {
+                gearRatio = 0;
+            }
+            else
+            {
+                gearRatio = gearRatios[gear - 1];
+            }
+
+            w.torque = gearRatio * w.torqueFactor * engineTorque * lastMoveInput.y;
             float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
 
             RaycastHit hit;
@@ -450,10 +455,23 @@ public class PlayerCarMovement : MonoBehaviour
         {
             groundTimer = Mathf.Min(leaveGroundCoyoteTime, groundTimer - Time.fixedDeltaTime);
             //ApplyRotationalInput();
+            if(groundTimer < (leaveGroundCoyoteTime - airControlCoyoteTime))
+            {
+                if(Mathf.Abs(lastMoveInput.x) > 0.1f)
+                {
+                    rb.angularDrag = 1.8f;
+                }
+                else
+                {
+                    rb.angularDrag = 0.02f;
+                }
+            }
+            
         }
         else
         {
             groundTimer = Mathf.Max(-hitGroundCoyoteTime, groundTimer + Time.fixedDeltaTime);
+            rb.angularDrag = 1f;
         }
     }
 

@@ -529,16 +529,17 @@ MonoBehaviour:
   MaxStaticTravelForce: 25000
   MinKineticLateralForce: 2000
   MinKineticTravelForce: 7200
-  SpringStrength: 550
-  SpringClamp: 25000
-  DamperStrength: 15
+  SpringStrength: 580
+  SpringClamp: 35000
+  DamperStrength: 18
   MaxTurnAngle: 45
   MaxSpringExtension: 1
   leaveGroundCoyoteTime: 0.1
   hitGroundCoyoteTime: 0.1
   airControlCoyoteTime: 0.25
-  airRollForce: 30
-  airPitchForce: 40
+  releaseRotateFriction: 0.02
+  steerRotateFriction: 1
+  gearRatios: []
   m_wheels:
   - skidTrail: {fileID: 0}
     skidParticles: {fileID: 0}
