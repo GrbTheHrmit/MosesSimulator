@@ -518,9 +518,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc302e6a0a150a34293ca226deeefa93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxSpeed: 120
-  MoveSpeedIncrease: 20
+  MaxSpeed: 260
+  engineTorque: 32
+  brakeStrength: 10
   ReleaseBrake: 0.2
+  drag: 0.12
+  airDragFactor: 0.8
+  airForceFactor: 0.1
   MaxStaticLateralForce: 18000
   MaxStaticTravelForce: 25000
   MinKineticLateralForce: 2000
@@ -544,8 +548,8 @@ MonoBehaviour:
     lastSuspensionLength: 0
     mass: 0
     size: 2
-    engineTorque: 15
-    brakeStrength: 10
+    torqueFactor: 1
+    brakeFactor: 1
     lateralGripFactor: 1
     travelGripFactor: 1
     lateralGripCurve:
@@ -672,8 +676,8 @@ MonoBehaviour:
     lastSuspensionLength: 0
     mass: 0
     size: 2
-    engineTorque: 15
-    brakeStrength: 10
+    torqueFactor: 1
+    brakeFactor: 1
     lateralGripFactor: 1
     travelGripFactor: 1
     lateralGripCurve:
@@ -800,8 +804,8 @@ MonoBehaviour:
     lastSuspensionLength: 0
     mass: 0
     size: 0
-    engineTorque: 15
-    brakeStrength: 10
+    torqueFactor: 1
+    brakeFactor: 1
     lateralGripFactor: 1
     travelGripFactor: 1
     lateralGripCurve:
@@ -928,8 +932,8 @@ MonoBehaviour:
     lastSuspensionLength: 0
     mass: 0
     size: 0
-    engineTorque: 15
-    brakeStrength: 10
+    torqueFactor: 1
+    brakeFactor: 1
     lateralGripFactor: 1
     travelGripFactor: 1
     lateralGripCurve:

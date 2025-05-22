@@ -19,8 +19,8 @@ public class WheelProperties
     [HideInInspector] public float lastSuspensionLength = 0.0f;
     [HideInInspector] public float mass = 16f;
     [HideInInspector] public float size = 0.5f;
-    public float engineTorque = 40f; // Engine power in Nm to wheel
-    public float brakeStrength = 0.5f; // Brake torque
+    public float torqueFactor = 1.0f;
+    public float brakeFactor = 1.0f;
     public float lateralGripFactor = 1.5f;
     public float travelGripFactor = 1f;
     [Tooltip("This is the percentage of grip you can apply based on slip %")]
@@ -47,11 +47,22 @@ public class PlayerCarMovement : MonoBehaviour
     [SerializeField]
     private float MaxSpeed = 40f;
     public float GetMaxSpeed {  get { return MaxSpeed; } }
+    
     [SerializeField]
-    private float MoveSpeedIncrease = 20f;
+    private float engineTorque = 40f; // Engine power in Nm to wheel
+    [SerializeField]
+    private float brakeStrength = 0.5f; // Brake torque
+
     [SerializeField]
     [Tooltip("Brake factor when accel and brake inputs are 0")]
     private float ReleaseBrake = 0.2f;
+
+    [SerializeField]
+    private float drag = 0.1f;
+    [SerializeField]
+    private float airDragFactor = 2f;
+    [SerializeField]
+    private float airForceFactor = 0.1f;
 
     [SerializeField]
     private float MaxStaticLateralForce = 15000;
@@ -348,8 +359,6 @@ public class PlayerCarMovement : MonoBehaviour
                 //appliedLocalForce *= slipFactor;// w.lateralGripCurve.Evaluate(slipFactor);
                 appliedLocalForce.x *= w.lateralGripFactor / Mathf.Clamp(w.lateralSlip * 0.1f, 1, 3);
                 appliedLocalForce.z *= w.travelGripFactor / Mathf.Clamp(w.travelSlip * 0.1f, 1, 3);
-                //appliedLocalForce.x = Mathf.Sign(appliedLocalForce.x) * Mathf.Min(Mathf.Abs(appliedLocalForce.x), currentMaxLateralForce);// * w.lateralGripCurve.Evaluate(w.lateralSlip);
-                //appliedLocalForce.z = Mathf.Sign(appliedLocalForce.z) * Mathf.Min(Mathf.Abs(appliedLocalForce.z), currentMaxTravelForce);// * w.travelGripCurve.Evaluate(w.travelSlip);
             }
             
 
@@ -357,7 +366,8 @@ public class PlayerCarMovement : MonoBehaviour
             w.worldSlipDirection = appliedWorldForce;
 
             // Torque calculations for next frame
-            w.torque = w.engineTorque * lastMoveInput.y;
+            float dragTorque = drag * Vector3.Dot(rb.velocity, w.wheelObject.transform.forward); // Apply drag as negative torque relative to velocity in wheel direction
+            w.torque = (w.torqueFactor * engineTorque * lastMoveInput.y);
             float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
 
             RaycastHit hit;
@@ -403,7 +413,7 @@ public class PlayerCarMovement : MonoBehaviour
                 }
 
                 // Apply torque and drag to wheel rotation
-                w.angularVelocity += ((-w.torque + appliedLocalForce.z / w.wheelCircumference) / inertia) * Time.fixedDeltaTime;
+                w.angularVelocity += ((-w.torque + dragTorque + appliedLocalForce.z / w.wheelCircumference) / inertia) * Time.fixedDeltaTime;
             }
             else
             {
@@ -417,15 +427,15 @@ public class PlayerCarMovement : MonoBehaviour
                     w.skidParticles.Stop();
                 }
 
-                // Apply torque to wheel rotation, no drag since no collision
-                w.angularVelocity += ((-w.torque / w.wheelCircumference) / inertia) * Time.fixedDeltaTime;
+                // Apply torque to wheel rotation, drag is minimized by air drag factor
+                w.angularVelocity += ((dragTorque * airDragFactor) + (airForceFactor * appliedLocalForce.z / w.wheelCircumference) - w.torque) / inertia * Time.fixedDeltaTime;
             } // End physics raycast section
 
             w.wheelObject.transform.GetChild(0).Rotate(Vector3.right, -w.angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime, Space.Self);
 
             // Final Wheel speed calc (after applying forces)
             w.braking = effectiveBrakeInput;
-            w.angularVelocity *= 1 - w.braking * w.brakeStrength * Time.fixedDeltaTime;
+            w.angularVelocity *= 1 - w.braking * w.brakeFactor * brakeStrength * Time.fixedDeltaTime;
             // Clamp to max speed
             w.angularVelocity = Mathf.Clamp(w.angularVelocity, -MaxSpeed / w.wheelCircumference, MaxSpeed / w.wheelCircumference);
 
