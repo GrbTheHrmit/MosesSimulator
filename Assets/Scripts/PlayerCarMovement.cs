@@ -115,7 +115,8 @@ public class PlayerCarMovement : MonoBehaviour
     public float wheelGripX = 8f;
     public float wheelGripZ = 42f;
 
-    
+    private InGameUIController uiController = null;
+    public InGameUIController UIController { set {  uiController = value; } }
 
     private int StringToWheelIndex(string str)
     {
@@ -218,7 +219,6 @@ public class PlayerCarMovement : MonoBehaviour
         }
 
         FollowManager.Instance().FollowObject = rb;
-
     }
 
     // Input Bindings
@@ -241,7 +241,11 @@ public class PlayerCarMovement : MonoBehaviour
     public void OnShiftAction(InputAction.CallbackContext context)
     {
         gear += Mathf.RoundToInt(context.ReadValue<float>());
-        Debug.Log("Shift to gear" + gear);
+        
+        if(uiController != null)
+        {
+            uiController.SetGear(gear);
+        }
     }
 
     /*public void OnAirRollAction(InputAction.CallbackContext context)
@@ -256,11 +260,6 @@ public class PlayerCarMovement : MonoBehaviour
         lastMoveInput = context.ReadValue<Vector2>();
     */
 
-    private void Update()
-    {
-        //Debug.Log(rb.velocity.magnitude);
-
-    }
 
     public void ApplyRotationalInput()
     {
@@ -297,6 +296,8 @@ public class PlayerCarMovement : MonoBehaviour
 
         grounded = false;
 
+        float aveWheelSpeed = 0;
+
         foreach(WheelProperties w in m_wheels)
         {
             Transform wheelTransform = w.wheelObject.transform;
@@ -314,6 +315,7 @@ public class PlayerCarMovement : MonoBehaviour
 
             float idealLateralForce = wheelGripX * rb.mass * (-lateralVelocity / Time.fixedDeltaTime);
             float idealTravelForce = wheelGripZ * rb.mass * (-travelVelocity - w.angularVelocity * w.wheelCircumference) / Time.fixedDeltaTime;
+            aveWheelSpeed += -w.angularVelocity * w.wheelCircumference;
 
             // Theoretical force we can apply if this wheel is on the ground with no slipping
             Vector3 idealLocalForce = new Vector3(
@@ -424,6 +426,11 @@ public class PlayerCarMovement : MonoBehaviour
 
         } // End Wheel Calculations
         
+        if(uiController != null)
+        {
+            uiController.SetSpeed(aveWheelSpeed / m_wheels.Length);
+        }
+
         if(!grounded)
         {
             groundTimer = Mathf.Min(leaveGroundCoyoteTime, groundTimer - Time.fixedDeltaTime);
