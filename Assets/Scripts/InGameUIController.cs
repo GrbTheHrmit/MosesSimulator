@@ -51,7 +51,7 @@ public class InGameUIController : MonoBehaviour
     {
         SpeedText.text = ((int)speed).ToString() + " MPH";
 
-        float factor = speed / MaxSpeed;
+        float factor = Mathf.Max(speed / MaxSpeed, 0);
         SpeedoNeedle.transform.rotation = Quaternion.Euler(0, 0, -factor * 180);
     }
 

@@ -359,11 +359,6 @@ public class PlayerCarMovement : MonoBehaviour
             // Torque calculations for next frame
             w.torque = w.engineTorque * lastMoveInput.y;
             float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
-            w.angularVelocity += ((-w.torque + appliedLocalForce.z / w.wheelCircumference) / inertia) * Time.fixedDeltaTime;
-            w.braking = effectiveBrakeInput;
-            w.angularVelocity *= 1 - w.braking * w.brakeStrength * Time.fixedDeltaTime;
-            // Clamp to max speed
-            w.angularVelocity = Mathf.Clamp(w.angularVelocity, -MaxSpeed / w.wheelCircumference, MaxSpeed / w.wheelCircumference);
 
             RaycastHit hit;
             if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f, (~LayerMask.GetMask("Player") & ~LayerMask.GetMask("NonCollidable")) ))
@@ -406,7 +401,9 @@ public class PlayerCarMovement : MonoBehaviour
                     w.skidTrail.emitting = false;
                     w.skidParticles.Stop();
                 }
-                
+
+                // Apply torque and drag to wheel rotation
+                w.angularVelocity += ((-w.torque + appliedLocalForce.z / w.wheelCircumference) / inertia) * Time.fixedDeltaTime;
             }
             else
             {
@@ -419,10 +416,18 @@ public class PlayerCarMovement : MonoBehaviour
                     w.skidTrail.emitting = false;
                     w.skidParticles.Stop();
                 }
-                
+
+                // Apply torque to wheel rotation, no drag since no collision
+                w.angularVelocity += ((-w.torque / w.wheelCircumference) / inertia) * Time.fixedDeltaTime;
             } // End physics raycast section
 
             w.wheelObject.transform.GetChild(0).Rotate(Vector3.right, -w.angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime, Space.Self);
+
+            // Final Wheel speed calc (after applying forces)
+            w.braking = effectiveBrakeInput;
+            w.angularVelocity *= 1 - w.braking * w.brakeStrength * Time.fixedDeltaTime;
+            // Clamp to max speed
+            w.angularVelocity = Mathf.Clamp(w.angularVelocity, -MaxSpeed / w.wheelCircumference, MaxSpeed / w.wheelCircumference);
 
         } // End Wheel Calculations
         
