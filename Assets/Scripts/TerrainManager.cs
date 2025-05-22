@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
+using UnityEngine.AI;
+using static UnityEditor.FilePathAttribute;
 
 public class TerrainManager : MonoBehaviour
 {
@@ -10,7 +12,11 @@ public class TerrainManager : MonoBehaviour
     public GameObject FinishPrefab;
 
     [SerializeField]
-    private int TerrainTileDims = 3;
+    private int MaxTerrainDim = 64;
+    [SerializeField]
+    private int TerrainTileDims = 6;
+    [SerializeField]
+    private int SwapEdgeDistance = 2;
     private Vector3 currentOrigin = Vector3.zero;
     private float baseHeight = -5;
 
@@ -25,6 +31,9 @@ public class TerrainManager : MonoBehaviour
 
     private int voronoiPointsPerTile = 50;
     private List<Vector2> voronoiPoints = new List<Vector2>();
+
+    private int currentBottomLeftTile;
+    private Vector2Int GetBottomLeftTile { get { return new Vector2Int(currentBottomLeftTile % MaxTerrainDim, currentBottomLeftTile / MaxTerrainDim); } }
 
     private static TerrainManager instance = null;
     public static float GetWorldHeightAtLocation(Vector3 location)
@@ -42,7 +51,7 @@ public class TerrainManager : MonoBehaviour
     {
         instance = this;
 
-        heightArray = new float[pointsPerTile * TerrainTileDims, pointsPerTile * TerrainTileDims];
+        heightArray = new float[pointsPerTile * MaxTerrainDim, pointsPerTile * MaxTerrainDim];
         PointInterval = TerrainInterval / pointsPerTile;
 
         if(TerrainPrefab != null)
@@ -52,13 +61,15 @@ public class TerrainManager : MonoBehaviour
                 float x = (i % TerrainTileDims) - ((TerrainTileDims - 1) * 0.5f);
                 float y = ((int)(i / TerrainTileDims)) - ((TerrainTileDims - 1) * 0.5f);
                 Vector3 position = new Vector3(x * TerrainInterval, baseHeight, y * TerrainInterval);
+
                 GameObject newTerrain = Instantiate(TerrainPrefab, position, Quaternion.identity);
                 terrainList.Add(newTerrain.GetComponent<ProceduralTerrainScript>());
                 terrainList[i].InitTerrain();
             }
 
+            // Set CenterOrigin to bottom left of tile location 0 ( World origin is the middle)
             float centerOffset = 0.5f * TerrainInterval;
-            currentOrigin = new Vector3(-((TerrainTileDims - 1) * 0.5f) * TerrainInterval, baseHeight, -((TerrainTileDims - 1) * 0.5f) * TerrainInterval);
+            currentOrigin = new Vector3(-((MaxTerrainDim - 1) * 0.5f) * TerrainInterval, baseHeight, -((MaxTerrainDim - 1) * 0.5f) * TerrainInterval);
             currentOrigin -= new Vector3(centerOffset, 0, centerOffset);
 
             //Debug.Log(currentOrigin);
@@ -84,6 +95,33 @@ public class TerrainManager : MonoBehaviour
     void FixedUpdate()
     {
         // Todo something about moving terrain around
+       // CheckMoveTiles();
+    }
+
+    private void CheckMoveTiles()
+    {
+        int playerTile = GetPlayerTileIdx();
+        int playerX = playerTile % MaxTerrainDim;
+        int playerY = playerTile / MaxTerrainDim;
+
+        int diffX = playerX - GetBottomLeftTile.x;
+        int diffY = playerY - GetBottomLeftTile.y;
+            
+
+
+        if(diffX < SwapEdgeDistance || diffX >= TerrainTileDims - SwapEdgeDistance)
+        {
+            //Swap a column
+            Debug.Log("Edging X");
+        }
+
+        if (diffY < SwapEdgeDistance || diffY >= TerrainTileDims - SwapEdgeDistance)
+        {
+            //Swap a row
+            Debug.Log("Edging Y");
+        }
+
+
     }
 
     private float CustomRandom(float x)
@@ -104,6 +142,24 @@ public class TerrainManager : MonoBehaviour
         float y = CustomRandom(position.z);
 
         return x * y;
+    }
+
+    public int GetPlayerTileIdx()
+    {
+        Vector3 relativePos = FollowManager.Instance().LeaderPosition - currentOrigin;
+        int tileCol = Mathf.FloorToInt(relativePos.x / TerrainInterval);
+        int tileRow = Mathf.FloorToInt(relativePos.z / TerrainInterval);
+
+        return tileRow * MaxTerrainDim + tileCol;
+    }
+
+    private int GetTileIdxAtLocation(Vector3 location)
+    {
+        Vector3 relativePos = location - currentOrigin;
+        int tileCol = Mathf.FloorToInt(relativePos.x / TerrainInterval);
+        int tileRow = Mathf.FloorToInt(relativePos.z / TerrainInterval);
+
+        return tileRow * MaxTerrainDim + tileCol;
     }
 
     private float GetHeightAtLocation(Vector3 location)
@@ -136,10 +192,10 @@ public class TerrainManager : MonoBehaviour
 
     private void GenerateNewHeightMap()
     {
-        for (int tile = 0; tile < TerrainTileDims * TerrainTileDims; tile++)
+        for (int tile = 0; tile < MaxTerrainDim * MaxTerrainDim; tile++)
         {
-            int tileCol = tile % TerrainTileDims;
-            int tileRow = tile / TerrainTileDims;
+            int tileCol = tile % MaxTerrainDim;
+            int tileRow = tile / MaxTerrainDim;
 
 
             for(int point = 0; point < pointsPerTile * pointsPerTile; point++)
@@ -172,6 +228,8 @@ public class TerrainManager : MonoBehaviour
             terrainList[tile].MyMesh.vertices = newVerts;
             terrainList[tile].RecomputeMeshCollider();
         }
+
+        currentBottomLeftTile = GetTileIdxAtLocation(terrainList[0].gameObject.transform.position);
 
     }
 

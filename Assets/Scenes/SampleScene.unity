@@ -782,7 +782,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TerrainPrefab: {fileID: 3346664031508845981, guid: 8fcea5e83986adb4bb13402a337b9c49, type: 3}
   FinishPrefab: {fileID: 6182003461833472563, guid: 4dc419715abf73644b28a80725cd102b, type: 3}
-  TerrainTileDims: 6
+  TerrainTileDims: 8
   pointsPerTile: 11
 --- !u!1 &1800582410
 GameObject:
