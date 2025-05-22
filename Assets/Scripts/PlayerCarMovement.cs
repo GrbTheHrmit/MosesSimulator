@@ -459,11 +459,11 @@ public class PlayerCarMovement : MonoBehaviour
             {
                 if(Mathf.Abs(lastMoveInput.x) > 0.1f)
                 {
-                    rb.angularDrag = 1.8f;
+                    rb.angularDrag = steerRotateFriction;
                 }
                 else
                 {
-                    rb.angularDrag = 0.02f;
+                    rb.angularDrag = releaseRotateFriction;
                 }
             }
             
