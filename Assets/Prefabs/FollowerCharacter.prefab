@@ -610,6 +610,7 @@ MonoBehaviour:
   wanderTargetDistance: 30
   wanderMaxSpeed: 2
   maxWanderSeconds: 8
+  climbSpeed: 1
 --- !u!95 &1063538681184436918
 Animator:
   serializedVersion: 5

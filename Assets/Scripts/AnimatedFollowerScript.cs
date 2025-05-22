@@ -47,9 +47,14 @@ public class AnimatedFollowerScript : MonoBehaviour
     [SerializeField]
     private float maxWanderSeconds = 8.0f;
 
+    [SerializeField]
+    private float climbSpeed = 1f;
+
     private Animator animator;
 
-    Vector3 lastVehiclePosition;
+    Vector3 lastOffsetPosition;
+    Quaternion localRotation;
+    Vector3 localVehicleOffset;
 
     // Start is called before the first frame update
     void Start()
@@ -96,11 +101,20 @@ public class AnimatedFollowerScript : MonoBehaviour
         rb.MoveRotation(Quaternion.FromToRotation(rb.transform.forward, lookDir.normalized) * rb.rotation);
         Debug.DrawRay(rb.position, lookDir);
 
-        if(isClimbing || isRiding)
+        if(isClimbing)
         {
-            Vector3 diff = FollowManager.Instance().LeaderPosition - lastVehiclePosition;
+
+            Vector3 newPosition = FollowManager.Instance().FollowObject.position + FollowManager.Instance().FollowObject.transform.TransformDirection(localVehicleOffset);
+            Vector3 diff = newPosition - lastOffsetPosition;
             rb.position += diff;
-            lastVehiclePosition = FollowManager.Instance().LeaderPosition;
+            rb.rotation = FollowManager.Instance().FollowObject.rotation * localRotation;
+            lastOffsetPosition = newPosition;
+        }
+        else if(isRiding)
+        {
+            Vector3 newPosition = FollowManager.Instance().FollowObject.position + FollowManager.Instance().FollowObject.transform.TransformDirection(localVehicleOffset);
+            rb.position = newPosition;
+            rb.rotation = FollowManager.Instance().FollowObject.rotation * localRotation;
         }
     }
 
@@ -117,10 +131,19 @@ public class AnimatedFollowerScript : MonoBehaviour
 
     public void StartClimbing()
     {
+        
+
         isClimbing = true;
         rb.useGravity = false;
         rb.isKinematic = true;
-        lastVehiclePosition = FollowManager.Instance().LeaderPosition;
+        rb.excludeLayers = LayerMask.GetMask("Player");
+        rb.constraints = RigidbodyConstraints.None;
+
+        Vector3 offset = rb.position - FollowManager.Instance().FollowObject.position;
+        localVehicleOffset = FollowManager.Instance().FollowObject.transform.InverseTransformDirection(offset);
+        localRotation = Quaternion.Inverse(rb.transform.rotation) * rb.rotation;
+        lastOffsetPosition = rb.position;
+
         animator.SetBool("Climbing", true);
     }
 
@@ -131,6 +154,9 @@ public class AnimatedFollowerScript : MonoBehaviour
         animator.SetBool("Climbing", false);
         animator.SetBool("Riding", true);
         //transform.localPosition = localPosition;
+
+        Vector3 offset = rb.position - FollowManager.Instance().FollowObject.position;
+        localVehicleOffset = FollowManager.Instance().FollowObject.transform.InverseTransformDirection(offset);
     }
 
     public void SaveFollower()
@@ -146,7 +172,7 @@ public class AnimatedFollowerScript : MonoBehaviour
         animator.SetBool("Following", true);
 
         isFollowing = true;
-        rb.excludeLayers = LayerMask.GetMask("Player");
+        //rb.excludeLayers = LayerMask.GetMask("Player");
         FollowManager.Instance().AddFollower(this);
         foreach (SphereCollider sph in GetComponents<SphereCollider>())
         {
