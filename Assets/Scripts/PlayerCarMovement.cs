@@ -348,8 +348,8 @@ public class PlayerCarMovement : MonoBehaviour
 
                 float slipFactor = Mathf.Max(w.lateralSlip, w.travelSlip);
                 //appliedLocalForce *= slipFactor;// w.lateralGripCurve.Evaluate(slipFactor);
-                appliedLocalForce.x *= w.lateralGripFactor / Mathf.Clamp(w.lateralSlip * 0.1f, 1, 3);
-                appliedLocalForce.z *= w.travelGripFactor / Mathf.Clamp(w.travelSlip * 0.1f, 1, 3);
+                appliedLocalForce.x *= w.lateralGripFactor / Mathf.Clamp(w.lateralSlip * 0.1f, 1, 4);
+                appliedLocalForce.z *= w.travelGripFactor / Mathf.Clamp(w.travelSlip * 0.1f, 1, 4);
             }
             
 
@@ -434,6 +434,8 @@ public class PlayerCarMovement : MonoBehaviour
 
                 // Apply torque to wheel rotation, drag is minimized by air drag factor
                 w.angularVelocity += ((dragTorque * airDragFactor) + (airForceFactor * appliedLocalForce.z / w.wheelCircumference) - w.torque) / inertia * Time.fixedDeltaTime;
+
+                w.slidding = true; // Helps to not get weird flips when landing
             } // End physics raycast section
 
             w.wheelObject.transform.GetChild(0).Rotate(Vector3.right, -w.angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime, Space.Self);

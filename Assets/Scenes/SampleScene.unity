@@ -782,7 +782,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TerrainPrefab: {fileID: 3346664031508845981, guid: 8fcea5e83986adb4bb13402a337b9c49, type: 3}
   FinishPrefab: {fileID: 6182003461833472563, guid: 4dc419715abf73644b28a80725cd102b, type: 3}
-  TerrainTileDims: 8
+  MaxTerrainDim: 16
+  TerrainTileDims: 6
+  SwapEdgeDistance: 1
   pointsPerTile: 11
 --- !u!1 &1800582410
 GameObject:
@@ -1009,16 +1011,8 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.52
-      objectReference: {fileID: 0}
-    - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 2.94
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalRotation.w

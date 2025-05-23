@@ -1,10 +1,7 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEngine;
-using UnityEngine.AI;
-using static UnityEditor.FilePathAttribute;
 
 public class TerrainManager : MonoBehaviour
 {
@@ -32,8 +29,11 @@ public class TerrainManager : MonoBehaviour
     private int voronoiPointsPerTile = 50;
     private List<Vector2> voronoiPoints = new List<Vector2>();
 
-    private int currentBottomLeftTile;
-    private Vector2Int GetBottomLeftTile { get { return new Vector2Int(currentBottomLeftTile % MaxTerrainDim, currentBottomLeftTile / MaxTerrainDim); } }
+    private int currentBottomLeftX;
+    private int currentBottomLeftY;
+
+    private int TerrainBottomLeftX = 0;
+    private int TerrainBottomLeftY = 0;
 
     private static TerrainManager instance = null;
     public static float GetWorldHeightAtLocation(Vector3 location)
@@ -95,7 +95,7 @@ public class TerrainManager : MonoBehaviour
     void FixedUpdate()
     {
         // Todo something about moving terrain around
-       // CheckMoveTiles();
+        CheckMoveTiles();
     }
 
     private void CheckMoveTiles()
@@ -104,24 +104,153 @@ public class TerrainManager : MonoBehaviour
         int playerX = playerTile % MaxTerrainDim;
         int playerY = playerTile / MaxTerrainDim;
 
-        int diffX = playerX - GetBottomLeftTile.x;
-        int diffY = playerY - GetBottomLeftTile.y;
-            
-
+        int diffX = (playerX - currentBottomLeftX + MaxTerrainDim) % MaxTerrainDim;
+        int diffY = (playerY - currentBottomLeftY + MaxTerrainDim) % MaxTerrainDim;
 
         if(diffX < SwapEdgeDistance || diffX >= TerrainTileDims - SwapEdgeDistance)
         {
-            //Swap a column
-            Debug.Log("Edging X");
+            SwapCol(!(diffX < SwapEdgeDistance));
         }
 
         if (diffY < SwapEdgeDistance || diffY >= TerrainTileDims - SwapEdgeDistance)
         {
-            //Swap a row
-            Debug.Log("Edging Y");
+            SwapRow(!(diffY < SwapEdgeDistance));
         }
 
 
+    }
+
+    private void SwapRow(bool increase)
+    {
+        int maxTileNum = MaxTerrainDim * MaxTerrainDim;
+
+        if(increase)
+        {
+            // Move all items in this row
+            for(int tile = 0; tile < TerrainTileDims; tile++)
+            {
+                int tileIdx = TerrainBottomLeftY * TerrainTileDims + tile;
+                terrainList[tileIdx].gameObject.transform.position += new Vector3(0, 0, TerrainTileDims * TerrainInterval);
+
+                // Recalculate Verts
+                Vector3[] newVerts = new Vector3[terrainList[tileIdx].MyMesh.vertexCount];
+                for (int i = 0; i < terrainList[tileIdx].MyMesh.vertexCount; i++)
+                {
+                    Vector3 vert = terrainList[tileIdx].MyMesh.vertices[i];
+                    Vector3 worldVert = vert;
+                    worldVert.x *= (TerrainInterval / TerrainDefaultScale);
+                    worldVert.z *= (TerrainInterval / TerrainDefaultScale);
+                    worldVert += terrainList[tileIdx].gameObject.transform.position;
+
+                    float interpolatedHeight = GetHeightAtLocation(worldVert);
+                    Debug.Log(interpolatedHeight);
+                    newVerts[i] = new Vector3(vert.x, interpolatedHeight, vert.z);
+                }
+                terrainList[tileIdx].MyMesh.vertices = newVerts;
+                terrainList[tileIdx].RecomputeMeshCollider();
+            }
+            
+            // Set the next row to be the bottomleft
+            TerrainBottomLeftY = (TerrainBottomLeftY + 1) % TerrainTileDims;
+            currentBottomLeftY = (currentBottomLeftY + 1) % MaxTerrainDim;
+        }
+        else
+        {
+            // Set the row we are going to move as the bottom left
+            TerrainBottomLeftY = (TerrainBottomLeftY + TerrainTileDims - 1) % TerrainTileDims;
+            currentBottomLeftY = (currentBottomLeftY + MaxTerrainDim - 1) % MaxTerrainDim;
+
+            // Move all items in this row
+            for (int tile = 0; tile < TerrainTileDims; tile++)
+            {
+                int tileIdx = TerrainBottomLeftY * TerrainTileDims + tile;
+                terrainList[tileIdx].transform.position -= new Vector3(0, 0, TerrainTileDims * TerrainInterval);
+
+                // Recalculate Verts
+                Vector3[] newVerts = new Vector3[terrainList[tileIdx].MyMesh.vertexCount];
+                for (int i = 0; i < terrainList[tileIdx].MyMesh.vertexCount; i++)
+                {
+                    Vector3 vert = terrainList[tileIdx].MyMesh.vertices[i];
+                    Vector3 worldVert = vert;
+                    worldVert.x *= (TerrainInterval / TerrainDefaultScale);
+                    worldVert.z *= (TerrainInterval / TerrainDefaultScale);
+                    worldVert += terrainList[tileIdx].gameObject.transform.position;
+
+                    float interpolatedHeight = GetHeightAtLocation(worldVert);
+
+                    newVerts[i] = new Vector3(vert.x, interpolatedHeight, vert.z);
+                }
+                terrainList[tileIdx].MyMesh.vertices = newVerts;
+                terrainList[tileIdx].RecomputeMeshCollider();
+            }
+        }
+
+    }
+
+    private void SwapCol(bool increase)
+    {
+        int maxTileNum = MaxTerrainDim * MaxTerrainDim;
+
+        if (increase)
+        {
+            // Move all items in this row
+            for (int tile = 0; tile < TerrainTileDims; tile++)
+            {
+                int tileIdx = tile * TerrainTileDims + TerrainBottomLeftX;
+                terrainList[tileIdx].gameObject.transform.position += new Vector3(TerrainTileDims * TerrainInterval, 0, 0);
+
+                // Recalculate Verts
+                Vector3[] newVerts = new Vector3[terrainList[tileIdx].MyMesh.vertexCount];
+                for (int i = 0; i < terrainList[tileIdx].MyMesh.vertexCount; i++)
+                {
+                    Vector3 vert = terrainList[tileIdx].MyMesh.vertices[i];
+                    Vector3 worldVert = vert;
+                    worldVert.x *= (TerrainInterval / TerrainDefaultScale);
+                    worldVert.z *= (TerrainInterval / TerrainDefaultScale);
+                    worldVert += terrainList[tileIdx].gameObject.transform.position;
+
+                    float interpolatedHeight = GetHeightAtLocation(worldVert);
+                    Debug.Log(interpolatedHeight);
+                    newVerts[i] = new Vector3(vert.x, interpolatedHeight, vert.z);
+                }
+                terrainList[tileIdx].MyMesh.vertices = newVerts;
+                terrainList[tileIdx].RecomputeMeshCollider();
+            }
+
+            // Set the next row to be the bottomleft
+            TerrainBottomLeftX = (TerrainBottomLeftX + 1) % TerrainTileDims;
+            currentBottomLeftX = (currentBottomLeftX + 1) % MaxTerrainDim;
+        }
+        else
+        {
+            // Set the row we are going to move as the bottom left
+            TerrainBottomLeftX = (TerrainBottomLeftX + TerrainTileDims - 1) % TerrainTileDims;
+            currentBottomLeftX = (currentBottomLeftX + MaxTerrainDim - 1) % MaxTerrainDim;
+
+            // Move all items in this row
+            for (int tile = 0; tile < TerrainTileDims; tile++)
+            {
+                int tileIdx = tile * TerrainTileDims + TerrainBottomLeftX;
+                terrainList[tileIdx].transform.position -= new Vector3(TerrainTileDims * TerrainInterval, 0, 0);
+
+                // Recalculate Verts
+                Vector3[] newVerts = new Vector3[terrainList[tileIdx].MyMesh.vertexCount];
+                for (int i = 0; i < terrainList[tileIdx].MyMesh.vertexCount; i++)
+                {
+                    Vector3 vert = terrainList[tileIdx].MyMesh.vertices[i];
+                    Vector3 worldVert = vert;
+                    worldVert.x *= (TerrainInterval / TerrainDefaultScale);
+                    worldVert.z *= (TerrainInterval / TerrainDefaultScale);
+                    worldVert += terrainList[tileIdx].gameObject.transform.position;
+
+                    float interpolatedHeight = GetHeightAtLocation(worldVert);
+
+                    newVerts[i] = new Vector3(vert.x, interpolatedHeight, vert.z);
+                }
+                terrainList[tileIdx].MyMesh.vertices = newVerts;
+                terrainList[tileIdx].RecomputeMeshCollider();
+            }
+        }
     }
 
     private float CustomRandom(float x)
@@ -131,8 +260,8 @@ public class TerrainManager : MonoBehaviour
 
     private float GetMappedValue(int tileNum, int pointNum)
     {
-        int tileCol = tileNum % TerrainTileDims;
-        int tileRow = tileNum / TerrainTileDims;
+        int tileCol = tileNum % MaxTerrainDim;
+        int tileRow = tileNum / MaxTerrainDim;
         int pointCol = pointNum % pointsPerTile;
         int pointRow = pointNum / pointsPerTile;
 
@@ -165,8 +294,21 @@ public class TerrainManager : MonoBehaviour
     private float GetHeightAtLocation(Vector3 location)
     {
         Vector3 relativePos = location - currentOrigin;
-        int pointCol = Mathf.FloorToInt(relativePos.x / PointInterval);
-        int pointRow = Mathf.FloorToInt(relativePos.z / PointInterval);
+
+        // Slightly jank way to make sure we get a point we've calculated. world will loop
+        int pointCol = Mathf.FloorToInt(relativePos.x / PointInterval) % (MaxTerrainDim * pointsPerTile);
+        while(pointCol < 0)
+        {
+            pointCol += MaxTerrainDim * pointsPerTile;
+        }
+        relativePos.x += (pointCol - Mathf.FloorToInt(relativePos.x / PointInterval)) * PointInterval;
+
+        int pointRow = Mathf.FloorToInt(relativePos.z / PointInterval) % (MaxTerrainDim * pointsPerTile);
+        while (pointRow < 0)
+        {
+            pointRow += MaxTerrainDim * pointsPerTile;
+        }
+        relativePos.z += (pointRow - Mathf.FloorToInt(relativePos.z / PointInterval)) * PointInterval;
 
         float interpolatedHeight = 0;
         int used = 0;
@@ -174,8 +316,8 @@ public class TerrainManager : MonoBehaviour
         {
             for (int y = 0; y < 2; y++)
             {
-                if ((0 <= pointCol + x) && (TerrainTileDims * pointsPerTile > pointCol + x) &&
-                    (0 <= pointRow + y) && (TerrainTileDims * pointsPerTile > pointRow + y))
+                if ((0 <= pointCol + x) && (MaxTerrainDim * pointsPerTile > pointCol + x) &&
+                    (0 <= pointRow + y) && (MaxTerrainDim * pointsPerTile > pointRow + y))
                 {
                     float distRatio = Vector3.Distance(relativePos, new Vector3(pointCol * PointInterval, relativePos.y, pointRow * PointInterval)) / PointInterval;
                     interpolatedHeight += (1f - distRatio) * heightArray[pointRow + y, pointCol + x];
@@ -222,15 +364,18 @@ public class TerrainManager : MonoBehaviour
                 worldVert += terrainList[tile].gameObject.transform.position;
 
                 float interpolatedHeight = GetHeightAtLocation(worldVert);
-
+                Debug.Log(interpolatedHeight);
                 newVerts[i] = new Vector3(vert.x, interpolatedHeight, vert.z);
             }
             terrainList[tile].MyMesh.vertices = newVerts;
             terrainList[tile].RecomputeMeshCollider();
         }
 
-        currentBottomLeftTile = GetTileIdxAtLocation(terrainList[0].gameObject.transform.position);
-
+        TerrainBottomLeftX = 0;
+        TerrainBottomLeftY = 0;
+        int currentBottomLeftTile = GetTileIdxAtLocation(terrainList[0].gameObject.transform.position);
+        currentBottomLeftX = currentBottomLeftTile % MaxTerrainDim;
+        currentBottomLeftY = currentBottomLeftTile / MaxTerrainDim;
     }
 
     private void PlaceFinish()
