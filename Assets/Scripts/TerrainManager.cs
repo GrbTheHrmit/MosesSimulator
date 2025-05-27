@@ -143,7 +143,7 @@ public class TerrainManager : MonoBehaviour
                     worldVert += terrainList[tileIdx].gameObject.transform.position;
 
                     float interpolatedHeight = GetHeightAtLocation(worldVert);
-                    Debug.Log(interpolatedHeight);
+                    //Debug.Log(interpolatedHeight);
                     newVerts[i] = new Vector3(vert.x, interpolatedHeight, vert.z);
                 }
                 terrainList[tileIdx].MyMesh.vertices = newVerts;
@@ -210,7 +210,7 @@ public class TerrainManager : MonoBehaviour
                     worldVert += terrainList[tileIdx].gameObject.transform.position;
 
                     float interpolatedHeight = GetHeightAtLocation(worldVert);
-                    Debug.Log(interpolatedHeight);
+                    //Debug.Log(interpolatedHeight);
                     newVerts[i] = new Vector3(vert.x, interpolatedHeight, vert.z);
                 }
                 terrainList[tileIdx].MyMesh.vertices = newVerts;
@@ -364,7 +364,6 @@ public class TerrainManager : MonoBehaviour
                 worldVert += terrainList[tile].gameObject.transform.position;
 
                 float interpolatedHeight = GetHeightAtLocation(worldVert);
-                Debug.Log(interpolatedHeight);
                 newVerts[i] = new Vector3(vert.x, interpolatedHeight, vert.z);
             }
             terrainList[tile].MyMesh.vertices = newVerts;

@@ -157,12 +157,14 @@ public class AnimatedFollowerScript : MonoBehaviour
 
         Vector3 offset = rb.position - FollowManager.Instance().FollowObject.position;
         localVehicleOffset = FollowManager.Instance().FollowObject.transform.InverseTransformDirection(offset);
+
+        // Add this to the count of gathered followers
+        FollowManager.Instance().AddFollower(this);
     }
 
     public void SaveFollower()
     {
         isSaved = true;
-
     }
 
     private void StartFollowing()
@@ -173,7 +175,6 @@ public class AnimatedFollowerScript : MonoBehaviour
 
         isFollowing = true;
         //rb.excludeLayers = LayerMask.GetMask("Player");
-        FollowManager.Instance().AddFollower(this);
         foreach (SphereCollider sph in GetComponents<SphereCollider>())
         {
             if (sph.isTrigger)

@@ -19,6 +19,9 @@ public class InGameUIController : MonoBehaviour
 
     private TextMeshProUGUI FollowerNumber = null;
 
+    private TextMeshProUGUI PointNumber = null;
+    private TextMeshProUGUI MultiplierNumber = null;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -37,11 +40,19 @@ public class InGameUIController : MonoBehaviour
 
         FollowerNumber = transform.Find("FollowerCount").Find("FollowerNumber").GetComponent<TextMeshProUGUI>();
 
+        PointNumber = transform.Find("PointIndicator").Find("PointText").GetComponent<TextMeshProUGUI>();
+        MultiplierNumber = transform.Find("PointIndicator").Find("MultiplierText").GetComponent<TextMeshProUGUI>();
+
         PlayerCarMovement playermovement = FindObjectOfType<PlayerCarMovement>();
         if(playermovement != null )
         {
             MaxSpeed = playermovement.GetMaxSpeed;
             playermovement.UIController = this;
+
+            SpeedoEast.SetText(MaxSpeed.ToString());
+            SpeedoNorth.SetText((MaxSpeed * 0.5f).ToString());
+            SpeedoNorthEast.SetText((MaxSpeed * 0.75f).ToString());
+            SpeedoNorthWest.SetText((MaxSpeed * 0.25f).ToString());
         }
 
         FollowManager.Instance().GameUIController = this;
@@ -81,4 +92,16 @@ public class InGameUIController : MonoBehaviour
     {
         FollowerNumber.text = followerCount.ToString();
     }
+
+    public void SetPoints(int points)
+    {
+        PointNumber.text = points.ToString();
+    }
+
+    public void SetMulitplier(double multiplier)
+    {
+        MultiplierNumber.text = "x" + multiplier.ToString("0.00");
+    }
+
+
 }

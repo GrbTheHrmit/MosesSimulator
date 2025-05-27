@@ -90,9 +90,12 @@ public class PlayerCarMovement : MonoBehaviour
     private float leaveGroundCoyoteTime = 0.1f;
     [SerializeField]
     private float hitGroundCoyoteTime = 0.1f;
+    [SerializeField]
+    private int numWheelsForGround = 2;
 
     private float groundTimer = 0f;
     private bool grounded = false;
+    public bool IsGrounded { get { return groundTimer >= 0; } }
 
     [Header("Air Controls")]
     [SerializeField]
@@ -103,6 +106,12 @@ public class PlayerCarMovement : MonoBehaviour
     [SerializeField]
     private float steerRotateFriction = 1f;
 
+    [Header("Trick Controls")]
+    [SerializeField]
+    private float groundFlipForce = 100;
+    [SerializeField]
+    private float airFlipForce = 200;
+
     private static int WHEEL_FR = 0;
     private static int WHEEL_FL = 1;
     private static int WHEEL_BR = 2;
@@ -111,6 +120,7 @@ public class PlayerCarMovement : MonoBehaviour
 
     private Vector2 lastMoveInput;
     private float lastBrakeInput;
+    private bool flipInput = false;
     private float steerAngle = 0;
     private float effectiveBrakeInput;
     private int gear = 1;
@@ -129,7 +139,9 @@ public class PlayerCarMovement : MonoBehaviour
     public float wheelGripZ = 42f;
 
     private InGameUIController uiController = null;
-    public InGameUIController UIController { set {  uiController = value; } }
+    public InGameUIController UIController { set {  uiController = value; } get { return uiController; } }
+
+    private PointManager pointManager = null;
 
     private int StringToWheelIndex(string str)
     {
@@ -158,6 +170,11 @@ public class PlayerCarMovement : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        pointManager = GetComponent<PointManager>();
+        if(pointManager == null)
+        {
+            Debug.LogError("Player Script could not find Point Manager");
+        }
 
         SphereCollider[] children = GetComponentsInChildren<SphereCollider>();
         m_wheelObjs = new SphereCollider[children.Length];
@@ -234,6 +251,7 @@ public class PlayerCarMovement : MonoBehaviour
             input.currentActionMap.FindAction("Accelerate").performed += OnAccelerateAction;
             input.currentActionMap.FindAction("Brake").performed += OnBrakeAction;
             input.currentActionMap.FindAction("Shift").performed += OnShiftAction;
+            input.currentActionMap.FindAction("Flip").performed += OnFlipAction;
         }
 
         FollowManager.Instance().FollowObject = rb;
@@ -268,6 +286,11 @@ public class PlayerCarMovement : MonoBehaviour
         }
     }
 
+    public void OnFlipAction(InputAction.CallbackContext context)
+    {
+        flipInput = context.ReadValue<float>() > 0.5f;
+    }
+
     /*public void OnAirRollAction(InputAction.CallbackContext context)
     {
 
@@ -279,10 +302,28 @@ public class PlayerCarMovement : MonoBehaviour
 
         lastMoveInput = context.ReadValue<Vector2>();
     */
-
-
-    void FixedUpdate()
+    private void UpdateTricks()
     {
+        if (flipInput)
+        {
+            float flipForce = IsGrounded ? groundFlipForce : airFlipForce;
+            // Frontflip
+            if (lastMoveInput.y > 0)
+            {
+                rb.AddForceAtPosition(flipForce * rb.transform.up, transform.TransformPoint(new Vector3(0, 0.1f, -3.5f)), ForceMode.Impulse);
+            }
+            else
+            {
+                rb.AddForceAtPosition(flipForce * rb.transform.up, transform.TransformPoint(new Vector3(0, 0.1f, 3.5f)), ForceMode.Impulse);
+            }
+
+            flipInput = false;
+        }
+    }
+
+    private void UpdateMovement()
+    {
+
         steerAngle = Mathf.MoveTowards(steerAngle, lastMoveInput.x, smoothTurn * Time.fixedDeltaTime);
 
         if (Mathf.Abs(lastMoveInput.y) <= 0.01f && Mathf.Abs(lastBrakeInput) < 0.01f)
@@ -297,10 +338,11 @@ public class PlayerCarMovement : MonoBehaviour
         rb.AddForce(-transform.up * rb.velocity.magnitude * 0.2f, ForceMode.Force);  // downforce
 
         grounded = false;
+        int groundedWheels = 0;
 
         float aveWheelSpeed = 0;
 
-        foreach(WheelProperties w in m_wheels)
+        foreach (WheelProperties w in m_wheels)
         {
             Transform wheelTransform = w.wheelObject.transform;
 
@@ -351,7 +393,7 @@ public class PlayerCarMovement : MonoBehaviour
                 appliedLocalForce.x *= w.lateralGripFactor / Mathf.Clamp(w.lateralSlip * 0.1f, 1, 4);
                 appliedLocalForce.z *= w.travelGripFactor / Mathf.Clamp(w.travelSlip * 0.1f, 1, 4);
             }
-            
+
 
             Vector3 appliedWorldForce = wheelTransform.TransformDirection(appliedLocalForce);
             w.worldSlipDirection = appliedWorldForce;
@@ -359,11 +401,11 @@ public class PlayerCarMovement : MonoBehaviour
             // Torque calculations for next frame
             float dragTorque = drag * Vector3.Dot(rb.velocity, w.wheelObject.transform.forward); // Apply drag as negative torque relative to velocity in wheel direction
             float gearRatio = 1;
-            if(gear == -1)
+            if (gear == -1)
             {
                 gearRatio = -gearRatios[0];
             }
-            else if(gear == 0)
+            else if (gear == 0)
             {
                 gearRatio = 0;
             }
@@ -376,12 +418,12 @@ public class PlayerCarMovement : MonoBehaviour
             float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
 
             RaycastHit hit;
-            if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f, (~LayerMask.GetMask("Player") & ~LayerMask.GetMask("NonCollidable")) ))
+            if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f, (~LayerMask.GetMask("Player") & ~LayerMask.GetMask("NonCollidable"))))
             {
-                grounded = true;
+                groundedWheels++;
 
                 // Spring Force
-                { 
+                {
                     float restDist = w.size * 2f;
                     float compression = restDist - hit.distance; // how much the spring is compressed
                     float damping = (w.lastSuspensionLength - hit.distance) * DamperStrength; // damping is difference from last frame
@@ -399,7 +441,7 @@ public class PlayerCarMovement : MonoBehaviour
                 w.lastSuspensionLength = hit.distance; // store for damping next frame
                 wheelTransform.position = hit.point + transform.up * w.size; // Move wheel visuals to the contact point + offset
 
-                
+
                 // ---- Skid marks ----
                 if (w.slidding)
                 {
@@ -424,7 +466,7 @@ public class PlayerCarMovement : MonoBehaviour
             {
                 wheelTransform.position = w.wheelWorldPosition - transform.up * w.size; // If not hitting anything, just position the wheel under the local anchor
                 w.normalForce = 0;
-                
+
                 // If wheel is off ground stop skid effects
                 if (w.skidTrail != null && w.skidParticles != null && w.skidTrail.emitting)
                 {
@@ -447,19 +489,21 @@ public class PlayerCarMovement : MonoBehaviour
             w.angularVelocity = Mathf.Clamp(w.angularVelocity, -MaxSpeed / w.wheelCircumference, MaxSpeed / w.wheelCircumference);
 
         } // End Wheel Calculations
-        
-        if(uiController != null)
+
+        if (uiController != null)
         {
             uiController.SetSpeed(aveWheelSpeed / m_wheels.Length);
         }
 
-        if(!grounded)
+        grounded = groundedWheels >= numWheelsForGround;
+
+        if (!grounded)
         {
             groundTimer = Mathf.Min(leaveGroundCoyoteTime, groundTimer - Time.fixedDeltaTime);
             //ApplyRotationalInput();
-            if(groundTimer < (leaveGroundCoyoteTime - airControlCoyoteTime))
+            if (groundTimer < (leaveGroundCoyoteTime - airControlCoyoteTime))
             {
-                if(Mathf.Abs(lastMoveInput.x) > 0.1f)
+                if (Mathf.Abs(lastMoveInput.x) > 0.1f)
                 {
                     rb.angularDrag = steerRotateFriction;
                 }
@@ -468,13 +512,20 @@ public class PlayerCarMovement : MonoBehaviour
                     rb.angularDrag = releaseRotateFriction;
                 }
             }
-            
+
         }
         else
         {
             groundTimer = Mathf.Max(-hitGroundCoyoteTime, groundTimer + Time.fixedDeltaTime);
             rb.angularDrag = 1f;
         }
+    }
+
+    void FixedUpdate()
+    {
+        UpdateMovement();
+        UpdateTricks();
+        pointManager.UpdatePoints();
     }
 
 }

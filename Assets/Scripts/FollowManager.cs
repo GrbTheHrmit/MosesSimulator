@@ -38,6 +38,9 @@ public class FollowManager : ScriptableObject
     private InGameUIController gameUIController = null;
     public InGameUIController GameUIController { set {  gameUIController = value; }  }
 
+    private PointManager playerPointManager = null;
+    public PointManager PlayerPointManager { set { playerPointManager = value; } }
+
     // Update is called once per frame
     public void FixedUpdate()
     {
@@ -72,6 +75,7 @@ public class FollowManager : ScriptableObject
         collectedFollowers.Add(follower);
         timeSinceLastCollected = 0;
         gameUIController.SetFollowerNum(collectedFollowers.Count);
+        playerPointManager.AddFollower();
     }
 
     // Returns the number of followers spawned

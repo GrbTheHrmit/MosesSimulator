@@ -215,6 +215,28 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
+--- !u!1 &472907108 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5206145035262871849, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+  m_PrefabInstance: {fileID: 1994057722}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &472907113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 472907108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb4e98119f880574585eafd56f151fba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxMultiplier: 5
+  MultiIncreasePerFollower: 0.15
+  ChainMultiIncrease: 0.5
+  MaxChainTime: 1.5
+  PointLossPerDrop: 500
 --- !u!1 &553989488
 GameObject:
   m_ObjectHideFlags: 0
@@ -1043,6 +1065,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: engineTorque
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: airControlCoyoteTime
       value: 0.12
       objectReference: {fileID: 0}
@@ -1081,7 +1107,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5206145035262871849, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      insertIndex: 2
+      addedObject: {fileID: 472907113}
   m_SourcePrefab: {fileID: 100100000, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
 --- !u!1 &2143823830
 GameObject:
@@ -1210,6 +1239,10 @@ PrefabInstance:
     - target: {fileID: 3583281987367729678, guid: d3501cee22d1ade4bb568b857134ac83, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7687638012016730044, guid: d3501cee22d1ade4bb568b857134ac83, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7691636296099022431, guid: d3501cee22d1ade4bb568b857134ac83, type: 3}
       propertyPath: m_SizeDelta.x
