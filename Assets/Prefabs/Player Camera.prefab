@@ -140,6 +140,9 @@ MonoBehaviour:
   MinDistToPlayer: 25
   MaxDistToPlayer: 35
   CameraHeight: 8
-  MinMoveSpeed: 8
-  MaxSwivelAngle: 90
+  MinMoveSpeed: 15
+  HSwivelSpeed: 90
+  VSwivelSpeed: 30
+  MaxHSwivelAngle: 120
+  MaxVSwivelAngle: 20
   FocusObject: {fileID: 0}

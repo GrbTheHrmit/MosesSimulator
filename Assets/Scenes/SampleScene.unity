@@ -171,41 +171,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
-      propertyPath: MoveSpeed
-      value: 120
-      objectReference: {fileID: 0}
-    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
       propertyPath: FocusObject
       value: 
       objectReference: {fileID: 559876035}
-    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
-      propertyPath: CameraHeight
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
-      propertyPath: MinMoveSpeed
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
-      propertyPath: VSwivelSpeed
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
-      propertyPath: MaxSwivelAngle
-      value: 120
-      objectReference: {fileID: 0}
-    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
-      propertyPath: MaxDistToPlayer
-      value: 35
-      objectReference: {fileID: 0}
-    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
-      propertyPath: MaxVSwivelAngle
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 7964131627100733085, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
-      propertyPath: MinDistToPlayer
-      value: 25
-      objectReference: {fileID: 0}
     - target: {fileID: 8024083148813376100, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
       propertyPath: m_Name
       value: Player Camera
@@ -215,28 +183,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
---- !u!1 &472907108 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5206145035262871849, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-  m_PrefabInstance: {fileID: 1994057722}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &472907113
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 472907108}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb4e98119f880574585eafd56f151fba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxMultiplier: 5
-  MultiIncreasePerFollower: 0.15
-  ChainMultiIncrease: 0.5
-  MaxChainTime: 1.5
-  PointLossPerDrop: 500
 --- !u!1 &553989488
 GameObject:
   m_ObjectHideFlags: 0
@@ -1029,21 +975,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4652825583138632287, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_ImplicitCom
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4652825583138632287, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_ImplicitTensor
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5206145035262871849, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalPosition.y
       value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1073,161 +1019,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: flipForce
-      value: 150
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: SpringClamp
-      value: 50000
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: MaxTrickTime
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: engineTorque
-      value: 40
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: MaxTrickForce
-      value: 750
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: MinTrickForce
-      value: 300
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: TrickCooldown
-      value: 0.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: airDragFactor
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: DamperStrength
-      value: 35
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: SpringStrength
-      value: 400
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: airForceFactor
-      value: 0.9
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: InitialTrickForce
-      value: 200
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: BoostTorqueIncrease
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: InitialTrickImpulse
-      value: 500
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: steerRotateFriction
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: MaxStaticTravelForce
-      value: 15000
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: airControlCoyoteTime
-      value: 0.12
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: MaxStaticLateralForce
-      value: 16500
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: MinKineticTravelForce
-      value: 7200
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: gearRatios.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: releaseRotateFriction
-      value: 0.14
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: MinKineticLateralForce
-      value: 2500
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: gearRatios.Array.data[0]
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: gearRatios.Array.data[1]
-      value: 1.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: gearRatios.Array.data[2]
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: maxGearSpeeds.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: maxGearSpeeds.Array.data[0]
-      value: 120
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: maxGearSpeeds.Array.data[1]
-      value: 200
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: maxGearSpeeds.Array.data[2]
-      value: 260
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[0].lateralSlipFactor
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[1].lateralSlipFactor
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[2].lateralSlipFactor
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[3].lateralSlipFactor
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[0].maxLateralSlipDivisor
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[1].maxLateralSlipDivisor
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[2].maxLateralSlipDivisor
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[3].maxLateralSlipDivisor
-      value: 5
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5206145035262871849, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      insertIndex: 2
-      addedObject: {fileID: 472907113}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
 --- !u!1 &2143823830
 GameObject:
@@ -1356,22 +1151,6 @@ PrefabInstance:
     - target: {fileID: 3583281987367729678, guid: d3501cee22d1ade4bb568b857134ac83, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7687638012016730044, guid: d3501cee22d1ade4bb568b857134ac83, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7691636296099022431, guid: d3501cee22d1ade4bb568b857134ac83, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 7691636296099022431, guid: d3501cee22d1ade4bb568b857134ac83, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8132360230553872932, guid: d3501cee22d1ade4bb568b857134ac83, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

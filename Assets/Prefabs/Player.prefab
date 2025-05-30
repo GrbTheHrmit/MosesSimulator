@@ -440,6 +440,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6503413759995862816}
   - component: {fileID: 1761495573077216322}
+  - component: {fileID: 5965416597448398359}
   - component: {fileID: 8062446476219220792}
   - component: {fileID: 4652825583138632287}
   m_Layer: 3
@@ -506,6 +507,23 @@ MonoBehaviour:
   m_DefaultActionMap: Default
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &5965416597448398359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5206145035262871849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb4e98119f880574585eafd56f151fba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxMultiplier: 5
+  MultiIncreasePerFollower: 0.15
+  ChainMultiIncrease: 0.5
+  MaxChainTime: 1.5
+  PointLossPerDrop: 500
 --- !u!114 &8062446476219220792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -519,27 +537,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxSpeed: 260
-  engineTorque: 32
+  engineTorque: 40
   brakeStrength: 10
   ReleaseBrake: 0.2
   drag: 0.12
-  airDragFactor: 0.8
-  airForceFactor: 0.5
-  MaxStaticLateralForce: 18000
-  MaxStaticTravelForce: 25000
-  MinKineticLateralForce: 2000
+  airDragFactor: 0.2
+  airForceFactor: 0.9
+  MaxStaticLateralForce: 16500
+  MaxStaticTravelForce: 15000
+  MinKineticLateralForce: 2500
   MinKineticTravelForce: 7200
-  SpringStrength: 580
+  SpringStrength: 425
   SpringClamp: 35000
-  DamperStrength: 18
+  DamperStrength: 28
   MaxTurnAngle: 45
   MaxSpringExtension: 1
   leaveGroundCoyoteTime: 0.1
   hitGroundCoyoteTime: 0.1
-  airControlCoyoteTime: 0.25
-  releaseRotateFriction: 0.02
-  steerRotateFriction: 1
-  gearRatios: []
+  numWheelsForGround: 2
+  airControlCoyoteTime: 0.12
+  releaseRotateFriction: 0.2
+  steerRotateFriction: 1.5
+  MinTrickForce: 300
+  MaxTrickForce: 750
+  MaxTrickTime: 0.5
+  TrickCooldown: 0.25
+  MultiplyBoostIncrease: 1
+  BoostTorqueIncrease: 2
+  MaxBoostTime: 1.5
+  BoostRecoveryRate: 0.5
+  gearRatios:
+  - 1
   m_wheels:
   - skidTrail: {fileID: 0}
     skidParticles: {fileID: 0}
@@ -551,8 +579,10 @@ MonoBehaviour:
     size: 2
     torqueFactor: 1
     brakeFactor: 1
-    lateralGripFactor: 1
-    travelGripFactor: 1
+    lateralSlipFactor: 0.2
+    travelSlipFactor: 0.12
+    maxLateralSlipDivisor: 5
+    maxTravelSlipDivisor: 3.5
     lateralGripCurve:
       serializedVersion: 2
       m_Curve:
@@ -679,8 +709,10 @@ MonoBehaviour:
     size: 2
     torqueFactor: 1
     brakeFactor: 1
-    lateralGripFactor: 1
-    travelGripFactor: 1
+    lateralSlipFactor: 0.2
+    travelSlipFactor: 0.12
+    maxLateralSlipDivisor: 5
+    maxTravelSlipDivisor: 3.5
     lateralGripCurve:
       serializedVersion: 2
       m_Curve:
@@ -807,8 +839,10 @@ MonoBehaviour:
     size: 0
     torqueFactor: 1
     brakeFactor: 1
-    lateralGripFactor: 1
-    travelGripFactor: 1
+    lateralSlipFactor: 0.2
+    travelSlipFactor: 0.12
+    maxLateralSlipDivisor: 5
+    maxTravelSlipDivisor: 3.5
     lateralGripCurve:
       serializedVersion: 2
       m_Curve:
@@ -935,8 +969,10 @@ MonoBehaviour:
     size: 0
     torqueFactor: 1
     brakeFactor: 1
-    lateralGripFactor: 1
-    travelGripFactor: 1
+    lateralSlipFactor: 0.2
+    travelSlipFactor: 0.12
+    maxLateralSlipDivisor: 5
+    maxTravelSlipDivisor: 3.5
     lateralGripCurve:
       serializedVersion: 2
       m_Curve:
@@ -1077,7 +1113,7 @@ Rigidbody:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_ImplicitCom: 1
+  m_ImplicitCom: 0
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
