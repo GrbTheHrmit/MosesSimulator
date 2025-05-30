@@ -21,6 +21,9 @@ public class TerrainManager : MonoBehaviour
     private int pointsPerTile = 50;
     private float[,] heightArray = null;
 
+    [SerializeField]
+    private float MaxTerrainHeight = 30;
+
     private List<ProceduralTerrainScript> terrainList = new List<ProceduralTerrainScript>();
     private float TerrainInterval = 1000f;
     private float TerrainDefaultScale = 10f; // need for vert locations
@@ -328,7 +331,7 @@ public class TerrainManager : MonoBehaviour
 
         interpolatedHeight *= (5 - used);
 
-        return interpolatedHeight * 40;
+        return interpolatedHeight * MaxTerrainHeight;
 
     }
 

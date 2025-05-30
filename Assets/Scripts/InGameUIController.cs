@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InGameUIController : MonoBehaviour
 {
+    [SerializeField]
+    private float MinMeterHeight = 5f;
+
     private GameObject SpeedoNeedle = null;
     private TextMeshProUGUI SpeedText = null;
     private float MaxSpeed = 0;
@@ -21,6 +25,12 @@ public class InGameUIController : MonoBehaviour
 
     private TextMeshProUGUI PointNumber = null;
     private TextMeshProUGUI MultiplierNumber = null;
+
+    private RectTransform FlipChargeMeter = null;
+    private Vector2 FlipMeterDims = new Vector2(100, 500);
+
+    private RectTransform BoostMeter = null;
+    private Vector2 BoostMeterDims = new Vector2(100, 500);
 
     // Start is called before the first frame update
     void Start()
@@ -42,6 +52,15 @@ public class InGameUIController : MonoBehaviour
 
         PointNumber = transform.Find("PointIndicator").Find("PointText").GetComponent<TextMeshProUGUI>();
         MultiplierNumber = transform.Find("PointIndicator").Find("MultiplierText").GetComponent<TextMeshProUGUI>();
+
+        GameObject flipMeterObj = transform.Find("FlipIndicator").Find("ChargeMeter").gameObject;
+        FlipChargeMeter = (RectTransform)flipMeterObj.transform;
+        FlipMeterDims = FlipChargeMeter.sizeDelta;
+        FlipChargeMeter.sizeDelta = new Vector2(FlipMeterDims.x, MinMeterHeight);
+
+        GameObject boostMeterObj = transform.Find("BoostIndicator").Find("ChargeMeter").gameObject;
+        BoostMeter = (RectTransform)boostMeterObj.transform;
+        BoostMeterDims = BoostMeter.sizeDelta; // Starts at max height
 
         PlayerCarMovement playermovement = FindObjectOfType<PlayerCarMovement>();
         if(playermovement != null )
@@ -68,7 +87,7 @@ public class InGameUIController : MonoBehaviour
 
     public void SetGear(int gear)
     {
-        string gearString = "G: ";
+        string gearString = "Gear: ";
         switch(gear)
         {
             case -1:
@@ -103,5 +122,15 @@ public class InGameUIController : MonoBehaviour
         MultiplierNumber.text = "x" + multiplier.ToString("0.00");
     }
 
+    public void SetFlipChargePercent(float percent)
+    {
+        float height = Mathf.Max(FlipMeterDims.y * Mathf.Clamp(percent, 0, 1), MinMeterHeight);
+        FlipChargeMeter.sizeDelta = new Vector2(FlipMeterDims.x, height);
+    }
 
+    public void SetBoostPercent(float percent)
+    {
+        float height = Mathf.Max(BoostMeterDims.y * Mathf.Clamp(percent, 0, 1), MinMeterHeight);
+        BoostMeter.sizeDelta = new Vector2(BoostMeterDims.x, height);
+    }
 }

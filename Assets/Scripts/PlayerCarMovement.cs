@@ -21,8 +21,10 @@ public class WheelProperties
     [HideInInspector] public float size = 0.5f;
     public float torqueFactor = 1.0f;
     public float brakeFactor = 1.0f;
-    public float lateralGripFactor = 1.5f;
-    public float travelGripFactor = 1f;
+    public float lateralSlipFactor = 0.12f;
+    public float travelSlipFactor = 0.12f;
+    public float maxLateralSlipDivisor = 3.5f;
+    public float maxTravelSlipDivisor = 3.5f;
     [Tooltip("This is the percentage of grip you can apply based on slip %")]
     public AnimationCurve lateralGripCurve;
     public AnimationCurve travelGripCurve;
@@ -108,22 +110,52 @@ public class PlayerCarMovement : MonoBehaviour
 
     [Header("Trick Controls")]
     [SerializeField]
-    private float groundFlipForce = 100;
+    private float MinTrickForce = 150;
     [SerializeField]
-    private float airFlipForce = 200;
+    private float MaxTrickForce = 500;
+    [SerializeField]
+    private float MaxTrickTime = 2f;
+    [SerializeField]
+    private float TrickCooldown = 0.5f;
+
+    [Header("Boost Controls")]
+    [SerializeField]
+    [Tooltip("If true the Torque will be multiplied by torque increase value instead of added on")]
+    private bool MultiplyBoostIncrease = true;
+    [SerializeField]
+    private float BoostTorqueIncrease = 1.5f;
+    [SerializeField]
+    private float MaxBoostTime = 1.5f;
+    [SerializeField]
+    private float BoostRecoveryRate = 0.5f;
 
     private static int WHEEL_FR = 0;
     private static int WHEEL_FL = 1;
     private static int WHEEL_BR = 2;
     private static int WHEEL_BL = 3;
 
+    ////// INPUTS and Timers /////
 
+    // Movement
     private Vector2 lastMoveInput;
     private float lastBrakeInput;
-    private bool flipInput = false;
     private float steerAngle = 0;
     private float effectiveBrakeInput;
     private int gear = 1;
+
+    // Tricks
+    private Vector2 lastFlipDirInput;
+    private bool trickInput = false;
+    private bool activateTrick = false;
+    private bool airFrictionInput = false;
+    private float trickInputStartTime;
+    private float trickCDTimer = 0;
+
+    // Boost
+    private float boostTimer = 0;
+    private bool boostInput = false;
+    private bool boosting = false;
+
     [SerializeField]
     private List<float> gearRatios = new List<float>();
 
@@ -142,6 +174,8 @@ public class PlayerCarMovement : MonoBehaviour
     public InGameUIController UIController { set {  uiController = value; } get { return uiController; } }
 
     private PointManager pointManager = null;
+
+    private Camera playerCamera = null;
 
     private int StringToWheelIndex(string str)
     {
@@ -252,9 +286,20 @@ public class PlayerCarMovement : MonoBehaviour
             input.currentActionMap.FindAction("Brake").performed += OnBrakeAction;
             input.currentActionMap.FindAction("Shift").performed += OnShiftAction;
             input.currentActionMap.FindAction("Flip").performed += OnFlipAction;
+            input.currentActionMap.FindAction("FlipDirection").performed += OnFlipDirectionAction;
+            input.currentActionMap.FindAction("AirFriction").performed += OnAirFrictionAction;
+            input.currentActionMap.FindAction("Boost").performed += OnBoostStartAction;
+            input.currentActionMap.FindAction("Boost").canceled += OnBoostReleaseAction;
+
         }
 
         FollowManager.Instance().FollowObject = rb;
+
+        playerCamera = FindObjectOfType<Camera>();
+        if(playerCamera == null)
+        {
+            Debug.LogWarning("Could Not Find Player Camera");
+        }
     }
 
     // Input Bindings
@@ -286,39 +331,179 @@ public class PlayerCarMovement : MonoBehaviour
         }
     }
 
+    ////// BOOST FUNCTIONS //////
+
+    public void OnBoostStartAction(InputAction.CallbackContext context)
+    {
+        if(!boosting && boostTimer >= 0)
+        {
+            StartBoosting();
+        }
+    }
+
+    public void OnBoostReleaseAction(InputAction.CallbackContext context)
+    {
+        if(boosting)
+        {
+            FinishBoosting();
+        }
+    }
+
+    private void StartBoosting()
+    {
+        boosting = true;
+        boostTimer = 0;
+        Debug.Log("Start Boost");
+    }
+
+    private void FinishBoosting()
+    {
+        boosting = false;
+        boostTimer = -boostTimer;
+        Debug.Log("End Boost");
+    }
+
+    private void UpdateBoost()
+    {
+        if (boostTimer < 0)
+        {
+            boostTimer += Time.fixedDeltaTime * BoostRecoveryRate;
+
+            float percent = 1 - Mathf.Abs(boostTimer / MaxBoostTime);
+            uiController.SetBoostPercent(percent);
+        }
+        else if (boosting)
+        {
+            boostTimer += Time.fixedDeltaTime;
+
+            float percent = 1 - Mathf.Abs(boostTimer / MaxBoostTime);
+            uiController.SetBoostPercent(percent);
+
+            if (boostTimer > MaxBoostTime)
+            {
+                FinishBoosting();
+            }
+        }
+    }
+
+    ////// TRICK FUNCTIONS //////
+    
     public void OnFlipAction(InputAction.CallbackContext context)
     {
-        flipInput = context.ReadValue<float>() > 0.5f;
+        // Not on cooldown
+        if (trickCDTimer <= 0)
+        {
+            if (context.ReadValue<float>() > 0.5f && !trickInput) // Start charge
+            {
+                trickInput = true;
+                trickInputStartTime = Time.time;
+            }
+            else if (trickInput)
+            {
+                ActivateTrick();
+            }
+        }
+
     }
 
-    /*public void OnAirRollAction(InputAction.CallbackContext context)
+    public void OnFlipDirectionAction(InputAction.CallbackContext context)
     {
-
-        lastMoveInput = context.ReadValue<Vector2>();
+        lastFlipDirInput = context.ReadValue<Vector2>();
     }
 
-    public void OnAirPitchAction(InputAction.CallbackContext context)
+    public void OnAirFrictionAction(InputAction.CallbackContext context)
     {
+        airFrictionInput = context.ReadValue<float>() > 0.5f;
+    }
 
-        lastMoveInput = context.ReadValue<Vector2>();
-    */
+
+    private void ActivateTrick()
+    {
+        trickInput = false;
+        activateTrick = true;
+        trickCDTimer = TrickCooldown;
+        uiController.SetFlipChargePercent(0);
+    }
+
     private void UpdateTricks()
     {
-        if (flipInput)
+        
+        if(trickCDTimer > 0)
         {
-            float flipForce = IsGrounded ? groundFlipForce : airFlipForce;
-            // Frontflip
-            if (lastMoveInput.y > 0)
+            // Tick CD
+            trickCDTimer -= Time.fixedDeltaTime;
+        }
+
+
+        if (activateTrick)
+        {
+            activateTrick = false;
+            float t = Mathf.Max((Time.time - trickInputStartTime) / MaxTrickTime, 0);
+            float trickForce = MinTrickForce * (1 - t) + MaxTrickForce * t;
+
+            if(lastFlipDirInput.sqrMagnitude < 0.01f) // No Input Direction
             {
-                rb.AddForceAtPosition(flipForce * rb.transform.up, transform.TransformPoint(new Vector3(0, 0.1f, -3.5f)), ForceMode.Impulse);
+                rb.AddRelativeForce(new Vector3(0, trickForce, 0), ForceMode.Impulse);
             }
             else
             {
-                rb.AddForceAtPosition(flipForce * rb.transform.up, transform.TransformPoint(new Vector3(0, 0.1f, 3.5f)), ForceMode.Impulse);
-            }
+                Vector3 camForward = playerCamera.transform.forward;
+                camForward.y = 0;
+                camForward.Normalize();
+                Vector3 torqueVector = trickForce * (Quaternion.FromToRotation(Vector3.forward, camForward) * Quaternion.FromToRotation(Vector3.right, new Vector3(lastFlipDirInput.y, 0, -lastFlipDirInput.x)) * Vector3.right);
+                //Vector3 torqueVector = trickForce * (Quaternion.FromToRotation(Vector3.right, new Vector3(lastFlipDirInput.y, lastFlipDirInput.x, 0)) * Vector3.right);
 
-            flipInput = false;
+                Debug.DrawRay(transform.position, torqueVector, Color.yellow, 1);
+
+                rb.AddTorque(torqueVector, ForceMode.Impulse);
+                /*
+                // Front/Back Flip Force
+                if (Mathf.Abs(lastFlipDirInput.y) > 0.5f)
+                {
+                    rb.AddForceAtPosition(trickForce * rb.transform.up, transform.TransformPoint(new Vector3(0, 0.1f, Mathf.Sign(lastFlipDirInput.y) * 3.5f)), ForceMode.Impulse);
+                }
+                // Left/Right Rotational Force
+                if (Mathf.Abs(lastFlipDirInput.x) > 0.5f)
+                {
+                    rb.AddRelativeTorque(trickForce * rb.transform.up, ForceMode.Impulse);
+                }*/
+            }
+            
+
+            Debug.Log("Impulse: " + trickForce);
         }
+        else if (trickInput) // Charging flip
+        {
+            float chargePercent = Mathf.Max((Time.time - trickInputStartTime) / MaxTrickTime, 0);
+            // TODO: Something for charge ui
+            uiController.SetFlipChargePercent(chargePercent);
+
+            if (chargePercent >= 1)
+            {
+                // If we are still holding the input when max time hits activate on next frame
+                ActivateTrick();
+            }
+            
+        }
+
+    }
+
+    private float GetCurrentEngineTorque()
+    {
+        float torque = engineTorque;
+        if(boosting)
+        {
+            if(MultiplyBoostIncrease)
+            {
+                torque *= BoostTorqueIncrease;
+            }
+            else
+            {
+                torque += BoostTorqueIncrease;
+            }
+        }
+
+        return torque;
     }
 
     private void UpdateMovement()
@@ -390,8 +575,8 @@ public class PlayerCarMovement : MonoBehaviour
 
                 float slipFactor = Mathf.Max(w.lateralSlip, w.travelSlip);
                 //appliedLocalForce *= slipFactor;// w.lateralGripCurve.Evaluate(slipFactor);
-                appliedLocalForce.x *= w.lateralGripFactor / Mathf.Clamp(w.lateralSlip * 0.1f, 1, 4);
-                appliedLocalForce.z *= w.travelGripFactor / Mathf.Clamp(w.travelSlip * 0.1f, 1, 4);
+                appliedLocalForce.x *= 1 / Mathf.Clamp(w.lateralSlip * w.lateralSlipFactor, 1, w.maxLateralSlipDivisor);
+                appliedLocalForce.z *= 1 / Mathf.Clamp(w.travelSlip * w.travelSlipFactor, 1, w.maxTravelSlipDivisor);
             }
 
 
@@ -414,7 +599,7 @@ public class PlayerCarMovement : MonoBehaviour
                 gearRatio = gearRatios[gear - 1];
             }
 
-            w.torque = gearRatio * w.torqueFactor * engineTorque * lastMoveInput.y;
+            w.torque = gearRatio * w.torqueFactor * GetCurrentEngineTorque() * lastMoveInput.y;
             float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
 
             RaycastHit hit;
@@ -496,14 +681,19 @@ public class PlayerCarMovement : MonoBehaviour
         }
 
         grounded = groundedWheels >= numWheelsForGround;
+        UpdateAirLogic(grounded);
+        
+    }
 
+    private void UpdateAirLogic(bool currentlyGrounded)
+    {
         if (!grounded)
         {
             groundTimer = Mathf.Min(leaveGroundCoyoteTime, groundTimer - Time.fixedDeltaTime);
             //ApplyRotationalInput();
             if (groundTimer < (leaveGroundCoyoteTime - airControlCoyoteTime))
             {
-                if (Mathf.Abs(lastMoveInput.x) > 0.1f)
+                if (airFrictionInput)
                 {
                     rb.angularDrag = steerRotateFriction;
                 }
@@ -524,6 +714,7 @@ public class PlayerCarMovement : MonoBehaviour
     void FixedUpdate()
     {
         UpdateMovement();
+        UpdateBoost();
         UpdateTricks();
         pointManager.UpdatePoints();
     }
