@@ -114,6 +114,8 @@ public class PlayerCarMovement : MonoBehaviour
     [SerializeField]
     private float MaxTrickForce = 500;
     [SerializeField]
+    private float VerticalFlipFactor = 1.5f;
+    [SerializeField]
     private float MaxTrickTime = 2f;
     [SerializeField]
     private float TrickCooldown = 0.5f;
@@ -438,8 +440,9 @@ public class PlayerCarMovement : MonoBehaviour
         if (activateTrick)
         {
             activateTrick = false;
-            float t = Mathf.Max((Time.time - trickInputStartTime) / MaxTrickTime, 0);
+            float t = Mathf.Pow(Mathf.Clamp((Time.time - trickInputStartTime) / MaxTrickTime, 0, 1), 2);
             float trickForce = MinTrickForce * (1 - t) + MaxTrickForce * t;
+            //float trickForce = MaxTrickForce;
 
             if(lastFlipDirInput.sqrMagnitude < 0.01f) // No Input Direction
             {
@@ -450,11 +453,14 @@ public class PlayerCarMovement : MonoBehaviour
                 Vector3 camForward = playerCamera.transform.forward;
                 camForward.y = 0;
                 camForward.Normalize();
-                Vector3 torqueVector = trickForce * (Quaternion.FromToRotation(Vector3.forward, camForward) * Quaternion.FromToRotation(Vector3.right, new Vector3(lastFlipDirInput.y, 0, -lastFlipDirInput.x)) * Vector3.right);
+                Vector3 torqueVector = trickForce * (Quaternion.FromToRotation(Vector3.right, new Vector3(lastFlipDirInput.y, 0, -lastFlipDirInput.x)) * Vector3.right);
+                torqueVector.x *= VerticalFlipFactor;
+                torqueVector = Quaternion.FromToRotation(Vector3.forward, camForward) * torqueVector;
                 //Vector3 torqueVector = trickForce * (Quaternion.FromToRotation(Vector3.right, new Vector3(lastFlipDirInput.y, lastFlipDirInput.x, 0)) * Vector3.right);
 
                 Debug.DrawRay(transform.position, torqueVector, Color.yellow, 1);
 
+                rb.angularVelocity *= 0.1f;
                 rb.AddTorque(torqueVector, ForceMode.Impulse);
                 /*
                 // Front/Back Flip Force
