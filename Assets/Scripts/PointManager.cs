@@ -38,11 +38,14 @@ public class PointManager : MonoBehaviour
 
     private GameObject playerObject;
     private PlayerCarMovement playerMovement;
+    private Rigidbody rb;
 
     [SerializeField]
     private float MaxMultiplier = 5;
     [SerializeField]
     private float MultiIncreasePerFollower = 0.15f;
+
+    [SerializeField]
     [Tooltip("Max time allowed on ground before trick cancels")]
     private float GroundTimeout = 1.5f;
 
@@ -52,8 +55,29 @@ public class PointManager : MonoBehaviour
     [Tooltip("Max time allowed after a trick ends to chain into another")]
     private float MaxChainTime = 3;
 
+    [Header("Point Settings")]
+    [SerializeField]
+    private int TrickPointsPerSecond = 100;
+    [SerializeField]
+    private int FlipPoints = 3000;
+    [SerializeField]
+    private int SpinPoints = 2000;
+    [SerializeField]
+    private int RollPoints = 1000;
+    [SerializeField]
+    private int CornerFlipPoints = 5000;
     [SerializeField]
     private int PointLossPerDrop = 500;
+
+    [Header("Flip Settings")]
+    [SerializeField]
+    [Tooltip("Degrees of rotation (per main axis half flip) required to count a second axis")]
+    private float SecondaryAxisDeg = 60f;
+    [SerializeField]
+    [Tooltip("Degrees off of a half rotation to count")]
+    private float TrickBufferDegrees = 10f;
+    [SerializeField]
+    private float multiAxisFactor = 1.4f;
 
     /*[SerializeField]
     private List<TrickDefinition> trickList = new List<TrickDefinition>();
@@ -61,21 +85,22 @@ public class PointManager : MonoBehaviour
 
     //
     private bool tricking = false;
-    private int points = 0;
+    private float points = 0;
     private double multiplier = 1;
     private double chainMulti = 1;
+    private float currentTrickPoints = 0;
 
     private float groundTimer = 0;
 
     private Vector3Int spinDirection = Vector3Int.zero;
     private Vector3 spinAmount = Vector3.zero;
-    private Quaternion lastRotation = Quaternion.identity;
-    private List<float> yRotations = new List<float>();
+    private List<Vector3> rotationList = new List<Vector3>();
+
 
     public void AddFollower()
     {
         multiplier += MultiIncreasePerFollower;
-        playerMovement.UIController.SetMulitplier(multiplier);
+        playerMovement.UIController.SetMultiplier(multiplier);
     }
 
     public void SubtractFollower(int numLost)
@@ -88,7 +113,7 @@ public class PointManager : MonoBehaviour
     public void ResetMultiplier()
     {
         multiplier = 1;
-        playerMovement.UIController.SetMulitplier(multiplier);
+        playerMovement.UIController.SetMultiplier(multiplier);
     }
 
     void Start()
@@ -99,7 +124,12 @@ public class PointManager : MonoBehaviour
             Debug.LogError("Point Manager could not find player movement script");
         }
 
-        lastRotation = transform.rotation;
+        rb = GetComponent<Rigidbody>();
+        if (playerMovement == null)
+        {
+            Debug.LogError("Point Manager could not find rigidbody");
+        }
+
         FollowManager.Instance().PlayerPointManager = this;
     }
 
@@ -107,35 +137,12 @@ public class PointManager : MonoBehaviour
     {
         if (playerMovement == null) return;
 
-        Vector3 eulerDiff = transform.rotation.eulerAngles - lastRotation.eulerAngles;
+        Vector3 eulerDiff = rb.transform.InverseTransformVector(rb.angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime);
 
-        for (int i = 0; i < 3; i++)
+        if(tricking)
         {
-            float diff = eulerDiff[i];
-            if(Mathf.Abs(diff) > 180)
-            {
-                diff += -360 * Mathf.Sign(diff);
-                eulerDiff[i] = diff;
-            }
-        }
-
-        spinAmount += eulerDiff;
-        lastRotation = transform.rotation;
-
-        if(tricking && Mathf.Abs(spinAmount.y) > 180)
-        {
-            if (yRotations.Count > 0 && Mathf.Sign(spinAmount.y) == Mathf.Sign(yRotations[yRotations.Count - 1]))
-            {
-                yRotations[yRotations.Count - 1] += spinAmount.y;
-            }
-            else
-            {
-                yRotations.Add(spinAmount.y);
-            }
-
-            Debug.Log("Last Trick: " + yRotations[yRotations.Count - 1]);
-
-            spinAmount.y -= 180 * Mathf.Sign(spinAmount.y);
+            spinAmount += eulerDiff;
+            CalculatePoints();
         }
 
         // Player movement script handles ground coyote times
@@ -147,37 +154,215 @@ public class PointManager : MonoBehaviour
         {
             groundTimer = 0;
             tricking = true;
+            playerMovement.UIController.ToggleTrickPoints(true);
         }
 
         bool crashed = false;
         // TODO: Some crash logic including resetting multiplier
 
         // Reset spin tracker on ground timeout or crashing
-        if(groundTimer >= GroundTimeout || crashed)
+        if(tricking && (groundTimer >= GroundTimeout || crashed))
         {
-            float rotations = Mathf.RoundToInt(2 * Mathf.Abs(spinAmount.y) / 360) / 2f;
-            CalculatePoints();
-
-            spinAmount = Vector3.zero;
-            tricking = false;
+            FinishTrick();
         }
 
         //Debug.Log(spinAmount);
     }
 
+    private float CalculateTrickPoints(int primaryAxis, int secondaryAxis)
+    {
+        double trickPoints = chainMulti;
+
+        Vector3 rotation = rotationList[rotationList.Count - 1];
+        float primaryAxisRotation = rotation[primaryAxis];
+        float secondaryAxisRotation = 0;
+        if (secondaryAxis != -1)
+        {
+            secondaryAxisRotation = rotation[secondaryAxis];
+        }
+        
+
+
+        float flipDegrees = Mathf.Abs(primaryAxisRotation) + Mathf.Abs(secondaryAxisRotation);
+
+        // Multiply trick buffer by 2 since its per half flip
+        int fullFlips = (int)( (flipDegrees + TrickBufferDegrees * 2) / (360 * (secondaryAxis == -1 ? 1 : multiAxisFactor)) );
+
+        if(fullFlips > 0)
+        {
+            string trickString = "";
+            chainMulti += ChainMultiIncrease;
+            trickString += "Did " + fullFlips.ToString() + " ";
+            if (secondaryAxis != -1)
+            {
+                trickString += "Corner Flip";
+                trickPoints *= CornerFlipPoints;
+            }
+            else
+            {
+                switch (primaryAxis)
+                {
+                    case 0:
+                        if (primaryAxisRotation < 0)
+                        {
+                            trickString += "Back";
+                        }
+                        else
+                        {
+                            trickString += "Front";
+                        }
+                        trickString += " Flip";
+                        trickPoints *= FlipPoints;
+                        break;
+
+                    case 1:
+                        if (primaryAxisRotation < 0)
+                        {
+                            trickString += "Counter";
+                        }
+                        else
+                        {
+                            trickString += "Clockwise";
+                        }
+                        trickString += " Spin";
+                        trickPoints *= SpinPoints;
+                        break;
+
+                    case 2:
+                        if (primaryAxisRotation < 0)
+                        {
+                            trickString += "Clockwise";
+                        }
+                        else
+                        {
+                            trickString += "Counter";
+                        }
+                        trickString += " Roll";
+                        trickPoints *= RollPoints;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            if (fullFlips != 1)
+            {
+                trickString += "s";
+            }
+
+            trickString += "\n" + trickPoints.ToString() + " Points!";
+
+            Debug.Log(trickString);
+        }
+
+        return (float)trickPoints;
+    }
+
     private void CalculatePoints()
     {
-        /*
-        if(rotations > 0.5f)
-        {
-            points += (int)(rotations * 1000 * multiplier);
-            playerMovement.UIController.SetPoints(points);
+        // If in the air start with default trick points
+        float addedPoints = playerMovement.IsGrounded ? 0 : TrickPointsPerSecond * Time.fixedDeltaTime;
 
-            Debug.Log("Rotations Completed: " + rotations);
-            // TODO: some VFX
+        float primaryAxisRotation = 0;
+        int primaryAxis = -1;
+        float secondaryAxisRotation = 0;
+        int secondaryAxis = -1;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (Mathf.Abs(spinAmount[i]) > Mathf.Abs(primaryAxisRotation))
+            {
+                secondaryAxisRotation = primaryAxisRotation;
+                secondaryAxis = primaryAxis;
+
+                primaryAxisRotation = spinAmount[i];
+                primaryAxis = i;
+
+            }
+            else if (Mathf.Abs(spinAmount[i]) > Mathf.Abs(secondaryAxisRotation))
+            {
+                secondaryAxisRotation = spinAmount[i];
+                secondaryAxis = i;
+            }
         }
-        */
-        yRotations.Clear();
+
+        float flipDegrees = 0;
+        if (primaryAxis != -1)
+        {
+            flipDegrees += Mathf.Abs(primaryAxisRotation);
+        }
+
+        int flips = (int)flipDegrees / 180;
+        float axisFactor = 1;
+
+        if (secondaryAxis != -1 && Mathf.Abs(secondaryAxisRotation) > SecondaryAxisDeg / Mathf.Max(flips, 1))
+        {
+            flipDegrees += Mathf.Abs(secondaryAxisRotation);
+            axisFactor = multiAxisFactor; // Approx extra rotation required for corner flips
+        }
+        else
+        { 
+            // Reset secondary axis since the rotation isn't large enough
+            secondaryAxis = -1;
+        }
+
+        bool hasTrick = flipDegrees >= (180 - TrickBufferDegrees) * axisFactor;
+        bool continuedTrick = true;
+
+        if(hasTrick)
+        {
+            if (rotationList.Count <= 0)
+            {
+                continuedTrick = false;
+            }
+            else
+            {
+                continuedTrick &= Mathf.Sign(primaryAxisRotation) == Mathf.Sign(rotationList[rotationList.Count - 1][primaryAxis]);
+                
+                if(continuedTrick && secondaryAxis != -1)
+                {
+                    // Technically we should also check if last secondary axis is valid but this is ok for now
+                    continuedTrick &= Mathf.Sign(secondaryAxisRotation) == Mathf.Sign(rotationList[rotationList.Count - 1][secondaryAxis]);
+                }
+            }
+
+            spinAmount += spinAmount.normalized * TrickBufferDegrees * axisFactor;
+
+            if (continuedTrick)
+            {
+                rotationList[rotationList.Count - 1] += spinAmount;
+            }
+            else
+            {
+                rotationList.Add(spinAmount);
+            }
+
+            spinAmount = Vector3.zero;
+
+            // Already multiplied by chain multi
+            addedPoints += CalculateTrickPoints(primaryAxis, secondaryAxis);
+        }
+
+        currentTrickPoints += addedPoints;
+        playerMovement.UIController.SetTrickPoints((int)currentTrickPoints);
+        playerMovement.UIController.SetTrickMulti(chainMulti);
+    }
+
+    private void FinishTrick()
+    {
+        spinAmount = Vector3.zero;
+        tricking = false;
+        rotationList.Clear();
+
+        points += (float)(currentTrickPoints * multiplier);
+        playerMovement.UIController.SetPoints((int)points);
+        currentTrickPoints = 0;
+        playerMovement.UIController.SetTrickPoints((int)currentTrickPoints);
+        chainMulti = 1;
+        playerMovement.UIController.SetTrickMulti(chainMulti);
+        playerMovement.UIController.ToggleTrickPoints(false);
+        
     }
 
 }

@@ -81,6 +81,10 @@ public class PlayerCarMovement : MonoBehaviour
     private float SpringClamp = 200f;
     [SerializeField]
     private float DamperStrength = 0.95f;
+    [SerializeField]
+    private float ReturnDamperFactor = 2.5f;
+    [SerializeField]
+    private float ReturnDamperCutoff = 5f;
 
     [SerializeField]
     private float MaxTurnAngle = 30f;
@@ -119,6 +123,8 @@ public class PlayerCarMovement : MonoBehaviour
     private float MaxTrickTime = 2f;
     [SerializeField]
     private float TrickCooldown = 0.5f;
+    [SerializeField]
+    private float TrickRotationCancel = 0.1f;
 
     [Header("Boost Controls")]
     [SerializeField]
@@ -152,6 +158,7 @@ public class PlayerCarMovement : MonoBehaviour
     private bool airFrictionInput = false;
     private float trickInputStartTime;
     private float trickCDTimer = 0;
+    private float trickRotationPercent = 0;
 
     // Boost
     private float boostTimer = 0;
@@ -302,6 +309,9 @@ public class PlayerCarMovement : MonoBehaviour
         {
             Debug.LogWarning("Could Not Find Player Camera");
         }
+
+        trickRotationPercent = Mathf.Pow((TrickRotationCancel / 1), Time.fixedDeltaTime / 1);
+        Debug.Log(trickRotationPercent);
     }
 
     // Input Bindings
@@ -355,14 +365,12 @@ public class PlayerCarMovement : MonoBehaviour
     {
         boosting = true;
         boostTimer = 0;
-        Debug.Log("Start Boost");
     }
 
     private void FinishBoosting()
     {
         boosting = false;
         boostTimer = -boostTimer;
-        Debug.Log("End Boost");
     }
 
     private void UpdateBoost()
@@ -460,7 +468,6 @@ public class PlayerCarMovement : MonoBehaviour
 
                 Debug.DrawRay(transform.position, torqueVector, Color.yellow, 1);
 
-                rb.angularVelocity *= 0.1f;
                 rb.AddTorque(torqueVector, ForceMode.Impulse);
                 /*
                 // Front/Back Flip Force
@@ -475,11 +482,10 @@ public class PlayerCarMovement : MonoBehaviour
                 }*/
             }
             
-
-            Debug.Log("Impulse: " + trickForce);
         }
         else if (trickInput) // Charging flip
         {
+            rb.angularVelocity *= trickRotationPercent;
             float chargePercent = Mathf.Max((Time.time - trickInputStartTime) / MaxTrickTime, 0);
             // TODO: Something for charge ui
             uiController.SetFlipChargePercent(chargePercent);
@@ -618,6 +624,10 @@ public class PlayerCarMovement : MonoBehaviour
                     float restDist = w.size * 2f;
                     float compression = restDist - hit.distance; // how much the spring is compressed
                     float damping = (w.lastSuspensionLength - hit.distance) * DamperStrength; // damping is difference from last frame
+                    if(damping < -ReturnDamperCutoff)
+                    {
+                        damping *= ReturnDamperFactor;
+                    }
                     w.normalForce = (compression + damping) * SpringStrength;
                     w.normalForce = Mathf.Clamp(w.normalForce, 0f, SpringClamp); // clamp it
 

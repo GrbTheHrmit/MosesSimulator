@@ -521,9 +521,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxMultiplier: 5
   MultiIncreasePerFollower: 0.15
+  GroundTimeout: 0.75
   ChainMultiIncrease: 0.5
-  MaxChainTime: 1.5
+  MaxChainTime: 3
+  TrickPointsPerSecond: 100
+  FlipPoints: 3000
+  SpinPoints: 2000
+  RollPoints: 1000
+  CornerFlipPoints: 5000
   PointLossPerDrop: 500
+  SecondaryAxisDeg: 90
+  TrickBufferDegrees: 10
+  multiAxisFactor: 1.4
 --- !u!114 &8062446476219220792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -543,13 +552,13 @@ MonoBehaviour:
   drag: 0.12
   airDragFactor: 0.2
   airForceFactor: 0.9
-  MaxStaticLateralForce: 16500
+  MaxStaticLateralForce: 18000
   MaxStaticTravelForce: 15000
-  MinKineticLateralForce: 2500
+  MinKineticLateralForce: 2800
   MinKineticTravelForce: 7200
   SpringStrength: 425
-  SpringClamp: 35000
-  DamperStrength: 28
+  SpringClamp: 40000
+  DamperStrength: 30
   MaxTurnAngle: 45
   MaxSpringExtension: 1
   leaveGroundCoyoteTime: 0.1
@@ -558,10 +567,12 @@ MonoBehaviour:
   airControlCoyoteTime: 0.12
   releaseRotateFriction: 0.2
   steerRotateFriction: 1.5
-  MinTrickForce: 300
+  MinTrickForce: 200
   MaxTrickForce: 750
+  VerticalFlipFactor: 1.5
   MaxTrickTime: 0.5
   TrickCooldown: 0.25
+  TrickRotationCancel: 0.1
   MultiplyBoostIncrease: 1
   BoostTorqueIncrease: 2
   MaxBoostTime: 1.5
@@ -579,7 +590,7 @@ MonoBehaviour:
     size: 2
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.2
+    lateralSlipFactor: 0.15
     travelSlipFactor: 0.12
     maxLateralSlipDivisor: 5
     maxTravelSlipDivisor: 3.5
@@ -709,7 +720,7 @@ MonoBehaviour:
     size: 2
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.2
+    lateralSlipFactor: 0.15
     travelSlipFactor: 0.12
     maxLateralSlipDivisor: 5
     maxTravelSlipDivisor: 3.5
@@ -839,7 +850,7 @@ MonoBehaviour:
     size: 0
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.2
+    lateralSlipFactor: 0.15
     travelSlipFactor: 0.12
     maxLateralSlipDivisor: 5
     maxTravelSlipDivisor: 3.5
@@ -969,7 +980,7 @@ MonoBehaviour:
     size: 0
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.2
+    lateralSlipFactor: 0.15
     travelSlipFactor: 0.12
     maxLateralSlipDivisor: 5
     maxTravelSlipDivisor: 3.5

@@ -25,6 +25,8 @@ public class InGameUIController : MonoBehaviour
 
     private TextMeshProUGUI PointNumber = null;
     private TextMeshProUGUI MultiplierNumber = null;
+    private TextMeshProUGUI TrickPointNumber = null;
+    private TextMeshProUGUI TrickMultiNumber = null;
 
     private RectTransform FlipChargeMeter = null;
     private Vector2 FlipMeterDims = new Vector2(100, 500);
@@ -52,6 +54,8 @@ public class InGameUIController : MonoBehaviour
 
         PointNumber = transform.Find("PointIndicator").Find("PointText").GetComponent<TextMeshProUGUI>();
         MultiplierNumber = transform.Find("PointIndicator").Find("MultiplierText").GetComponent<TextMeshProUGUI>();
+        TrickPointNumber = transform.Find("PointIndicator").Find("TrickPointText").GetComponent<TextMeshProUGUI>();
+        TrickMultiNumber = transform.Find("PointIndicator").Find("TrickMultiText").GetComponent<TextMeshProUGUI>();
 
         GameObject flipMeterObj = transform.Find("FlipIndicator").Find("ChargeMeter").gameObject;
         FlipChargeMeter = (RectTransform)flipMeterObj.transform;
@@ -117,9 +121,33 @@ public class InGameUIController : MonoBehaviour
         PointNumber.text = points.ToString();
     }
 
-    public void SetMulitplier(double multiplier)
+    public void SetMultiplier(double multiplier)
     {
         MultiplierNumber.text = "x" + multiplier.ToString("0.00");
+    }
+
+    public void ToggleTrickPoints(bool turnOn)
+    {
+        if(turnOn)
+        {
+            TrickPointNumber.alpha = 1;
+            TrickMultiNumber.alpha = 1;
+        }
+        else
+        {
+            TrickPointNumber.alpha = 0;
+            TrickMultiNumber.alpha = 0;
+        }
+    }
+
+    public void SetTrickPoints(int points)
+    {
+        TrickPointNumber.text = points.ToString();
+    }
+
+    public void SetTrickMulti(double multiplier)
+    {
+        TrickMultiNumber.text = "x" + multiplier.ToString("0.0");
     }
 
     public void SetFlipChargePercent(float percent)
