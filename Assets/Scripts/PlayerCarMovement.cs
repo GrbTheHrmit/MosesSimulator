@@ -85,6 +85,7 @@ public class PlayerCarMovement : MonoBehaviour
     private float ReturnDamperFactor = 2.5f;
     [SerializeField]
     private float ReturnDamperCutoff = 5f;
+    
 
     [SerializeField]
     private float MaxTurnAngle = 30f;
@@ -106,11 +107,13 @@ public class PlayerCarMovement : MonoBehaviour
     [Header("Air Controls")]
     [SerializeField]
     private float airControlCoyoteTime = 0.25f;
-
     [SerializeField]
     private float releaseRotateFriction = 0.02f;
     [SerializeField]
     private float steerRotateFriction = 1f;
+    [SerializeField]
+    [Tooltip("Force factor applied to a wheel touching the ground when car is considered airborne")]
+    private float initialGroundForceFactor = 0.2f;
 
     [Header("Trick Controls")]
     [SerializeField]
@@ -448,15 +451,12 @@ public class PlayerCarMovement : MonoBehaviour
         if (activateTrick)
         {
             activateTrick = false;
+
             float t = Mathf.Pow(Mathf.Clamp((Time.time - trickInputStartTime) / MaxTrickTime, 0, 1), 2);
             float trickForce = MinTrickForce * (1 - t) + MaxTrickForce * t;
             //float trickForce = MaxTrickForce;
 
-            if(lastFlipDirInput.sqrMagnitude < 0.01f) // No Input Direction
-            {
-                rb.AddRelativeForce(new Vector3(0, trickForce, 0), ForceMode.Impulse);
-            }
-            else
+            if (groundTimer < 0 && lastFlipDirInput.sqrMagnitude >= 0.01f)
             {
                 Vector3 camForward = playerCamera.transform.forward;
                 camForward.y = 0;
@@ -480,6 +480,10 @@ public class PlayerCarMovement : MonoBehaviour
                 {
                     rb.AddRelativeTorque(trickForce * rb.transform.up, ForceMode.Impulse);
                 }*/
+            }
+            else if(groundTimer >= 0) // No Input Direction or on ground
+            {
+                rb.AddRelativeForce(new Vector3(0, trickForce, 0), ForceMode.Impulse);
             }
             
         }
@@ -585,8 +589,6 @@ public class PlayerCarMovement : MonoBehaviour
                 w.lateralSlip = Mathf.Abs(idealLateralForce) / currentMaxLateralForce;
                 w.travelSlip = Mathf.Abs(idealTravelForce) / currentMaxTravelForce;
 
-                float slipFactor = Mathf.Max(w.lateralSlip, w.travelSlip);
-                //appliedLocalForce *= slipFactor;// w.lateralGripCurve.Evaluate(slipFactor);
                 appliedLocalForce.x *= 1 / Mathf.Clamp(w.lateralSlip * w.lateralSlipFactor, 1, w.maxLateralSlipDivisor);
                 appliedLocalForce.z *= 1 / Mathf.Clamp(w.travelSlip * w.travelSlipFactor, 1, w.maxTravelSlipDivisor);
             }
@@ -634,7 +636,11 @@ public class PlayerCarMovement : MonoBehaviour
                     Vector3 springDir = hit.normal * w.normalForce; // direction is the surface normal
                     w.suspensionForceDirection = springDir;
 
-                    //appliedLocalForce
+                    // If the car is not on the ground limit the amount of force this wheel can apply
+                    if (groundTimer < 0)
+                    {
+                        appliedWorldForce *= initialGroundForceFactor;
+                    }
 
                     rb.AddForceAtPosition(springDir + appliedWorldForce, hit.point); // Apply total forces at contact
                 }
