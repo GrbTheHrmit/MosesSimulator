@@ -140,6 +140,11 @@ public class PlayerCarMovement : MonoBehaviour
     [SerializeField]
     private float BoostRecoveryRate = 0.5f;
 
+    [Header("Crash Settings")]
+    [SerializeField]
+    private float MinCrashImpulseSqr = 10000f;
+    private float CrashLevelIntervalSqr = 500000;
+
     private static int WHEEL_FR = 0;
     private static int WHEEL_FL = 1;
     private static int WHEEL_BR = 2;
@@ -313,8 +318,8 @@ public class PlayerCarMovement : MonoBehaviour
             Debug.LogWarning("Could Not Find Player Camera");
         }
 
-        trickRotationPercent = Mathf.Pow((TrickRotationCancel / 1), Time.fixedDeltaTime / 1);
-        Debug.Log(trickRotationPercent);
+        // % Multiplier calculation for how much to damp the rotation each tick when charging tricks
+        trickRotationPercent = Mathf.Pow(TrickRotationCancel, Time.fixedDeltaTime);
     }
 
     // Input Bindings
@@ -626,7 +631,7 @@ public class PlayerCarMovement : MonoBehaviour
                     float restDist = w.size * 2f;
                     float compression = restDist - hit.distance; // how much the spring is compressed
                     float damping = (w.lastSuspensionLength - hit.distance) * DamperStrength; // damping is difference from last frame
-                    if(damping < -ReturnDamperCutoff)
+                    if(damping < -ReturnDamperCutoff) // Add extra damping if bouncing back too hard
                     {
                         damping *= ReturnDamperFactor;
                     }
@@ -731,6 +736,24 @@ public class PlayerCarMovement : MonoBehaviour
             groundTimer = Mathf.Max(-hitGroundCoyoteTime, groundTimer + Time.fixedDeltaTime);
             rb.angularDrag = 1f;
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.GetContact(0).thisCollider.tag == "CrashDetection" && collision.impulse.sqrMagnitude > MinCrashImpulseSqr && collision.gameObject.tag == "Ground")
+        {
+            HandleCrash(collision.impulse.sqrMagnitude);
+        }
+    }
+
+    private void HandleCrash(float impulseSqr)
+    {
+        float crashMagnitude = (impulseSqr - MinCrashImpulseSqr) / (CrashLevelIntervalSqr - MinCrashImpulseSqr);
+
+        pointManager.HandleCrash();
+        FollowManager.Instance().HandleCrash(crashMagnitude);
+
+        Debug.Log("Crash!! Magnitude: " + crashMagnitude);
     }
 
     void FixedUpdate()

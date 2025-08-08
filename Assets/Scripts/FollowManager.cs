@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using UnityEngine;
 
 public class FollowManager : ScriptableObject
@@ -194,5 +195,11 @@ public class FollowManager : ScriptableObject
         follower.SaveFollower();
         collectedFollowers.Remove(follower);
         uncollectedFollowers.Remove(follower);
+    }
+
+    public void HandleCrash(float crashMagnitude)
+    {
+        playerPointManager.SubtractFollowers(Mathf.FloorToInt(crashMagnitude + 1));
+        Debug.Log("Lose " + Mathf.FloorToInt(crashMagnitude + 1) + " gigachads :(");
     }
 }

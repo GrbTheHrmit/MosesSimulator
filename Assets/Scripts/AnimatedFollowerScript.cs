@@ -198,7 +198,7 @@ public class AnimatedFollowerScript : MonoBehaviour
         }
         
 
-        if (other.gameObject.tag == "Player" && !isFollowing)
+        if ((other.gameObject.tag == "Player" || other.gameObject.tag == "CrashDetection") && !isFollowing)
         {
             
             StartFollowing();

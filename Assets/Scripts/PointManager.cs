@@ -90,6 +90,8 @@ public class PointManager : MonoBehaviour
     private double chainMulti = 1;
     private float currentTrickPoints = 0;
 
+    private bool crashed = false;
+
     private float groundTimer = 0;
 
     private Vector3Int spinDirection = Vector3Int.zero;
@@ -103,11 +105,12 @@ public class PointManager : MonoBehaviour
         playerMovement.UIController.SetMultiplier(multiplier);
     }
 
-    public void SubtractFollower(int numLost)
+    public void SubtractFollowers(int numLost)
     {
         ResetMultiplier();
 
-        points -= numLost * PointLossPerDrop;
+        // Removing since it feels harsh
+        //points -= numLost * PointLossPerDrop;
     }
 
     public void ResetMultiplier()
@@ -149,16 +152,14 @@ public class PointManager : MonoBehaviour
         if(playerMovement.IsGrounded)
         {
             groundTimer += Time.fixedDeltaTime;
+            crashed = false; // Reset crash flag on being grounded
         }
-        else
+        else if(!crashed)
         {
             groundTimer = 0;
             tricking = true;
             playerMovement.UIController.ToggleTrickPoints(true);
         }
-
-        bool crashed = false;
-        // TODO: Some crash logic including resetting multiplier
 
         // Reset spin tracker on ground timeout or crashing
         if(tricking && (groundTimer >= GroundTimeout || crashed))
@@ -347,6 +348,16 @@ public class PointManager : MonoBehaviour
         currentTrickPoints += addedPoints;
         playerMovement.UIController.SetTrickPoints((int)currentTrickPoints);
         playerMovement.UIController.SetTrickMulti(chainMulti);
+    }
+
+    public void HandleCrash()
+    {
+        crashed = true;
+        currentTrickPoints = 0;
+        playerMovement.UIController.SetTrickPoints((int)currentTrickPoints);
+        chainMulti = 1;
+        playerMovement.UIController.SetTrickMulti(chainMulti);
+        playerMovement.UIController.ToggleTrickPoints(false);
     }
 
     private void FinishTrick()

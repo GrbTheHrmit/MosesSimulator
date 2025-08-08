@@ -7,6 +7,8 @@ TagManager:
   - Follower
   - Ladder
   - Roof
+  - CrashDetection
+  - Ground
   layers:
   - Default
   - TransparentFX

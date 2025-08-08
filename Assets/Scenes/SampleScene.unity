@@ -975,6 +975,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 208228918733355292, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_TagString
+      value: CrashDetection
+      objectReference: {fileID: 0}
     - target: {fileID: 5206145035262871849, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_Name
       value: Player
@@ -1019,8 +1023,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: DamperStrength
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: SpringStrength
+      value: 475
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5146421572030227547, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
