@@ -14,12 +14,14 @@ public class TerrainManager : MonoBehaviour
     private int TerrainTileDims = 6;
     [SerializeField]
     private int SwapEdgeDistance = 2;
+    // The world location of the map's bottom left corner
     private Vector3 currentOrigin = Vector3.zero;
     private float baseHeight = -5;
 
     [SerializeField]
     private int pointsPerTile = 50;
     private float[,] heightArray = null;
+    private Vector3[] peakPositions = null;
 
     [SerializeField]
     private float MaxTerrainHeight = 30;
@@ -32,9 +34,14 @@ public class TerrainManager : MonoBehaviour
     private int voronoiPointsPerTile = 50;
     private List<Vector2> voronoiPoints = new List<Vector2>();
 
+
+    // For Tracking Looping World
+    // these represent where the bottom left terrain object is in world X and Y coordinates
     private int currentBottomLeftX;
     private int currentBottomLeftY;
-
+    
+    // For Tracking Looping Terrain Array
+    // These represent the actual array location of the current bottom left object
     private int TerrainBottomLeftX = 0;
     private int TerrainBottomLeftY = 0;
 
@@ -55,6 +62,7 @@ public class TerrainManager : MonoBehaviour
         instance = this;
 
         heightArray = new float[pointsPerTile * MaxTerrainDim, pointsPerTile * MaxTerrainDim];
+        peakPositions = new Vector3[MaxTerrainDim * MaxTerrainDim];
         PointInterval = TerrainInterval / pointsPerTile;
 
         if(TerrainPrefab != null)
@@ -74,6 +82,9 @@ public class TerrainManager : MonoBehaviour
             float centerOffset = 0.5f * TerrainInterval;
             currentOrigin = new Vector3(-((MaxTerrainDim - 1) * 0.5f) * TerrainInterval, baseHeight, -((MaxTerrainDim - 1) * 0.5f) * TerrainInterval);
             currentOrigin -= new Vector3(centerOffset, 0, centerOffset);
+
+            currentBottomLeftX = 0;
+            currentBottomLeftY = 0;
 
             //Debug.Log(currentOrigin);
 
@@ -254,6 +265,7 @@ public class TerrainManager : MonoBehaviour
                 terrainList[tileIdx].RecomputeMeshCollider();
             }
         }
+
     }
 
     private float CustomRandom(float x)
@@ -296,49 +308,85 @@ public class TerrainManager : MonoBehaviour
 
     private float GetHeightAtLocation(Vector3 location)
     {
+
         Vector3 relativePos = location - currentOrigin;
+        int tileCol = Mathf.FloorToInt(relativePos.x / TerrainInterval) % MaxTerrainDim;
+        int tileRow = Mathf.FloorToInt(relativePos.z / TerrainInterval) % MaxTerrainDim;
+        int tileIdx = tileRow * MaxTerrainDim + tileCol;
 
-        // Slightly jank way to make sure we get a point we've calculated. world will loop
-        int pointCol = Mathf.FloorToInt(relativePos.x / PointInterval) % (MaxTerrainDim * pointsPerTile);
-        while(pointCol < 0)
-        {
-            pointCol += MaxTerrainDim * pointsPerTile;
-        }
-        relativePos.x += (pointCol - Mathf.FloorToInt(relativePos.x / PointInterval)) * PointInterval;
+        // Get the [0,1] value for relative x and z location on this tile
+        float localX = (relativePos.x - (tileCol * TerrainInterval)) / TerrainInterval;
+        float localZ = (relativePos.z - (tileRow * TerrainInterval)) / TerrainInterval;
 
-        int pointRow = Mathf.FloorToInt(relativePos.z / PointInterval) % (MaxTerrainDim * pointsPerTile);
-        while (pointRow < 0)
-        {
-            pointRow += MaxTerrainDim * pointsPerTile;
-        }
-        relativePos.z += (pointRow - Mathf.FloorToInt(relativePos.z / PointInterval)) * PointInterval;
-
-        float interpolatedHeight = 0;
-        int used = 0;
-        for (int x = 0; x < 2; x++)
-        {
-            for (int y = 0; y < 2; y++)
-            {
-                if ((0 <= pointCol + x) && (MaxTerrainDim * pointsPerTile > pointCol + x) &&
-                    (0 <= pointRow + y) && (MaxTerrainDim * pointsPerTile > pointRow + y))
-                {
-                    float distRatio = Vector3.Distance(relativePos, new Vector3(pointCol * PointInterval, relativePos.y, pointRow * PointInterval)) / PointInterval;
-                    interpolatedHeight += (1f - distRatio) * heightArray[pointRow + y, pointCol + x];
-                    used++;
-                }
-            }
-        }
-
-        interpolatedHeight *= (5 - used);
+        float interpolatedHeight = ComputeBarycentricHeight(tileIdx, localX, localZ);
 
         return interpolatedHeight * MaxTerrainHeight;
 
     }
 
+
+    // This is the barycentric interpolation formula used for color interpolation of triangles, just adapted for height
+    private float ComputeBarycentricHeight(int tile, float x, float z)
+    {
+        int tileCol = tile % MaxTerrainDim;
+        int tileRow = tile / MaxTerrainDim;
+
+        Vector3 v1 = peakPositions[tile];
+        // NOTE: Doing it this way means that it will never consider a corner connection as potentially closer
+        Vector3 v2;
+        Vector3 v3;
+
+        if (x > 0.5f)
+        {
+            int newCol = (tileCol + 1) % MaxTerrainDim;
+            v2 = peakPositions[tileRow * MaxTerrainDim + newCol];
+            v2.x += 1; // Adjusting because peaks are stored as 0-1 values for location
+        }
+        else
+        {
+            int newCol = (tileCol + (MaxTerrainDim - 1)) % MaxTerrainDim;
+            v2 = peakPositions[tileRow * MaxTerrainDim + newCol];
+            v2.x -= 1;
+        }
+
+        if (z > 0.5f)
+        {
+            int newRow = (tileRow + 1) % MaxTerrainDim;
+            v3 = peakPositions[newRow * MaxTerrainDim + tileCol];
+            v3.z += 1;
+        }
+        else
+        {
+            int newRow = (tileRow + (MaxTerrainDim - 1)) % MaxTerrainDim;
+            v3 = peakPositions[newRow * MaxTerrainDim + tileCol];
+            v3.z -= 1;
+        }
+        
+
+        float w1 =  ( (v2.z - v3.z) * (x - v3.x) + (v3.x - v2.x) * (z - v3.z) ) / 
+                    ( (v2.z - v3.z) * (v1.x - v3.x) + (v3.x - v2.x) * (v1.z - v3.z) );
+
+        float w2 =  ( (v3.z - v1.z) * (x - v3.x) + (v1.x - v3.x) * (z - v3.z) ) /
+                    ( (v2.z - v3.z) * (v1.x - v3.x) + (v3.x - v2.x) * (v1.z - v3.z) );
+
+        float w3 = 1 - (w1 + w2);
+
+        return v1.y * w1 + v2.y * w2 + v3.y * w3;
+
+    }
+
     private void GenerateNewHeightMap()
     {
+        // First we generate a set of peak locations for each tile
         for (int tile = 0; tile < MaxTerrainDim * MaxTerrainDim; tile++)
         {
+            peakPositions[tile] = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+        }
+
+        // Then we create a heightmap of interpolated values
+        for (int tile = 0; tile < MaxTerrainDim * MaxTerrainDim; tile++)
+        {
+
             int tileCol = tile % MaxTerrainDim;
             int tileRow = tile / MaxTerrainDim;
 
@@ -348,13 +396,17 @@ public class TerrainManager : MonoBehaviour
                 int pointCol = point % pointsPerTile;
                 int pointRow = point / pointsPerTile;
 
-                float height = GetMappedValue(tile, point);
+                float x = (float)pointCol / pointsPerTile;
+                float z = (float)pointRow / pointsPerTile;
+
+                float height = ComputeBarycentricHeight(tile, x, z);
 
                 heightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] = height;
             }
 
         }
 
+        // Finally modify the terrain vertices to match the height map
         for(int tile = 0; tile < TerrainTileDims * TerrainTileDims; tile++)
         {
             Vector3[] newVerts = new Vector3[terrainList[tile].MyMesh.vertexCount];

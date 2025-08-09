@@ -18,6 +18,11 @@ public class ProceduralTerrainScript : MonoBehaviour
     
     private MeshCollider myCollider = null;
 
+    // Terrain Height Vars //
+
+    private Vector3 peakPosition = Vector3.zero;
+    public Vector3 Peak { get { return peakPosition; } }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -64,30 +69,9 @@ public class ProceduralTerrainScript : MonoBehaviour
     }
 
 
-    /*void GenerateNewHeightmap()
+    public void GenerateNewPeak()
     {
-        float initX = transform.position.x;
-        float initY = transform.position.z;
-        
-        float[,] newHeightArray = new float[pointsPerTile, pointsPerTile];
-        float interval = 1000f / ((float)pointsPerTile - 1);
-
-        for (int iX = 0; iX < pointsPerTile; iX++)
-        {
-            for(int iY = 0; iY < pointsPerTile; iY++)
-            {
-                float x = 0.001f * (iX * interval + initX);
-                float y = 0.001f * (iY * interval + initY);
-                newHeightArray[iX, iY] = 0.5f * Mathf.PerlinNoise(x, y);
-                if((iX == 0 || iX == 512) && (iY == 0 || iY == 512))
-                {
-                    Debug.Log("pos: " + (x) + ", " + (y));
-                    Debug.Log(0.5f * Mathf.PerlinNoise(x, y));
-                }
-            }
-        }
-
-        myTerrain.terrainData.SetHeights(0, 0, newHeightArray);
-    }*/
+        peakPosition = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+    }
 
 }

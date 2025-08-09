@@ -588,13 +588,15 @@ MonoBehaviour:
   MaxStaticTravelForce: 15000
   MinKineticLateralForce: 2800
   MinKineticTravelForce: 7200
-  SpringStrength: 475
+  SpringStrength: 550
   SpringClamp: 60000
+  ReturnSpringFactor: 0.3
+  ReturnSpringDistCutoff: 5
   DamperStrength: 22
-  ReturnDamperFactor: 3
-  ReturnDamperCutoff: 4
+  ReturnDamperFactor: 5
+  ReturnDamperDistCutoff: 3
   MaxTurnAngle: 45
-  MaxSpringExtension: 1
+  MaxSpringExtension: 2
   leaveGroundCoyoteTime: 0.1
   hitGroundCoyoteTime: 0.1
   numWheelsForGround: 3

@@ -80,11 +80,17 @@ public class PlayerCarMovement : MonoBehaviour
     [SerializeField]
     private float SpringClamp = 200f;
     [SerializeField]
+    private float ReturnSpringFactor = 0.35f;
+    [SerializeField]
+    [Tooltip("How fast the spring must move to trigger lower spring str")]
+    private float ReturnSpringDistCutoff = 3f;
+    [SerializeField]
     private float DamperStrength = 0.95f;
     [SerializeField]
     private float ReturnDamperFactor = 2.5f;
     [SerializeField]
-    private float ReturnDamperCutoff = 5f;
+    [Tooltip("How fast the spring must move to trigger extra damping")]
+    private float ReturnDamperDistCutoff = 5f;
     
 
     [SerializeField]
@@ -631,12 +637,18 @@ public class PlayerCarMovement : MonoBehaviour
                     float restDist = w.size * 2f;
                     float compression = restDist - hit.distance; // how much the spring is compressed
                     float damping = (w.lastSuspensionLength - hit.distance) * DamperStrength; // damping is difference from last frame
-                    if(damping < -ReturnDamperCutoff) // Add extra damping if bouncing back too hard
+                    if((w.lastSuspensionLength - hit.distance) < -ReturnDamperDistCutoff * Time.fixedDeltaTime) // Add extra damping if bouncing back too hard
                     {
                         damping *= ReturnDamperFactor;
+                        Debug.Log("Extra Damp");
                     }
                     w.normalForce = (compression + damping) * SpringStrength;
                     w.normalForce = Mathf.Clamp(w.normalForce, 0f, SpringClamp); // clamp it
+                    if((w.lastSuspensionLength - hit.distance) < -ReturnSpringDistCutoff * Time.fixedDeltaTime)
+                    {
+                        w.normalForce *= ReturnSpringFactor;
+                        Debug.Log("Reduced Spring");
+                    }
 
                     Vector3 springDir = hit.normal * w.normalForce; // direction is the surface normal
                     w.suspensionForceDirection = springDir;
