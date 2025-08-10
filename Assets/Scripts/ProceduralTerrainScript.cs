@@ -23,6 +23,8 @@ public class ProceduralTerrainScript : MonoBehaviour
     private Vector3 peakPosition = Vector3.zero;
     public Vector3 Peak { get { return peakPosition; } }
 
+    public int currentMapTile;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -66,12 +68,6 @@ public class ProceduralTerrainScript : MonoBehaviour
     void Update()
     {
         
-    }
-
-
-    public void GenerateNewPeak()
-    {
-        peakPosition = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
     }
 
 }

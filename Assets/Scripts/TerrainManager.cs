@@ -8,6 +8,8 @@ public class TerrainManager : MonoBehaviour
     public GameObject TerrainPrefab;
     public GameObject FinishPrefab;
 
+    public GameObject PeakDebugPrefab;
+
     [SerializeField]
     private int MaxTerrainDim = 64;
     [SerializeField]
@@ -118,6 +120,7 @@ public class TerrainManager : MonoBehaviour
         int playerX = playerTile % MaxTerrainDim;
         int playerY = playerTile / MaxTerrainDim;
 
+        // Adding MaxTerrainDim to make sure this comes out positive
         int diffX = (playerX - currentBottomLeftX + MaxTerrainDim) % MaxTerrainDim;
         int diffY = (playerY - currentBottomLeftY + MaxTerrainDim) % MaxTerrainDim;
 
@@ -162,6 +165,7 @@ public class TerrainManager : MonoBehaviour
                 }
                 terrainList[tileIdx].MyMesh.vertices = newVerts;
                 terrainList[tileIdx].RecomputeMeshCollider();
+                terrainList[tileIdx].currentMapTile = GetTileIdxAtLocation(terrainList[tileIdx].gameObject.transform.position);
             }
             
             // Set the next row to be the bottomleft
@@ -196,6 +200,7 @@ public class TerrainManager : MonoBehaviour
                 }
                 terrainList[tileIdx].MyMesh.vertices = newVerts;
                 terrainList[tileIdx].RecomputeMeshCollider();
+                terrainList[tileIdx].currentMapTile = GetTileIdxAtLocation(terrainList[tileIdx].gameObject.transform.position);
             }
         }
 
@@ -229,6 +234,7 @@ public class TerrainManager : MonoBehaviour
                 }
                 terrainList[tileIdx].MyMesh.vertices = newVerts;
                 terrainList[tileIdx].RecomputeMeshCollider();
+                terrainList[tileIdx].currentMapTile = GetTileIdxAtLocation(terrainList[tileIdx].gameObject.transform.position);
             }
 
             // Set the next row to be the bottomleft
@@ -263,38 +269,15 @@ public class TerrainManager : MonoBehaviour
                 }
                 terrainList[tileIdx].MyMesh.vertices = newVerts;
                 terrainList[tileIdx].RecomputeMeshCollider();
+                terrainList[tileIdx].currentMapTile = GetTileIdxAtLocation(terrainList[tileIdx].gameObject.transform.position);
             }
         }
 
     }
 
-    private float CustomRandom(float x)
-    {
-        return Mathf.Sin(((Mathf.Sin(x * 53885.7f) * 31841.93f) % 1f) * 19) * 0.5f + 0.5f;
-    }
-
-    private float GetMappedValue(int tileNum, int pointNum)
-    {
-        int tileCol = tileNum % MaxTerrainDim;
-        int tileRow = tileNum / MaxTerrainDim;
-        int pointCol = pointNum % pointsPerTile;
-        int pointRow = pointNum / pointsPerTile;
-
-        Vector3 position = currentOrigin + new Vector3(tileCol * TerrainInterval + pointCol * PointInterval, baseHeight, tileRow * TerrainInterval + pointRow * PointInterval);
-
-        float x = CustomRandom(position.x);
-        float y = CustomRandom(position.z);
-
-        return x * y;
-    }
-
     public int GetPlayerTileIdx()
     {
-        Vector3 relativePos = FollowManager.Instance().LeaderPosition - currentOrigin;
-        int tileCol = Mathf.FloorToInt(relativePos.x / TerrainInterval);
-        int tileRow = Mathf.FloorToInt(relativePos.z / TerrainInterval);
-
-        return tileRow * MaxTerrainDim + tileCol;
+        return GetTileIdxAtLocation(FollowManager.Instance().LeaderPosition);
     }
 
     private int GetTileIdxAtLocation(Vector3 location)
@@ -303,6 +286,18 @@ public class TerrainManager : MonoBehaviour
         int tileCol = Mathf.FloorToInt(relativePos.x / TerrainInterval);
         int tileRow = Mathf.FloorToInt(relativePos.z / TerrainInterval);
 
+        while(tileCol < 0)
+        {
+            tileCol += MaxTerrainDim;
+        }
+        tileCol = tileCol % MaxTerrainDim;
+
+        while (tileRow < 0)
+        {
+            tileRow += MaxTerrainDim;
+        }
+        tileRow = tileRow % MaxTerrainDim;
+
         return tileRow * MaxTerrainDim + tileCol;
     }
 
@@ -310,13 +305,27 @@ public class TerrainManager : MonoBehaviour
     {
 
         Vector3 relativePos = location - currentOrigin;
-        int tileCol = Mathf.FloorToInt(relativePos.x / TerrainInterval) % MaxTerrainDim;
-        int tileRow = Mathf.FloorToInt(relativePos.z / TerrainInterval) % MaxTerrainDim;
-        int tileIdx = tileRow * MaxTerrainDim + tileCol;
 
+        int tileCol = Mathf.FloorToInt(relativePos.x / TerrainInterval);
+        int tileRow = Mathf.FloorToInt(relativePos.z / TerrainInterval);
+        
         // Get the [0,1] value for relative x and z location on this tile
         float localX = (relativePos.x - (tileCol * TerrainInterval)) / TerrainInterval;
         float localZ = (relativePos.z - (tileRow * TerrainInterval)) / TerrainInterval;
+
+        // Make sure we get a valid tile number
+        while(tileCol < 0)
+        {
+            tileCol += MaxTerrainDim;
+        }
+        tileCol = tileCol % MaxTerrainDim;
+
+        while(tileRow < 0)
+        {
+            tileRow += MaxTerrainDim;
+        }
+        tileRow = tileRow % MaxTerrainDim;
+        int tileIdx = tileRow * MaxTerrainDim + tileCol;
 
         float interpolatedHeight = ComputeBarycentricHeight(tileIdx, localX, localZ);
 
@@ -329,40 +338,65 @@ public class TerrainManager : MonoBehaviour
     private float ComputeBarycentricHeight(int tile, float x, float z)
     {
         int tileCol = tile % MaxTerrainDim;
-        int tileRow = tile / MaxTerrainDim;
+        int tileRow = (tile / MaxTerrainDim) % MaxTerrainDim;
 
         Vector3 v1 = peakPositions[tile];
-        // NOTE: Doing it this way means that it will never consider a corner connection as potentially closer
         Vector3 v2;
         Vector3 v3;
 
+        int newCol, newRow;
+
         if (x > 0.5f)
         {
-            int newCol = (tileCol + 1) % MaxTerrainDim;
+            newCol = (tileCol + 1) % MaxTerrainDim;
             v2 = peakPositions[tileRow * MaxTerrainDim + newCol];
             v2.x += 1; // Adjusting because peaks are stored as 0-1 values for location
         }
         else
         {
-            int newCol = (tileCol + (MaxTerrainDim - 1)) % MaxTerrainDim;
+            newCol = (tileCol + (MaxTerrainDim - 1)) % MaxTerrainDim;
             v2 = peakPositions[tileRow * MaxTerrainDim + newCol];
             v2.x -= 1;
         }
 
         if (z > 0.5f)
         {
-            int newRow = (tileRow + 1) % MaxTerrainDim;
+            newRow = (tileRow + 1) % MaxTerrainDim;
             v3 = peakPositions[newRow * MaxTerrainDim + tileCol];
             v3.z += 1;
         }
         else
         {
-            int newRow = (tileRow + (MaxTerrainDim - 1)) % MaxTerrainDim;
+            newRow = (tileRow + (MaxTerrainDim - 1)) % MaxTerrainDim;
             v3 = peakPositions[newRow * MaxTerrainDim + tileCol];
             v3.z -= 1;
         }
-        
+        // V4 is the closest corner tile
+        Vector3 v4 = peakPositions[newRow * MaxTerrainDim + newCol];
+        v4.x += x > 0.5f ? 1 : -1;
+        v4.z += z > 0.5f ? 1 : -1;
 
+        // Remove the furthest point by swapping so that v4 is always the furthest point
+        if ( Vector2.Distance(new Vector2(x, z), new Vector2(v1.x, v1.z)) > Vector2.Distance(new Vector2(x, z), new Vector2(v4.x, v4.z)) )
+        {
+            Vector3 temp = v2;
+            v2 = v4;
+            v4 = temp;
+        }
+        if (Vector2.Distance(new Vector2(x, z), new Vector2(v2.x, v2.z)) > Vector2.Distance(new Vector2(x, z), new Vector2(v4.x, v4.z)))
+        {
+            Vector3 temp = v1;
+            v1 = v4;
+            v4 = temp;
+        }
+        if (Vector2.Distance(new Vector2(x, z), new Vector2(v3.x, v3.z)) > Vector2.Distance(new Vector2(x, z), new Vector2(v4.x, v4.z)))
+        {
+            Vector3 temp = v3;
+            v3 = v4;
+            v4 = temp;
+        }
+
+        // Compute point weights
         float w1 =  ( (v2.z - v3.z) * (x - v3.x) + (v3.x - v2.x) * (z - v3.z) ) / 
                     ( (v2.z - v3.z) * (v1.x - v3.x) + (v3.x - v2.x) * (v1.z - v3.z) );
 
@@ -371,7 +405,7 @@ public class TerrainManager : MonoBehaviour
 
         float w3 = 1 - (w1 + w2);
 
-        return v1.y * w1 + v2.y * w2 + v3.y * w3;
+        return Mathf.Clamp(v1.y * w1 + v2.y * w2 + v3.y * w3, 0, 1);
 
     }
 
@@ -380,7 +414,17 @@ public class TerrainManager : MonoBehaviour
         // First we generate a set of peak locations for each tile
         for (int tile = 0; tile < MaxTerrainDim * MaxTerrainDim; tile++)
         {
-            peakPositions[tile] = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+            peakPositions[tile] = new Vector3(Random.Range(0.15f, 0.85f), Random.Range(0.10f, 0.90f), Random.Range(0.15f, 0.85f));
+            //Debug.Log("Tile #: " + tile + "\nPeak: " + peakPositions[tile]);
+            if(PeakDebugPrefab)
+            {
+                int tileCol = tile % MaxTerrainDim;
+                int tileRow = tile / MaxTerrainDim;
+                Vector3 startpos = new Vector3(tileCol * TerrainInterval, baseHeight, tileRow * TerrainInterval);
+                Vector3 peakPos = new Vector3(peakPositions[tile].x * TerrainInterval, peakPositions[tile].y * MaxTerrainHeight, peakPositions[tile].z * TerrainInterval);
+                Instantiate(PeakDebugPrefab, peakPos + startpos + currentOrigin, Quaternion.identity);
+            }
+            
         }
 
         // Then we create a heightmap of interpolated values
@@ -388,7 +432,7 @@ public class TerrainManager : MonoBehaviour
         {
 
             int tileCol = tile % MaxTerrainDim;
-            int tileRow = tile / MaxTerrainDim;
+            int tileRow = (tile / MaxTerrainDim) % MaxTerrainDim;
 
 
             for(int point = 0; point < pointsPerTile * pointsPerTile; point++)
@@ -423,6 +467,7 @@ public class TerrainManager : MonoBehaviour
             }
             terrainList[tile].MyMesh.vertices = newVerts;
             terrainList[tile].RecomputeMeshCollider();
+            terrainList[tile].currentMapTile = GetTileIdxAtLocation(terrainList[tile].gameObject.transform.position);
         }
 
         TerrainBottomLeftX = 0;
