@@ -767,7 +767,7 @@ MonoBehaviour:
   TerrainTileDims: 6
   SwapEdgeDistance: 1
   pointsPerTile: 26
-  MaxTerrainHeight: 60
+  MaxTerrainHeight: 150
 --- !u!1 &1800582410
 GameObject:
   m_ObjectHideFlags: 0
@@ -1002,7 +1002,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 60
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalPosition.z
