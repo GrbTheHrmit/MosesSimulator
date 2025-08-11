@@ -1037,8 +1037,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: DamperStrength
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: SpringStrength
-      value: 575
+      value: 650
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: MinCrashImpulseSqr
@@ -1046,7 +1050,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: ReturnDamperFactor
-      value: 6.5
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: ReturnSpringFactor
@@ -1066,7 +1070,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: ReturnSpringDistCutoff
-      value: 1.8
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[0].travelSlipFactor
