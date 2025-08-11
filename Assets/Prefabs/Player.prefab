@@ -551,7 +551,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb4e98119f880574585eafd56f151fba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxMultiplier: 5
+  MaxMultiplier: 5.07
   MultiIncreasePerFollower: 0.15
   GroundTimeout: 0.75
   ChainMultiIncrease: 0.5
@@ -590,10 +590,11 @@ MonoBehaviour:
   MinKineticTravelForce: 7200
   SpringStrength: 550
   SpringClamp: 60000
-  ReturnSpringFactor: 0.3
+  ReturnSpringStrength: 300
+  ReturnSpringClamp: 10000
   ReturnSpringDistCutoff: 5
   DamperStrength: 22
-  ReturnDamperFactor: 5
+  ReturnDamperStrength: 85
   ReturnDamperDistCutoff: 3
   MaxTurnAngle: 45
   MaxSpringExtension: 2
