@@ -78,7 +78,10 @@ public class PlayerCarMovement : MonoBehaviour
     [SerializeField]
     private float SpringStrength = 10f;
     [SerializeField]
-    private float SpringClamp = 200f;
+    private float SpringClamp = 20000f;
+    [SerializeField]
+    [Tooltip("How far from max compression when we use the max clamp value")]
+    private float MaxSpringBuffer = 0.02f;
     [SerializeField]
     private float ReturnSpringStrength = 300f;
     [SerializeField]
@@ -630,22 +633,28 @@ public class PlayerCarMovement : MonoBehaviour
             float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
 
             RaycastHit hit;
-            if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f, (~LayerMask.GetMask("Player") & ~LayerMask.GetMask("NonCollidable"))))
+            if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, 2f * w.size + MaxSpringExtension, (~LayerMask.GetMask("Player") & ~LayerMask.GetMask("NonCollidable"))))
             {
                 groundedWheels++;
 
                 // Spring Force
                 {
-                    float restDist = w.size * 2f;
+                    float restDist = MaxSpringExtension + w.size;
                     float compression = restDist - hit.distance; // how much the spring is compressed
                     float returnSpeed = (w.lastSuspensionLength - hit.distance);
+                    // Check if the spring is bottoming out and still compressing
+                    if (returnSpeed > 0 && hit.distance < MaxSpringBuffer)
+                    {
+                        w.normalForce = SpringClamp;
+                        Debug.Log("Bottoming");
+                    }
                     // Checks if the spring is extending fast enough for changed spring values
-                    if (returnSpeed < -ReturnSpringDistCutoff * Time.fixedDeltaTime)
+                    else if (returnSpeed < -ReturnSpringDistCutoff * Time.fixedDeltaTime)
                     {
                         float damping = returnSpeed * ReturnDamperStrength; // damping is difference from last frame
                         w.normalForce = (compression + damping) * ReturnSpringStrength;
                         w.normalForce = Mathf.Clamp(w.normalForce, 0f, ReturnSpringClamp);
-                        Debug.Log("Reduced Spring");
+                        //Debug.Log("Reduced Spring");
                     }
                     else
                     {
@@ -692,7 +701,7 @@ public class PlayerCarMovement : MonoBehaviour
             }
             else
             {
-                wheelTransform.position = w.wheelWorldPosition - transform.up * w.size; // If not hitting anything, just position the wheel under the local anchor
+                wheelTransform.position = w.wheelWorldPosition - transform.up * (w.size + MaxSpringExtension); // If not hitting anything, just position the wheel under the local anchor
                 w.normalForce = 0;
 
                 // If wheel is off ground stop skid effects
