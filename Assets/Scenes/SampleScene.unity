@@ -190,11 +190,34 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 600678011106460612, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5263581034234945022, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 100655931}
   m_SourcePrefab: {fileID: 100100000, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
+--- !u!1 &100655930 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5263581034234945022, guid: 0bf24623670b8b5419faacbf341af0ee, type: 3}
+  m_PrefabInstance: {fileID: 100655929}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &100655931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100655930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c6556701af9e04380698b89f691b6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nonRigidbodyVelocity: 0
+  attenuationObject: {fileID: 0}
 --- !u!1 &553989488
 GameObject:
   m_ObjectHideFlags: 0
@@ -1103,6 +1126,42 @@ PrefabInstance:
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[3].lateralSlipFactor
       value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572731228813670830, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: Params.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572731228813670830, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: EventReference.Path
+      value: event:/BasicEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572731228813670830, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: OverrideMaxDistance
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572731228813670830, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: OverrideMinDistance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572731228813670830, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: EventReference.Guid.Data1
+      value: -2122315810
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572731228813670830, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: EventReference.Guid.Data2
+      value: 1196058099
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572731228813670830, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: EventReference.Guid.Data3
+      value: 156837266
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572731228813670830, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: EventReference.Guid.Data4
+      value: 96958304
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572731228813670830, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: Params.Array.data[0].Name
+      value: Revs
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
