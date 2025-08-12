@@ -83,6 +83,9 @@ public class PlayerCarMovement : MonoBehaviour
     [Tooltip("How far from max compression when we use the max clamp value")]
     private float MaxSpringBuffer = 0.02f;
     [SerializeField]
+    [Tooltip("How fast the spring is moving at max compression when we use max clamp value")]
+    private float MaxSpringSpeed = 2f;
+    [SerializeField]
     private float ReturnSpringStrength = 300f;
     [SerializeField]
     private float ReturnSpringClamp = 10000f;
@@ -93,9 +96,6 @@ public class PlayerCarMovement : MonoBehaviour
     private float DamperStrength = 0.95f;
     [SerializeField]
     private float ReturnDamperStrength = 85f;
-    [SerializeField]
-    [Tooltip("How fast the spring must move to trigger extra damping")]
-    private float ReturnDamperDistCutoff = 5f;
     
 
     [SerializeField]
@@ -125,6 +125,8 @@ public class PlayerCarMovement : MonoBehaviour
     [SerializeField]
     [Tooltip("Force factor applied to a wheel touching the ground when car is considered airborne")]
     private float initialGroundForceFactor = 0.2f;
+    [SerializeField]
+    private bool UseLocalTrickRotations = true;
 
     [Header("Trick Controls")]
     [SerializeField]
@@ -146,6 +148,12 @@ public class PlayerCarMovement : MonoBehaviour
     private bool MultiplyBoostIncrease = true;
     [SerializeField]
     private float BoostTorqueIncrease = 1.5f;
+    [SerializeField]
+    private float InitialBoostImpulse = 750f;
+    [SerializeField]
+    private float InitialBoostForce = 300f;
+    [SerializeField]
+    private float FinalBoostForce = 100f;
     [SerializeField]
     private float MaxBoostTime = 1.5f;
     [SerializeField]
@@ -382,6 +390,7 @@ public class PlayerCarMovement : MonoBehaviour
 
     private void StartBoosting()
     {
+        rb.AddRelativeForce(new Vector3(0, 0, InitialBoostImpulse), ForceMode.Impulse);
         boosting = true;
         boostTimer = 0;
     }
@@ -412,11 +421,17 @@ public class PlayerCarMovement : MonoBehaviour
             {
                 FinishBoosting();
             }
+            else
+            {
+                float t = Mathf.Max(boostTimer / MaxBoostTime, 0); // Make sure this doesnt go below 0, upper bound taken care of by ifelse
+                float currentBoostForce = t * FinalBoostForce + (1 - t) * InitialBoostForce;
+                rb.AddRelativeForce(new Vector3(0, 0, currentBoostForce), ForceMode.Force);
+            }
         }
     }
 
     ////// TRICK FUNCTIONS //////
-    
+
     public void OnFlipAction(InputAction.CallbackContext context)
     {
         // Not on cooldown
@@ -474,28 +489,23 @@ public class PlayerCarMovement : MonoBehaviour
 
             if (groundTimer < 0 && lastFlipDirInput.sqrMagnitude >= 0.01f)
             {
-                Vector3 camForward = playerCamera.transform.forward;
-                camForward.y = 0;
-                camForward.Normalize();
                 Vector3 torqueVector = trickForce * (Quaternion.FromToRotation(Vector3.right, new Vector3(lastFlipDirInput.y, 0, -lastFlipDirInput.x)) * Vector3.right);
                 torqueVector.x *= VerticalFlipFactor;
-                torqueVector = Quaternion.FromToRotation(Vector3.forward, camForward) * torqueVector;
-                //Vector3 torqueVector = trickForce * (Quaternion.FromToRotation(Vector3.right, new Vector3(lastFlipDirInput.y, lastFlipDirInput.x, 0)) * Vector3.right);
 
-                Debug.DrawRay(transform.position, torqueVector, Color.yellow, 1);
-
-                rb.AddTorque(torqueVector, ForceMode.Impulse);
-                /*
-                // Front/Back Flip Force
-                if (Mathf.Abs(lastFlipDirInput.y) > 0.5f)
+                // Local vs World coordinates for flipping
+                if(UseLocalTrickRotations)
                 {
-                    rb.AddForceAtPosition(trickForce * rb.transform.up, transform.TransformPoint(new Vector3(0, 0.1f, Mathf.Sign(lastFlipDirInput.y) * 3.5f)), ForceMode.Impulse);
+                    rb.AddRelativeTorque(torqueVector, ForceMode.Impulse);
                 }
-                // Left/Right Rotational Force
-                if (Mathf.Abs(lastFlipDirInput.x) > 0.5f)
+                else
                 {
-                    rb.AddRelativeTorque(trickForce * rb.transform.up, ForceMode.Impulse);
-                }*/
+                    Vector3 camForward = playerCamera.transform.forward;
+                    camForward.y = 0;
+                    camForward.Normalize();
+                    torqueVector = Quaternion.FromToRotation(Vector3.forward, camForward) * torqueVector;
+                    rb.AddTorque(torqueVector, ForceMode.Impulse);
+                }
+                
             }
             else if(groundTimer >= 0) // No Input Direction or on ground
             {
@@ -643,7 +653,7 @@ public class PlayerCarMovement : MonoBehaviour
                     float compression = restDist - hit.distance; // how much the spring is compressed
                     float returnSpeed = (w.lastSuspensionLength - hit.distance);
                     // Check if the spring is bottoming out and still compressing
-                    if (returnSpeed > 0 && hit.distance < MaxSpringBuffer)
+                    if (returnSpeed > MaxSpringSpeed * Time.fixedDeltaTime && hit.distance < MaxSpringBuffer)
                     {
                         w.normalForce = SpringClamp;
                         Debug.Log("Bottoming");

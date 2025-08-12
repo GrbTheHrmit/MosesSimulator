@@ -642,17 +642,17 @@ MonoBehaviour:
   airForceFactor: 0.9
   MaxStaticLateralForce: 12000
   MaxStaticTravelForce: 18000
-  MinKineticLateralForce: 4200
+  MinKineticLateralForce: 2800
   MinKineticTravelForce: 7200
   SpringStrength: 725
-  SpringClamp: 25000
-  MaxSpringBuffer: 0.02
+  SpringClamp: 22000
+  MaxSpringBuffer: 0.05
+  MaxSpringSpeed: 2.5
   ReturnSpringStrength: 200
   ReturnSpringClamp: 10000
-  ReturnSpringDistCutoff: 2
+  ReturnSpringDistCutoff: 1.2
   DamperStrength: 14
-  ReturnDamperStrength: 120
-  ReturnDamperDistCutoff: 1.5
+  ReturnDamperStrength: 90
   MaxTurnAngle: 45
   MaxSpringExtension: 0.5
   leaveGroundCoyoteTime: 0.1
@@ -662,6 +662,7 @@ MonoBehaviour:
   releaseRotateFriction: 0.2
   steerRotateFriction: 1.5
   initialGroundForceFactor: 0.15
+  UseLocalTrickRotations: 1
   MinTrickForce: 200
   MaxTrickForce: 750
   VerticalFlipFactor: 1.5
@@ -670,8 +671,11 @@ MonoBehaviour:
   TrickRotationCancel: 0.1
   MultiplyBoostIncrease: 1
   BoostTorqueIncrease: 2
+  InitialBoostImpulse: 750
+  InitialBoostForce: 300
+  FinalBoostForce: 100
   MaxBoostTime: 1.5
-  BoostRecoveryRate: 0.5
+  BoostRecoveryRate: 0.75
   MinCrashImpulseSqr: 4000
   gearRatios:
   - 1
@@ -686,7 +690,7 @@ MonoBehaviour:
     size: 2
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.18
+    lateralSlipFactor: 0.22
     travelSlipFactor: 0.15
     maxLateralSlipDivisor: 3
     maxTravelSlipDivisor: 4
@@ -816,7 +820,7 @@ MonoBehaviour:
     size: 2
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.18
+    lateralSlipFactor: 0.22
     travelSlipFactor: 0.15
     maxLateralSlipDivisor: 3
     maxTravelSlipDivisor: 4
@@ -946,7 +950,7 @@ MonoBehaviour:
     size: 0
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.18
+    lateralSlipFactor: 0.22
     travelSlipFactor: 0.15
     maxLateralSlipDivisor: 3
     maxTravelSlipDivisor: 4
@@ -1076,7 +1080,7 @@ MonoBehaviour:
     size: 0
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.18
+    lateralSlipFactor: 0.22
     travelSlipFactor: 0.15
     maxLateralSlipDivisor: 3
     maxTravelSlipDivisor: 4
