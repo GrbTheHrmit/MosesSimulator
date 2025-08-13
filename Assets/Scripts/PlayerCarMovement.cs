@@ -78,7 +78,13 @@ public class PlayerCarMovement : MonoBehaviour
     [SerializeField]
     private float SpringStrength = 10f;
     [SerializeField]
-    private float SpringClamp = 200f;
+    private float SpringClamp = 20000f;
+    [SerializeField]
+    [Tooltip("How far from max compression when we use the max clamp value")]
+    private float MaxSpringBuffer = 0.02f;
+    [SerializeField]
+    [Tooltip("How fast the spring is moving at max compression when we use max clamp value")]
+    private float MaxSpringSpeed = 2f;
     [SerializeField]
     private float ReturnSpringStrength = 300f;
     [SerializeField]
@@ -90,9 +96,6 @@ public class PlayerCarMovement : MonoBehaviour
     private float DamperStrength = 0.95f;
     [SerializeField]
     private float ReturnDamperStrength = 85f;
-    [SerializeField]
-    [Tooltip("How fast the spring must move to trigger extra damping")]
-    private float ReturnDamperDistCutoff = 5f;
     
 
     [SerializeField]
@@ -122,6 +125,8 @@ public class PlayerCarMovement : MonoBehaviour
     [SerializeField]
     [Tooltip("Force factor applied to a wheel touching the ground when car is considered airborne")]
     private float initialGroundForceFactor = 0.2f;
+    [SerializeField]
+    private bool UseLocalTrickRotations = true;
 
     [Header("Trick Controls")]
     [SerializeField]
@@ -143,6 +148,12 @@ public class PlayerCarMovement : MonoBehaviour
     private bool MultiplyBoostIncrease = true;
     [SerializeField]
     private float BoostTorqueIncrease = 1.5f;
+    [SerializeField]
+    private float InitialBoostImpulse = 750f;
+    [SerializeField]
+    private float InitialBoostForce = 300f;
+    [SerializeField]
+    private float FinalBoostForce = 100f;
     [SerializeField]
     private float MaxBoostTime = 1.5f;
     [SerializeField]
@@ -379,6 +390,7 @@ public class PlayerCarMovement : MonoBehaviour
 
     private void StartBoosting()
     {
+        rb.AddRelativeForce(new Vector3(0, 0, InitialBoostImpulse), ForceMode.Impulse);
         boosting = true;
         boostTimer = 0;
     }
@@ -409,11 +421,17 @@ public class PlayerCarMovement : MonoBehaviour
             {
                 FinishBoosting();
             }
+            else
+            {
+                float t = Mathf.Max(boostTimer / MaxBoostTime, 0); // Make sure this doesnt go below 0, upper bound taken care of by ifelse
+                float currentBoostForce = t * FinalBoostForce + (1 - t) * InitialBoostForce;
+                rb.AddRelativeForce(new Vector3(0, 0, currentBoostForce), ForceMode.Force);
+            }
         }
     }
 
     ////// TRICK FUNCTIONS //////
-    
+
     public void OnFlipAction(InputAction.CallbackContext context)
     {
         // Not on cooldown
@@ -471,28 +489,23 @@ public class PlayerCarMovement : MonoBehaviour
 
             if (groundTimer < 0 && lastFlipDirInput.sqrMagnitude >= 0.01f)
             {
-                Vector3 camForward = playerCamera.transform.forward;
-                camForward.y = 0;
-                camForward.Normalize();
                 Vector3 torqueVector = trickForce * (Quaternion.FromToRotation(Vector3.right, new Vector3(lastFlipDirInput.y, 0, -lastFlipDirInput.x)) * Vector3.right);
                 torqueVector.x *= VerticalFlipFactor;
-                torqueVector = Quaternion.FromToRotation(Vector3.forward, camForward) * torqueVector;
-                //Vector3 torqueVector = trickForce * (Quaternion.FromToRotation(Vector3.right, new Vector3(lastFlipDirInput.y, lastFlipDirInput.x, 0)) * Vector3.right);
 
-                Debug.DrawRay(transform.position, torqueVector, Color.yellow, 1);
-
-                rb.AddTorque(torqueVector, ForceMode.Impulse);
-                /*
-                // Front/Back Flip Force
-                if (Mathf.Abs(lastFlipDirInput.y) > 0.5f)
+                // Local vs World coordinates for flipping
+                if(UseLocalTrickRotations)
                 {
-                    rb.AddForceAtPosition(trickForce * rb.transform.up, transform.TransformPoint(new Vector3(0, 0.1f, Mathf.Sign(lastFlipDirInput.y) * 3.5f)), ForceMode.Impulse);
+                    rb.AddRelativeTorque(torqueVector, ForceMode.Impulse);
                 }
-                // Left/Right Rotational Force
-                if (Mathf.Abs(lastFlipDirInput.x) > 0.5f)
+                else
                 {
-                    rb.AddRelativeTorque(trickForce * rb.transform.up, ForceMode.Impulse);
-                }*/
+                    Vector3 camForward = playerCamera.transform.forward;
+                    camForward.y = 0;
+                    camForward.Normalize();
+                    torqueVector = Quaternion.FromToRotation(Vector3.forward, camForward) * torqueVector;
+                    rb.AddTorque(torqueVector, ForceMode.Impulse);
+                }
+                
             }
             else if(groundTimer >= 0) // No Input Direction or on ground
             {
@@ -630,22 +643,32 @@ public class PlayerCarMovement : MonoBehaviour
             float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
 
             RaycastHit hit;
-            if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, w.size * 2f, (~LayerMask.GetMask("Player") & ~LayerMask.GetMask("NonCollidable"))))
+            // Raycast at dist of MaxExtension + 2*wheel size to make sure we check just past the wheel
+            if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, 2f * w.size + MaxSpringExtension, (~LayerMask.GetMask("Player") & ~LayerMask.GetMask("NonCollidable"))))
             {
                 groundedWheels++;
 
                 // Spring Force
                 {
-                    float restDist = w.size * 2f;
-                    float compression = restDist - hit.distance; // how much the spring is compressed
-                    float returnSpeed = (w.lastSuspensionLength - hit.distance);
+                    
+                    float restDist = MaxSpringExtension + w.size;
+                    float hitDist = Mathf.Min(hit.distance, restDist);
+                    float compression = restDist - hitDist;
+                    float returnSpeed = (w.lastSuspensionLength - hitDist);
+                    
+                    // Check if the spring is bottoming out and still compressing
+                    if (returnSpeed > MaxSpringSpeed * Time.fixedDeltaTime && hitDist < MaxSpringBuffer)
+                    {
+                        w.normalForce = SpringClamp;
+                        Debug.Log("Bottoming");
+                    }
                     // Checks if the spring is extending fast enough for changed spring values
-                    if (returnSpeed < -ReturnSpringDistCutoff * Time.fixedDeltaTime)
+                    else if (returnSpeed < -ReturnSpringDistCutoff * Time.fixedDeltaTime)
                     {
                         float damping = returnSpeed * ReturnDamperStrength; // damping is difference from last frame
                         w.normalForce = (compression + damping) * ReturnSpringStrength;
                         w.normalForce = Mathf.Clamp(w.normalForce, 0f, ReturnSpringClamp);
-                        Debug.Log("Reduced Spring");
+                        //Debug.Log("Reduced Spring");
                     }
                     else
                     {
@@ -664,9 +687,10 @@ public class PlayerCarMovement : MonoBehaviour
                     }
 
                     rb.AddForceAtPosition(springDir + appliedWorldForce, hit.point); // Apply total forces at contact
+                    w.lastSuspensionLength = hitDist; // store for damping next frame
                 }
 
-                w.lastSuspensionLength = hit.distance; // store for damping next frame
+                
                 wheelTransform.position = hit.point + transform.up * w.size; // Move wheel visuals to the contact point + offset
 
 
@@ -692,7 +716,8 @@ public class PlayerCarMovement : MonoBehaviour
             }
             else
             {
-                wheelTransform.position = w.wheelWorldPosition - transform.up * w.size; // If not hitting anything, just position the wheel under the local anchor
+                w.lastSuspensionLength = MaxSpringExtension + w.size;
+                wheelTransform.position = w.wheelWorldPosition - transform.up * (w.size + MaxSpringExtension); // If not hitting anything, just position the wheel under the local anchor
                 w.normalForce = 0;
 
                 // If wheel is off ground stop skid effects

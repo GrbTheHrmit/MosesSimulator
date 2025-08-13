@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{e1acc98c-6318-416d-834a-583fad2a8e2a}">
+		<property name="assetPath">
+			<value>HighRevV6.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>7.0005895691609981</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{40945b4f-8c20-4755-bc2c-fd3e53f57bdd}</destination>
+		</relationship>
+	</object>
+</objects>

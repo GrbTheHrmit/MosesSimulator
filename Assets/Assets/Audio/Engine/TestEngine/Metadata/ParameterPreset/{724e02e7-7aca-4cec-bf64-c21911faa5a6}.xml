@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="ParameterPreset" id="{724e02e7-7aca-4cec-bf64-c21911faa5a6}">
+		<property name="name">
+			<value>Revs</value>
+		</property>
+		<relationship name="folder">
+			<destination>{dbf31f76-0669-40c5-8685-e3c12d60c47b}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{a00b76bd-b5ad-4f08-b25b-a5fb14eeae86}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{a00b76bd-b5ad-4f08-b25b-a5fb14eeae86}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>
