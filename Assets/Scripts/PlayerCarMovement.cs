@@ -643,17 +643,21 @@ public class PlayerCarMovement : MonoBehaviour
             float inertia = Mathf.Max(w.mass * w.size * w.size / 2f, 1f);
 
             RaycastHit hit;
+            // Raycast at dist of MaxExtension + 2*wheel size to make sure we check just past the wheel
             if (Physics.Raycast(w.wheelWorldPosition, -transform.up, out hit, 2f * w.size + MaxSpringExtension, (~LayerMask.GetMask("Player") & ~LayerMask.GetMask("NonCollidable"))))
             {
                 groundedWheels++;
 
                 // Spring Force
                 {
+                    
                     float restDist = MaxSpringExtension + w.size;
-                    float compression = restDist - hit.distance; // how much the spring is compressed
-                    float returnSpeed = (w.lastSuspensionLength - hit.distance);
+                    float hitDist = Mathf.Min(hit.distance, restDist);
+                    float compression = restDist - hitDist;
+                    float returnSpeed = (w.lastSuspensionLength - hitDist);
+                    
                     // Check if the spring is bottoming out and still compressing
-                    if (returnSpeed > MaxSpringSpeed * Time.fixedDeltaTime && hit.distance < MaxSpringBuffer)
+                    if (returnSpeed > MaxSpringSpeed * Time.fixedDeltaTime && hitDist < MaxSpringBuffer)
                     {
                         w.normalForce = SpringClamp;
                         Debug.Log("Bottoming");
@@ -683,9 +687,10 @@ public class PlayerCarMovement : MonoBehaviour
                     }
 
                     rb.AddForceAtPosition(springDir + appliedWorldForce, hit.point); // Apply total forces at contact
+                    w.lastSuspensionLength = hitDist; // store for damping next frame
                 }
 
-                w.lastSuspensionLength = hit.distance; // store for damping next frame
+                
                 wheelTransform.position = hit.point + transform.up * w.size; // Move wheel visuals to the contact point + offset
 
 
@@ -711,6 +716,7 @@ public class PlayerCarMovement : MonoBehaviour
             }
             else
             {
+                w.lastSuspensionLength = MaxSpringExtension + w.size;
                 wheelTransform.position = w.wheelWorldPosition - transform.up * (w.size + MaxSpringExtension); // If not hitting anything, just position the wheel under the local anchor
                 w.normalForce = 0;
 

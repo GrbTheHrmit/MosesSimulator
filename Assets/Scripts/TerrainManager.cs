@@ -405,7 +405,8 @@ public class TerrainManager : MonoBehaviour
 
         float w3 = 1 - (w1 + w2);
 
-        return Mathf.Clamp(v1.y * w1 + v2.y * w2 + v3.y * w3, 0, 1);
+        //return Mathf.Clamp(v1.y * w1 + v2.y * w2 + v3.y * w3, 0, 1);
+        return Mathf.Clamp(v1.y * w1 * w1 + v2.y * w2 * w2 + v3.y * w3 * w3, 0, 1);
 
     }
 
