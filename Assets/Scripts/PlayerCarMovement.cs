@@ -197,7 +197,7 @@ public class PlayerCarMovement : MonoBehaviour
 
     private Rigidbody rb;
     public Vector3 GetCurrentVelocity { get { return rb.velocity; } }
-    private SphereCollider[] m_wheelObjs;
+    private WheelScript[] m_wheelObjs;
     public WheelProperties[] m_wheels;
 
     public GameObject skidMarkPrefab; // Assign a prefab with a TrailRenderer in the inspector
@@ -246,8 +246,8 @@ public class PlayerCarMovement : MonoBehaviour
             Debug.LogError("Player Script could not find Point Manager");
         }
 
-        SphereCollider[] children = GetComponentsInChildren<SphereCollider>();
-        m_wheelObjs = new SphereCollider[children.Length];
+        WheelScript[] children = GetComponentsInChildren<WheelScript>();
+        m_wheelObjs = new WheelScript[children.Length];
         //m_wheels = new WheelProperties[children.Length];
 
         if(gearRatios.Count == 0)

@@ -1079,7 +1079,11 @@ PrefabInstance:
       propertyPath: ReturnSpringStrength
       value: 250
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 655978632007471063, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+    - {fileID: 2489174455711759140, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+    - {fileID: 6594300604665150532, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+    - {fileID: 3543735652594494189, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
