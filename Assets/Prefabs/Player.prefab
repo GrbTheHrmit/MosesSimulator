@@ -644,17 +644,17 @@ MonoBehaviour:
   MaxStaticTravelForce: 18000
   MinKineticLateralForce: 2800
   MinKineticTravelForce: 7200
-  SpringStrength: 725
-  SpringClamp: 22000
-  MaxSpringBuffer: 0.05
+  SpringStrength: 4500
+  SpringClamp: 8500
+  MaxSpringBuffer: 0.02
   MaxSpringSpeed: 2.5
-  ReturnSpringStrength: 200
+  ReturnSpringStrength: 300
   ReturnSpringClamp: 10000
-  ReturnSpringDistCutoff: 1.2
-  DamperStrength: 14
-  ReturnDamperStrength: 90
+  ReturnSpringDistCutoff: 0.05
+  DamperStrength: 52
+  ReturnDamperStrength: 125
   MaxTurnAngle: 45
-  MaxSpringExtension: 0.5
+  MaxSpringExtension: 0.75
   leaveGroundCoyoteTime: 0.1
   hitGroundCoyoteTime: 0.1
   numWheelsForGround: 3
@@ -692,7 +692,7 @@ MonoBehaviour:
     brakeFactor: 1
     lateralSlipFactor: 0.22
     travelSlipFactor: 0.15
-    maxLateralSlipDivisor: 3
+    maxLateralSlipDivisor: 4
     maxTravelSlipDivisor: 4
     lateralGripCurve:
       serializedVersion: 2
@@ -822,7 +822,7 @@ MonoBehaviour:
     brakeFactor: 1
     lateralSlipFactor: 0.22
     travelSlipFactor: 0.15
-    maxLateralSlipDivisor: 3
+    maxLateralSlipDivisor: 4
     maxTravelSlipDivisor: 4
     lateralGripCurve:
       serializedVersion: 2
@@ -952,7 +952,7 @@ MonoBehaviour:
     brakeFactor: 1
     lateralSlipFactor: 0.22
     travelSlipFactor: 0.15
-    maxLateralSlipDivisor: 3
+    maxLateralSlipDivisor: 4
     maxTravelSlipDivisor: 4
     lateralGripCurve:
       serializedVersion: 2
@@ -1082,7 +1082,7 @@ MonoBehaviour:
     brakeFactor: 1
     lateralSlipFactor: 0.22
     travelSlipFactor: 0.15
-    maxLateralSlipDivisor: 3
+    maxLateralSlipDivisor: 4
     maxTravelSlipDivisor: 4
     lateralGripCurve:
       serializedVersion: 2

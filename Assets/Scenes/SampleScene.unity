@@ -789,6 +789,7 @@ MonoBehaviour:
   MaxTerrainDim: 16
   TerrainTileDims: 6
   SwapEdgeDistance: 1
+  HeightFrequency: 4
   pointsPerTile: 26
   MaxTerrainHeight: 150
 --- !u!1 &1800582410
@@ -1011,6 +1012,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3840951681780871408, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.35
+      objectReference: {fileID: 0}
     - target: {fileID: 4652825583138632287, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_Interpolate
       value: 0
@@ -1064,20 +1069,72 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: DamperStrength
-      value: 60
+      propertyPath: ReturnSpringClamp
+      value: 6000
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: SpringStrength
-      value: 1600
+      propertyPath: m_wheels.Array.data[0].travelSlipFactor
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: ReturnDamperStrength
-      value: 120
+      propertyPath: m_wheels.Array.data[1].travelSlipFactor
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: ReturnSpringStrength
-      value: 250
+      propertyPath: m_wheels.Array.data[2].travelSlipFactor
+      value: 0.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].travelSlipFactor
+      value: 0.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].lateralSlipFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].lateralSlipFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].lateralSlipFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].lateralSlipFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].maxTravelSlipDivisor
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].maxTravelSlipDivisor
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].maxTravelSlipDivisor
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].maxTravelSlipDivisor
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[0].maxLateralSlipDivisor
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[1].maxLateralSlipDivisor
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[2].maxLateralSlipDivisor
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_wheels.Array.data[3].maxLateralSlipDivisor
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 655978632007471063, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
