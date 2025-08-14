@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d05bb7a41f80ce248ab2b8a5000f8081
+guid: 46742071e73808b4d8abb97bd60aaf13
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -36,8 +36,8 @@ ModelImporter:
   meshes:
     lODScreenPercentages: []
     globalScale: 1
-    meshCompression: 2
-    addColliders: 0
+    meshCompression: 0
+    addColliders: 1
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
     importPhysicalCameras: 1
@@ -67,7 +67,7 @@ ModelImporter:
     secondaryUVMinLightmapResolution: 40
     secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
-    useFileScale: 0
+    useFileScale: 1
     strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60

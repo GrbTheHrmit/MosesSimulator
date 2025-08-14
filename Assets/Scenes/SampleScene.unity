@@ -783,15 +783,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1b3546d7ee3d994bbdc4b5b75ea09ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TerrainPrefab: {fileID: 3346664031508845981, guid: 8fcea5e83986adb4bb13402a337b9c49, type: 3}
+  TerrainPrefab: {fileID: 3346664031508845981, guid: 1b26e23f1b6929248aded47b25bc2c43, type: 3}
   FinishPrefab: {fileID: 6182003461833472563, guid: 4dc419715abf73644b28a80725cd102b, type: 3}
   PeakDebugPrefab: {fileID: 7208642259307279786, guid: 7aa01adf27a49e54394e4fdb0e979e3d, type: 3}
   MaxTerrainDim: 16
-  TerrainTileDims: 6
+  TerrainTileDims: 16
   SwapEdgeDistance: 1
-  HeightFrequency: 4
+  HeightFrequency: 5
   pointsPerTile: 26
-  MaxTerrainHeight: 150
+  MaxTerrainHeight: 350
 --- !u!1 &1800582410
 GameObject:
   m_ObjectHideFlags: 0
@@ -1012,6 +1012,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 977475588453664315, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: 6945dc1240c89d246a5d66e748509968, type: 2}
     - target: {fileID: 3840951681780871408, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalPosition.y
       value: -1.35
@@ -1028,6 +1032,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5731556424001959313, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: 6945dc1240c89d246a5d66e748509968, type: 2}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 500
@@ -1067,6 +1075,14 @@ PrefabInstance:
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: SpringClamp
+      value: 12000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: MaxSpringSpeed
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: ReturnSpringClamp

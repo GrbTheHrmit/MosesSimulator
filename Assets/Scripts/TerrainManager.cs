@@ -335,9 +335,9 @@ public class TerrainManager : MonoBehaviour
 
     }
 
-    private float AdjustWeightValue(float w)
+    private float AdjustHeightValue(float w)
     {
-        return (Mathf.Sin((w - 0.5f) * 3.14f) + 1) * 0.5f;
+        return (Mathf.Sin((w - 0.5f) * 3.14f) + 1) * 0.35f + 0.1f;
     }
 
     // This is the barycentric interpolation formula used for color interpolation of triangles, just adapted for height
@@ -345,6 +345,8 @@ public class TerrainManager : MonoBehaviour
     {
         int tileCol = tile % MaxTerrainDim;
         int tileRow = (tile / MaxTerrainDim) % MaxTerrainDim;
+
+        return AdjustHeightValue(Mathf.Abs(((Mathf.Abs(tileCol + x) * HeightFrequency) % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim);
 
         Vector3 v1 = peakPositions[tile];
         Vector3 v2;
@@ -411,12 +413,12 @@ public class TerrainManager : MonoBehaviour
 
         float w3 = 1 - (w1 + w2);
 
-        w1 = AdjustWeightValue(w1);
-        w2 = AdjustWeightValue(w2);
-        w3 = AdjustWeightValue(w3);
+        //v1.y = AdjustHeightValue(v1.y);
+        //v2.y = AdjustHeightValue(v2.y);
+        //v3.y = AdjustHeightValue(v3.y);
 
-        //return Mathf.Clamp(v1.y * w1 + v2.y * w2 + v3.y * w3, 0, 1);
-        return Mathf.Clamp(v1.y * w1 * w1 + v2.y * w2 * w2 + v3.y * w3 * w3, 0, 1);
+        return Mathf.Clamp(v1.y * w1 + v2.y * w2 + v3.y * w3, 0, 1);
+        //return Mathf.Clamp(v1.y * w1 * w1 + v2.y * w2 * w2 + v3.y * w3 * w3, 0, 1);
 
     }
 
@@ -429,10 +431,11 @@ public class TerrainManager : MonoBehaviour
             int tileRow = tile / MaxTerrainDim;
             // Distance from middle diagonal multiplied by frequency and then mod by 2x terrain dim and take the distance from maxterrain dim so it goes dist = max -> 0 -> max
             // Then divide by Max and multiply by 0.5 so the range is clamped to [0,0.5]
-            float minHeightVal = 0.5f * Mathf.Abs( ((Mathf.Abs(tileCol - tileRow) * HeightFrequency) % (2 * MaxTerrainDim)) - MaxTerrainDim ) / MaxTerrainDim;
-            float maxHeightVal = minHeightVal + 0.2f;
+            //float minHeightVal = 0.5f * Mathf.Abs( ((Mathf.Abs(tileCol - tileRow) * HeightFrequency) % (2 * MaxTerrainDim)) - MaxTerrainDim ) / MaxTerrainDim;
+            float minHeightVal = AdjustHeightValue(Mathf.Abs(((Mathf.Abs(tileCol) * HeightFrequency) % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim);
+            float maxHeightVal = minHeightVal;
             //peakPositions[tile] = new Vector3(Random.Range(0.15f, 0.85f), Random.Range(minHeightVal,maxHeightVal), Random.Range(0.15f, 0.85f));
-            peakPositions[tile] = new Vector3(Random.Range(0.25f, 0.75f), minHeightVal, Random.Range(0.25f, 0.75f));
+            peakPositions[tile] = new Vector3(Random.Range(0.45f, 0.55f), minHeightVal, Random.Range(0.45f, 0.55f));
             //Debug.Log("Tile #: " + tile + "\nPeak: " + peakPositions[tile]);
             if (PeakDebugPrefab)
             {
