@@ -483,7 +483,7 @@ public class PlayerCarMovement : MonoBehaviour
         {
             activateTrick = false;
 
-            float t = Mathf.Pow(Mathf.Clamp((Time.time - trickInputStartTime) / MaxTrickTime, 0, 1), 2);
+            float t = Mathf.Pow(Mathf.Clamp((Time.time - trickInputStartTime) / MaxTrickTime, 0, 1), 3);
             float trickForce = MinTrickForce * (1 - t) + MaxTrickForce * t;
             //float trickForce = MaxTrickForce;
 

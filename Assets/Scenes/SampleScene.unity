@@ -786,12 +786,18 @@ MonoBehaviour:
   TerrainPrefab: {fileID: 3346664031508845981, guid: 1b26e23f1b6929248aded47b25bc2c43, type: 3}
   FinishPrefab: {fileID: 6182003461833472563, guid: 4dc419715abf73644b28a80725cd102b, type: 3}
   PeakDebugPrefab: {fileID: 7208642259307279786, guid: 7aa01adf27a49e54394e4fdb0e979e3d, type: 3}
+  SwapEdgeDistance: 1
   MaxTerrainDim: 16
   TerrainTileDims: 16
-  SwapEdgeDistance: 1
-  HeightFrequency: 5
   pointsPerTile: 26
   MaxTerrainHeight: 350
+  TerrainGenerationPasses:
+  - HeightFrequency: 16
+    HeightStrength: 0.8
+  - HeightFrequency: 64
+    HeightStrength: 0.35
+  RandomInfluence: 0.9
+  RandomPeakRadius: 0.3
 --- !u!1 &1800582410
 GameObject:
   m_ObjectHideFlags: 0
@@ -1042,7 +1048,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 150
+      value: 350
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1081,12 +1087,24 @@ PrefabInstance:
       value: 12000
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: MaxTrickForce
+      value: 1800
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: MinTrickForce
+      value: 450
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: MaxSpringSpeed
       value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: ReturnSpringClamp
       value: 6000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: ReturnSpringStrength
+      value: 225
       objectReference: {fileID: 0}
     - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_wheels.Array.data[0].travelSlipFactor

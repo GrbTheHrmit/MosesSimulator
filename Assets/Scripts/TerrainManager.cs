@@ -2,6 +2,16 @@ using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.ShaderData;
+
+[System.Serializable]
+struct TerrainGenerationPass
+{
+    [Tooltip("For Good looping choose values of 2^x")]
+    public int HeightFrequency;
+    [Tooltip("Generally want 0-1")]
+    public float HeightStrength;
+}
 
 public class TerrainManager : MonoBehaviour
 {
@@ -11,28 +21,36 @@ public class TerrainManager : MonoBehaviour
     public GameObject PeakDebugPrefab;
 
     [SerializeField]
+    private int SwapEdgeDistance = 2;
+    [SerializeField]
     private int MaxTerrainDim = 64;
     [SerializeField]
     private int TerrainTileDims = 6;
+    
     [SerializeField]
-    private int SwapEdgeDistance = 2;
-    [SerializeField]
-    private int HeightFrequency = 4;
-    // The world location of the map's bottom left corner
-    private Vector3 currentOrigin = Vector3.zero;
-    private float baseHeight = -5;
-
-    [SerializeField]
-    private int pointsPerTile = 50;
+    private int pointsPerTile = 26;
     private float[,] heightArray = null;
     private Vector3[] peakPositions = null;
 
     [SerializeField]
-    private float MaxTerrainHeight = 30;
+    private float MaxTerrainHeight = 150;
+
+    [Header("Generation Settings")]
+    [SerializeField]
+    private List<TerrainGenerationPass> TerrainGenerationPasses;
+    [SerializeField]
+    private float RandomInfluence = 0.35f;
+    [SerializeField]
+    [Tooltip("How far from center we can generate a peak")]
+    private float RandomPeakRadius = 0.3f;
+
+    // The world location of the map's bottom left corner
+    private Vector3 currentOrigin = Vector3.zero;
+    private float baseHeight = -5;
 
     private List<ProceduralTerrainScript> terrainList = new List<ProceduralTerrainScript>();
     private float TerrainInterval = 1000f;
-    private float TerrainDefaultScale = 10f; // need for vert locations
+    private float TerrainDefaultScale = 10f; // need for vert locationsa
     private float PointInterval;
 
     private int voronoiPointsPerTile = 50;
@@ -329,24 +347,45 @@ public class TerrainManager : MonoBehaviour
         tileRow = tileRow % MaxTerrainDim;
         int tileIdx = tileRow * MaxTerrainDim + tileCol;
 
-        float interpolatedHeight = ComputeBarycentricHeight(tileIdx, localX, localZ);
+        float interpolatedHeight = ComputePointHeight(tileIdx, localX, localZ);
 
         return interpolatedHeight * MaxTerrainHeight;
 
     }
 
-    private float AdjustHeightValue(float w)
+    private float GetHeightValue(float w)
     {
-        return (Mathf.Sin((w - 0.5f) * 3.14f) + 1) * 0.35f + 0.1f;
+        // Sin wave, mapped to [Y,(2*X)+Y] where X is the multiplier at the front and Y is the add on at the back
+        // w is assumed to be between 0 and 1
+        return  0.35f * (Mathf.Sin((w - 0.5f) * 3.14f) + 1) + 0.1f;
     }
 
     // This is the barycentric interpolation formula used for color interpolation of triangles, just adapted for height
-    private float ComputeBarycentricHeight(int tile, float x, float z)
+    // X and Z should be between 0 and 1 and represent the location on the given tile of the point
+    private float ComputePointHeight(int tile, float x, float z)
     {
         int tileCol = tile % MaxTerrainDim;
         int tileRow = (tile / MaxTerrainDim) % MaxTerrainDim;
 
-        return AdjustHeightValue(Mathf.Abs(((Mathf.Abs(tileCol + x) * HeightFrequency) % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim);
+        float sinPassSum = 0;
+
+        foreach(TerrainGenerationPass pass in TerrainGenerationPasses)
+        {
+            // For a psss of sine wave terrain. Input to GetHeightValue is mapping the world to the values that go 0->1->0 repeating HeightFrequency times over the whole map
+            float horSinPass = GetHeightValue(Mathf.Abs((Mathf.Abs(tileCol + x) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * pass.HeightStrength;
+            float vertSinPass = GetHeightValue(Mathf.Abs((Mathf.Abs(tileRow + z) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * pass.HeightStrength;
+
+            sinPassSum += horSinPass * vertSinPass;
+        }
+
+        // Large pass of sine wave terrain. Input to GetHeightValue is mapping the world to the values that go 0->1->0 repeating HeightFrequency times over the whole map
+        /*float horSinPass1 = GetHeightValue(Mathf.Abs(((tileCol + x) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * 0.5f;
+        float vertSinPass1 = GetHeightValue(Mathf.Abs(((tileRow + z) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * 0.5f;
+
+        float horSinPass2 = GetHeightValue(Mathf.Abs((4 * (tileCol + x) * HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * 0.15f;
+        float vertSinPass2 = GetHeightValue(Mathf.Abs((4 * (tileRow + z) * HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * 0.15f;*/
+
+        
 
         Vector3 v1 = peakPositions[tile];
         Vector3 v2;
@@ -413,9 +452,9 @@ public class TerrainManager : MonoBehaviour
 
         float w3 = 1 - (w1 + w2);
 
-        //v1.y = AdjustHeightValue(v1.y);
-        //v2.y = AdjustHeightValue(v2.y);
-        //v3.y = AdjustHeightValue(v3.y);
+        float randHeight = Mathf.Clamp(v1.y * w1 + v2.y * w2 + v3.y * w3, 0, 1) * RandomInfluence;
+
+        return sinPassSum * randHeight;
 
         return Mathf.Clamp(v1.y * w1 + v2.y * w2 + v3.y * w3, 0, 1);
         //return Mathf.Clamp(v1.y * w1 * w1 + v2.y * w2 * w2 + v3.y * w3 * w3, 0, 1);
@@ -432,10 +471,10 @@ public class TerrainManager : MonoBehaviour
             // Distance from middle diagonal multiplied by frequency and then mod by 2x terrain dim and take the distance from maxterrain dim so it goes dist = max -> 0 -> max
             // Then divide by Max and multiply by 0.5 so the range is clamped to [0,0.5]
             //float minHeightVal = 0.5f * Mathf.Abs( ((Mathf.Abs(tileCol - tileRow) * HeightFrequency) % (2 * MaxTerrainDim)) - MaxTerrainDim ) / MaxTerrainDim;
-            float minHeightVal = AdjustHeightValue(Mathf.Abs(((Mathf.Abs(tileCol) * HeightFrequency) % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim);
-            float maxHeightVal = minHeightVal;
+            float minHeightVal = GetHeightValue(Mathf.Abs(((Mathf.Abs(tileCol) * 11) % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim);
+            //float maxHeightVal = minHeightVal;
             //peakPositions[tile] = new Vector3(Random.Range(0.15f, 0.85f), Random.Range(minHeightVal,maxHeightVal), Random.Range(0.15f, 0.85f));
-            peakPositions[tile] = new Vector3(Random.Range(0.45f, 0.55f), minHeightVal, Random.Range(0.45f, 0.55f));
+            peakPositions[tile] = new Vector3(Random.Range(0.5f - RandomPeakRadius, 0.5f + RandomPeakRadius), Random.Range(0.25f, 0.75f), Random.Range(0.5f - RandomPeakRadius, 0.5f + RandomPeakRadius));
             //Debug.Log("Tile #: " + tile + "\nPeak: " + peakPositions[tile]);
             if (PeakDebugPrefab)
             {
@@ -462,7 +501,7 @@ public class TerrainManager : MonoBehaviour
                 float x = (float)pointCol / pointsPerTile;
                 float z = (float)pointRow / pointsPerTile;
 
-                float height = ComputeBarycentricHeight(tile, x, z);
+                float height = ComputePointHeight(tile, x, z);
 
                 heightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] = height;
             }
