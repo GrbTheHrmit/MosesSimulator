@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 using static UnityEditor.ShaderData;
 
 [System.Serializable]
@@ -108,9 +109,7 @@ public class TerrainManager : MonoBehaviour
             currentBottomLeftX = 0;
             currentBottomLeftY = 0;
 
-            //Debug.Log(currentOrigin);
-
-            //SetTerrainNeighbors();
+            
             GenerateNewHeightMap();
 
             PlaceFinish();
@@ -345,12 +344,23 @@ public class TerrainManager : MonoBehaviour
             tileRow += MaxTerrainDim;
         }
         tileRow = tileRow % MaxTerrainDim;
-        int tileIdx = tileRow * MaxTerrainDim + tileCol;
 
-        float interpolatedHeight = ComputePointHeight(tileIdx, localX, localZ);
+        int pointCol = Mathf.RoundToInt(localX * pointsPerTile);
+        int pointRow = Mathf.RoundToInt(localZ * pointsPerTile);
 
-        return interpolatedHeight * MaxTerrainHeight;
+        return heightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] * MaxTerrainHeight;
 
+    }
+
+    private float GetHeightAtPoint(int tile, float x, float z)
+    {
+        int tileCol = tile % MaxTerrainDim;
+        int tileRow = (tile / MaxTerrainDim) % MaxTerrainDim;
+
+        int pointCol = Mathf.RoundToInt(x * pointsPerTile);
+        int pointRow = Mathf.RoundToInt(z * pointsPerTile);
+
+        return heightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] * MaxTerrainHeight;
     }
 
     private float GetSinValue(float w)
@@ -358,6 +368,31 @@ public class TerrainManager : MonoBehaviour
         // Sin wave, mapped to [Y,(2*X)+Y] where X is the multiplier at the front and Y is the add on at the back
         // w is assumed to be between 0 and 1
         return  (Mathf.Sin((w - 0.5f) * 3.14f) + 1);
+    }
+
+    private void ComputeHeightArray()
+    {
+
+        for (int tileCol = 0; tileCol < MaxTerrainDim; tileCol++)
+        {
+            for (int tileRow = 0; tileRow < MaxTerrainDim; tileRow++)
+            {
+                for (int pointCol = 0; pointCol < pointsPerTile; pointCol++)
+                {
+                    for (int pointRow = 0; pointRow < pointsPerTile; pointRow++)
+                    {
+                        float x = (float)pointCol / pointsPerTile;
+                        float z = (float)pointRow / pointsPerTile;
+
+                        float height = ComputePointHeight(tileRow * MaxTerrainDim + tileCol, x, z);
+
+                        heightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] = height;
+                    }
+
+
+                }
+            }
+        }
     }
 
     // This is the barycentric interpolation formula used for color interpolation of triangles, just adapted for height
@@ -475,27 +510,7 @@ public class TerrainManager : MonoBehaviour
         }
 
         // Then we create a heightmap of interpolated values
-        for (int tile = 0; tile < MaxTerrainDim * MaxTerrainDim; tile++)
-        {
-
-            int tileCol = tile % MaxTerrainDim;
-            int tileRow = (tile / MaxTerrainDim) % MaxTerrainDim;
-
-
-            for(int point = 0; point < pointsPerTile * pointsPerTile; point++)
-            {
-                int pointCol = point % pointsPerTile;
-                int pointRow = point / pointsPerTile;
-
-                float x = (float)pointCol / pointsPerTile;
-                float z = (float)pointRow / pointsPerTile;
-
-                float height = ComputePointHeight(tile, x, z);
-
-                heightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] = height;
-            }
-
-        }
+        ComputeHeightArray();
 
         // Finally modify the terrain vertices to match the height map
         for(int tile = 0; tile < TerrainTileDims * TerrainTileDims; tile++)
@@ -557,37 +572,8 @@ public class TerrainManager : MonoBehaviour
         }
     }
 
-    /*private void SetTerrainNeighbors()
+    private void ComputeWindPass(float windStr, Vector2 windDirection)
     {
-        for (int i = 0; i < TerrainTileDims * TerrainTileDims; i++)
-        {
-            int col = i % TerrainTileDims;
-            int row = i / TerrainTileDims;
 
-            Terrain left = null;
-            Terrain right = null;
-            Terrain top = null;
-            Terrain bottom = null;
-
-            if (col != 0)
-            {
-                left = terrainList[i - 1].MyTerrain;
-            }
-            if (col != TerrainTileDims - 1)
-            {
-                right = terrainList[i + 1].MyTerrain;
-            }
-
-            if (row != 0)
-            {
-                bottom = terrainList[i - TerrainTileDims].MyTerrain;
-            }
-            if (row != TerrainTileDims - 1)
-            {
-                top = terrainList[i + TerrainTileDims].MyTerrain;
-            }
-
-            terrainList[i].MyTerrain.SetNeighbors(left, top, right, bottom);
-        }
-    }*/
+    }
 }
