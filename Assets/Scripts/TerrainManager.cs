@@ -353,11 +353,11 @@ public class TerrainManager : MonoBehaviour
 
     }
 
-    private float GetHeightValue(float w)
+    private float GetSinValue(float w)
     {
         // Sin wave, mapped to [Y,(2*X)+Y] where X is the multiplier at the front and Y is the add on at the back
         // w is assumed to be between 0 and 1
-        return  0.35f * (Mathf.Sin((w - 0.5f) * 3.14f) + 1) + 0.1f;
+        return  (Mathf.Sin((w - 0.5f) * 3.14f) + 1);
     }
 
     // This is the barycentric interpolation formula used for color interpolation of triangles, just adapted for height
@@ -372,20 +372,11 @@ public class TerrainManager : MonoBehaviour
         foreach(TerrainGenerationPass pass in TerrainGenerationPasses)
         {
             // For a psss of sine wave terrain. Input to GetHeightValue is mapping the world to the values that go 0->1->0 repeating HeightFrequency times over the whole map
-            float horSinPass = GetHeightValue(Mathf.Abs((Mathf.Abs(tileCol + x) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * pass.HeightStrength;
-            float vertSinPass = GetHeightValue(Mathf.Abs((Mathf.Abs(tileRow + z) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * pass.HeightStrength;
+            float horSinPass = GetSinValue(Mathf.Abs((Mathf.Abs(tileCol + x) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * pass.HeightStrength;
+            float vertSinPass = GetSinValue(Mathf.Abs((Mathf.Abs(tileRow + z) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * pass.HeightStrength;
 
             sinPassSum += horSinPass * vertSinPass;
         }
-
-        // Large pass of sine wave terrain. Input to GetHeightValue is mapping the world to the values that go 0->1->0 repeating HeightFrequency times over the whole map
-        /*float horSinPass1 = GetHeightValue(Mathf.Abs(((tileCol + x) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * 0.5f;
-        float vertSinPass1 = GetHeightValue(Mathf.Abs(((tileRow + z) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * 0.5f;
-
-        float horSinPass2 = GetHeightValue(Mathf.Abs((4 * (tileCol + x) * HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * 0.15f;
-        float vertSinPass2 = GetHeightValue(Mathf.Abs((4 * (tileRow + z) * HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * 0.15f;*/
-
-        
 
         Vector3 v1 = peakPositions[tile];
         Vector3 v2;
@@ -452,12 +443,10 @@ public class TerrainManager : MonoBehaviour
 
         float w3 = 1 - (w1 + w2);
 
-        float randHeight = Mathf.Clamp(v1.y * w1 + v2.y * w2 + v3.y * w3, 0, 1) * RandomInfluence;
+        // At 0 influence the rand value is always 1
+        float randHeight = 1 - (Mathf.Clamp(v1.y * w1 + v2.y * w2 + v3.y * w3, 0, 1) * RandomInfluence);
 
         return sinPassSum * randHeight;
-
-        return Mathf.Clamp(v1.y * w1 + v2.y * w2 + v3.y * w3, 0, 1);
-        //return Mathf.Clamp(v1.y * w1 * w1 + v2.y * w2 * w2 + v3.y * w3 * w3, 0, 1);
 
     }
 
@@ -471,7 +460,7 @@ public class TerrainManager : MonoBehaviour
             // Distance from middle diagonal multiplied by frequency and then mod by 2x terrain dim and take the distance from maxterrain dim so it goes dist = max -> 0 -> max
             // Then divide by Max and multiply by 0.5 so the range is clamped to [0,0.5]
             //float minHeightVal = 0.5f * Mathf.Abs( ((Mathf.Abs(tileCol - tileRow) * HeightFrequency) % (2 * MaxTerrainDim)) - MaxTerrainDim ) / MaxTerrainDim;
-            float minHeightVal = GetHeightValue(Mathf.Abs(((Mathf.Abs(tileCol) * 11) % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim);
+            float minHeightVal = GetSinValue(Mathf.Abs(((Mathf.Abs(tileCol) * 11) % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim);
             //float maxHeightVal = minHeightVal;
             //peakPositions[tile] = new Vector3(Random.Range(0.15f, 0.85f), Random.Range(minHeightVal,maxHeightVal), Random.Range(0.15f, 0.85f));
             peakPositions[tile] = new Vector3(Random.Range(0.5f - RandomPeakRadius, 0.5f + RandomPeakRadius), Random.Range(0.25f, 0.75f), Random.Range(0.5f - RandomPeakRadius, 0.5f + RandomPeakRadius));

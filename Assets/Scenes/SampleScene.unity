@@ -793,10 +793,10 @@ MonoBehaviour:
   MaxTerrainHeight: 350
   TerrainGenerationPasses:
   - HeightFrequency: 16
-    HeightStrength: 0.8
+    HeightStrength: 0.5
   - HeightFrequency: 64
-    HeightStrength: 0.35
-  RandomInfluence: 0.9
+    HeightStrength: 0.25
+  RandomInfluence: 0.85
   RandomPeakRadius: 0.3
 --- !u!1 &1800582410
 GameObject:
