@@ -326,7 +326,7 @@ public class PlayerCarMovement : MonoBehaviour
             input.currentActionMap.FindAction("AirFriction").performed += OnAirFrictionAction;
             input.currentActionMap.FindAction("Boost").performed += OnBoostStartAction;
             input.currentActionMap.FindAction("Boost").canceled += OnBoostReleaseAction;
-
+            input.currentActionMap.FindAction("WindPass").performed += OnWindAction;
         }
 
         FollowManager.Instance().FollowObject = rb;
@@ -339,6 +339,18 @@ public class PlayerCarMovement : MonoBehaviour
 
         // % Multiplier calculation for how much to damp the rotation each tick when charging tricks
         trickRotationPercent = Mathf.Pow(TrickRotationCancel, Time.fixedDeltaTime);
+    }
+
+    public void OnWindAction(InputAction.CallbackContext context)
+    {
+        if(context.ReadValue<float>() > 0)
+        {
+            TerrainManager tManager = FindObjectOfType<TerrainManager>();
+            if(tManager != null)
+            {
+                tManager.IncrementWind();
+            }
+        }
     }
 
     // Input Bindings

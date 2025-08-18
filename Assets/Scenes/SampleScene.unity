@@ -792,12 +792,19 @@ MonoBehaviour:
   pointsPerTile: 26
   MaxTerrainHeight: 350
   TerrainGenerationPasses:
-  - HeightFrequency: 16
-    HeightStrength: 0.5
-  - HeightFrequency: 64
-    HeightStrength: 0.25
-  RandomInfluence: 0.85
-  RandomPeakRadius: 0.3
+  - HeightFrequency: 6
+    HeightStrength: 0.55
+  - HeightFrequency: 38
+    HeightStrength: 0.2
+  - HeightFrequency: 52
+    HeightStrength: 0.1
+  - HeightFrequency: 168
+    HeightStrength: 0.05
+  RandomInfluence: 0
+  RandomPeakRadius: 0.35
+  FlatSandPerIter: 0.002
+  SandPerWindStr: 0.002
+  SlipSteepness: 0.05
 --- !u!1 &1800582410
 GameObject:
   m_ObjectHideFlags: 0
@@ -1048,7 +1055,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 350
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalPosition.z
