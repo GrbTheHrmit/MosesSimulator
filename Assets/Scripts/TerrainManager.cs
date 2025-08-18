@@ -9,8 +9,9 @@ using static UnityEditor.ShaderData;
 [System.Serializable]
 struct TerrainGenerationPass
 {
-    [Tooltip("For Good looping choose values of 2^x")]
-    public int HeightFrequency;
+    [Tooltip("For Seamless looping choose values of 2^x")]
+    public int XFrequency;
+    public int ZFrequency;
     [Tooltip("Generally want 0-1")]
     public float HeightStrength;
 }
@@ -432,8 +433,8 @@ public class TerrainManager : MonoBehaviour
         foreach(TerrainGenerationPass pass in TerrainGenerationPasses)
         {
             // For a psss of sine wave terrain. Input to GetHeightValue is mapping the world to the values that go 0->1->0 repeating HeightFrequency times over the whole map
-            float horSinPass = GetSinValue(Mathf.Abs((Mathf.Abs(tileCol + x) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * pass.HeightStrength;
-            float vertSinPass = GetSinValue(Mathf.Abs((Mathf.Abs(tileRow + z) * pass.HeightFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * pass.HeightStrength;
+            float horSinPass = GetSinValue(Mathf.Abs((Mathf.Abs(tileCol + x) * pass.XFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * pass.HeightStrength;
+            float vertSinPass = GetSinValue(Mathf.Abs((Mathf.Abs(tileRow + z) * pass.ZFrequency % (2 * MaxTerrainDim)) - MaxTerrainDim) / (float)MaxTerrainDim) * pass.HeightStrength;
 
             sinPassSum += horSinPass * vertSinPass;
         }

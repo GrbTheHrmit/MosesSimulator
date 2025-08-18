@@ -645,14 +645,14 @@ MonoBehaviour:
   MinKineticLateralForce: 2800
   MinKineticTravelForce: 7200
   SpringStrength: 4500
-  SpringClamp: 8500
+  SpringClamp: 12000
   MaxSpringBuffer: 0.02
-  MaxSpringSpeed: 2.5
-  ReturnSpringStrength: 300
-  ReturnSpringClamp: 10000
+  MaxSpringSpeed: 0.05
+  ReturnSpringStrength: 450
+  ReturnSpringClamp: 6000
   ReturnSpringDistCutoff: 0.05
-  DamperStrength: 52
-  ReturnDamperStrength: 125
+  DamperStrength: 38
+  ReturnDamperStrength: 85
   MaxTurnAngle: 45
   MaxSpringExtension: 0.75
   leaveGroundCoyoteTime: 0.1
@@ -663,8 +663,8 @@ MonoBehaviour:
   steerRotateFriction: 1.5
   initialGroundForceFactor: 0.15
   UseLocalTrickRotations: 1
-  MinTrickForce: 200
-  MaxTrickForce: 750
+  MinTrickForce: 450
+  MaxTrickForce: 1800
   VerticalFlipFactor: 1.5
   MaxTrickTime: 0.5
   TrickCooldown: 0.25
@@ -690,8 +690,8 @@ MonoBehaviour:
     size: 2
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.22
-    travelSlipFactor: 0.15
+    lateralSlipFactor: 0.2
+    travelSlipFactor: 0.18
     maxLateralSlipDivisor: 4
     maxTravelSlipDivisor: 4
     lateralGripCurve:
@@ -820,8 +820,8 @@ MonoBehaviour:
     size: 2
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.22
-    travelSlipFactor: 0.15
+    lateralSlipFactor: 0.2
+    travelSlipFactor: 0.18
     maxLateralSlipDivisor: 4
     maxTravelSlipDivisor: 4
     lateralGripCurve:
@@ -950,8 +950,8 @@ MonoBehaviour:
     size: 0
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.22
-    travelSlipFactor: 0.15
+    lateralSlipFactor: 0.2
+    travelSlipFactor: 0.18
     maxLateralSlipDivisor: 4
     maxTravelSlipDivisor: 4
     lateralGripCurve:
@@ -1080,8 +1080,8 @@ MonoBehaviour:
     size: 0
     torqueFactor: 1
     brakeFactor: 1
-    lateralSlipFactor: 0.22
-    travelSlipFactor: 0.15
+    lateralSlipFactor: 0.2
+    travelSlipFactor: 0.18
     maxLateralSlipDivisor: 4
     maxTravelSlipDivisor: 4
     lateralGripCurve:

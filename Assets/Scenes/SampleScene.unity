@@ -792,14 +792,18 @@ MonoBehaviour:
   pointsPerTile: 26
   MaxTerrainHeight: 350
   TerrainGenerationPasses:
-  - HeightFrequency: 6
+  - XFrequency: 4
+    ZFrequency: 4
     HeightStrength: 0.55
-  - HeightFrequency: 38
+  - XFrequency: 12
+    ZFrequency: 18
+    HeightStrength: 0.3
+  - XFrequency: 36
+    ZFrequency: 36
     HeightStrength: 0.2
-  - HeightFrequency: 52
+  - XFrequency: 58
+    ZFrequency: 42
     HeightStrength: 0.1
-  - HeightFrequency: 168
-    HeightStrength: 0.05
   RandomInfluence: 0
   RandomPeakRadius: 0.35
   FlatSandPerIter: 0.002
@@ -1088,94 +1092,6 @@ PrefabInstance:
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: SpringClamp
-      value: 12000
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: MaxTrickForce
-      value: 1800
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: MinTrickForce
-      value: 450
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: MaxSpringSpeed
-      value: 0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: ReturnSpringClamp
-      value: 6000
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: ReturnSpringStrength
-      value: 225
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[0].travelSlipFactor
-      value: 0.18
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[1].travelSlipFactor
-      value: 0.18
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[2].travelSlipFactor
-      value: 0.18
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[3].travelSlipFactor
-      value: 0.18
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[0].lateralSlipFactor
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[1].lateralSlipFactor
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[2].lateralSlipFactor
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[3].lateralSlipFactor
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[0].maxTravelSlipDivisor
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[1].maxTravelSlipDivisor
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[2].maxTravelSlipDivisor
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[3].maxTravelSlipDivisor
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[0].maxLateralSlipDivisor
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[1].maxLateralSlipDivisor
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[2].maxLateralSlipDivisor
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
-      propertyPath: m_wheels.Array.data[3].maxLateralSlipDivisor
-      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 655978632007471063, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
