@@ -15,8 +15,12 @@ public class ProceduralTerrainScript : MonoBehaviour
 
     private Mesh myMesh = null;
     public Mesh MyMesh { get { return myMesh; } }
-    
+
+    private Material myMaterial = null;
+    public Material MyMaterial { get { return myMaterial; } }
+
     private MeshCollider myCollider = null;
+    public MeshCollider MyCollider { get { return myCollider; } }
 
     // Terrain Height Vars //
 
@@ -38,6 +42,8 @@ public class ProceduralTerrainScript : MonoBehaviour
         MeshFilter filter = GetComponent<MeshFilter>();
         myMesh = filter.mesh;
 
+        myMaterial = GetComponent<MeshRenderer>().material;
+
         myCollider = GetComponent<MeshCollider>();
         if(myCollider != null )
         {
@@ -54,14 +60,6 @@ public class ProceduralTerrainScript : MonoBehaviour
         GetComponent<TerrainCollider>().terrainData = newTerrainData;*/
 
 
-    }
-
-
-    public void RecomputeMeshCollider()
-    {
-        // Turn it off and back on again lmao (tells it to refresh the collider)
-        myCollider.sharedMesh = null;
-        myCollider.sharedMesh = MyMesh;
     }
 
     // Update is called once per frame
