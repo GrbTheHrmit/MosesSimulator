@@ -567,7 +567,7 @@ public class PlayerCarMovement : MonoBehaviour
 
         if (Mathf.Abs(lastMoveInput.y) <= 0.01f && Mathf.Abs(lastBrakeInput) < 0.01f)
         {
-            effectiveBrakeInput = 0.2f;
+            effectiveBrakeInput = ReleaseBrake;
         }
         else
         {

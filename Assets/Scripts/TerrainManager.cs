@@ -68,9 +68,6 @@ public class TerrainManager : MonoBehaviour
     private float TerrainDefaultScale = 10f; // need for vert locationsa
     private float PointInterval;
 
-    private int voronoiPointsPerTile = 50;
-    private List<Vector2> voronoiPoints = new List<Vector2>();
-
 
     // For Tracking Looping World
     // these represent where the bottom left terrain object is in world X and Y coordinates
