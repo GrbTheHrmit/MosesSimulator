@@ -23,10 +23,8 @@ struct TerrainGenerationPass
 struct ShrubTerrainObject
 {
     public GameObject ShrubPrefab;
-    [Tooltip("Minimum chance of a shrub appearing in a tile (>1 means guaranteed at least 1)")]
-    public float MinFrequency;
-    [Tooltip("Maximum possible number of shrubs per tile tile")]
-    public float MaxFrequency;
+    [Tooltip("Chance of shrub spawn on each tile, chance of 2nd only happens if 1st successfully spawns")]
+    public List<float> PlacementChance;
 }
 
 public class TerrainManager : MonoBehaviour
@@ -87,6 +85,12 @@ public class TerrainManager : MonoBehaviour
     private float TerrainDefaultScale = 10f; // need for vert locationsa
     private float PointInterval;
 
+    private struct ShrubLocation
+    {
+        public GameObject ShrubInstance;
+        public Vector3 Position;
+    }
+    private Dictionary<int,List<ShrubLocation>> ShrubLocations = new Dictionary<int,List<ShrubLocation>>();
 
     // For Tracking Looping World
     // these represent where the bottom left terrain object is in world X and Y coordinates
@@ -566,7 +570,34 @@ public class TerrainManager : MonoBehaviour
 
     public void GenerateShrubLocations()
     {
+        ShrubLocations.Clear();
 
+        for (int tile = 0; tile < MaxTerrainDim * MaxTerrainDim; tile++)
+        {
+            foreach(ShrubTerrainObject shrub in ShrubList)
+            {
+                List<ShrubLocation> tileShrubList = new List<ShrubLocation>();
+
+                foreach(float chance in shrub.PlacementChance)
+                {
+                    if(Random.Range(0f, 1f) < chance)
+                    {
+                        // Todo Fix random location and rotation
+                        Vector3 spawnLocation = Vector3.zero;
+                        Quaternion spawnRotation = Quaternion.identity;
+                        ShrubLocation spawnedShrub;
+                        spawnedShrub.ShrubInstance = Instantiate(shrub.ShrubPrefab, spawnLocation, spawnRotation);
+                        spawnedShrub.Position = spawnLocation;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                ShrubLocations.Add(tile, tileShrubList);
+            }
+        }
     }
 
     private void PlaceFinish()
