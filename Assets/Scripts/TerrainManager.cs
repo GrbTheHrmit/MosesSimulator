@@ -19,6 +19,16 @@ struct TerrainGenerationPass
     public float HeightStrength;
 }
 
+[System.Serializable]
+struct ShrubTerrainObject
+{
+    public GameObject ShrubPrefab;
+    [Tooltip("Minimum chance of a shrub appearing in a tile (>1 means guaranteed at least 1)")]
+    public float MinFrequency;
+    [Tooltip("Maximum possible number of shrubs per tile tile")]
+    public float MaxFrequency;
+}
+
 public class TerrainManager : MonoBehaviour
 {
     public GameObject TerrainPrefab;
@@ -52,6 +62,11 @@ public class TerrainManager : MonoBehaviour
     [Tooltip("How far from center we can generate a peak")]
     private float RandomPeakRadius = 0.3f;
 
+    [SerializeField]
+    private List<ShrubTerrainObject> ShrubList;
+
+    // Not using wind options right now
+    /*
     [Header("Procecural Wind Settings")]
     [SerializeField]
     [Tooltip("Height that can transfer from one point to another in 1 iteration")]
@@ -61,7 +76,7 @@ public class TerrainManager : MonoBehaviour
     private float SandPerWindStr = 0.2f;
     [SerializeField]
     private float SlipSteepness = 0.05f;
-    
+    */
 
     // The world location of the map's bottom left corner
     private Vector3 currentOrigin = Vector3.zero;
@@ -130,6 +145,7 @@ public class TerrainManager : MonoBehaviour
 
             
             GenerateNewHeightMap();
+            GenerateShrubLocations();
 
             PlaceFinish();
             //SpawnPlayer();
@@ -511,122 +527,6 @@ public class TerrainManager : MonoBehaviour
 
     }
 
-    /*
-    private void ComputeNormals()
-    {
-        for (int tileCol = 0; tileCol < MaxTerrainDim; tileCol++)
-        {
-            for (int tileRow = 0; tileRow < MaxTerrainDim; tileRow++)
-            {
-
-                // Starting on 1 because edges overlap and we dont wanna compute them twice
-                for (int pointCol = 0; pointCol < pointsPerTile; pointCol++)
-                {
-                    for (int pointRow = 0; pointRow < pointsPerTile; pointRow++)
-                    {
-                        float heightL = 0;
-                        float heightR = 0;
-                        float heightD = 0;
-                        float heightU = 0;
-
-                        for (int idx = 0; idx < 4; idx++)
-                        {
-                            // Quick equation for getting next row in an expanding cone.
-                            int newPointCol = pointCol;
-                            int newPointRow = pointRow;
-
-                            // Left Right Down Up
-                            switch(idx)
-                            {
-                                case 0:
-                                    newPointCol--;
-                                    break;
-
-                                case 1:
-                                    newPointCol++;
-                                    break;
-
-                                case 2:
-                                    newPointRow--;
-                                    break;
-
-                                case 3:
-                                    newPointRow++;
-                                    break;
-
-                            }
-
-                            int newTileCol = tileCol;
-                            int newTileRow = tileRow;
-
-                            // We aren't computing col 0
-                            if (newPointCol < 1)
-                            {
-                                // Now at the right side of the tile to the left
-                                newTileCol = (tileCol + (MaxTerrainDim - 1)) % MaxTerrainDim;
-                                // 1 point off because edges overlap
-                                newPointCol += (pointsPerTile - 1);
-                            }
-                            else if (newPointCol >= pointsPerTile)
-                            {
-                                // Now at the left side of the tile to the right
-                                newTileCol = (tileCol + 1) % MaxTerrainDim;
-                                // 1 point off because edges overlap
-                                newPointCol -= (pointsPerTile - 1);
-                            }
-
-                            // Again we aren't computing row 0
-                            if (newPointRow < 1)
-                            {
-                                // Now at the top of the tile below
-                                newTileRow = (tileRow + (MaxTerrainDim - 1)) % MaxTerrainDim;
-                                // 1 point off because edges overlap
-                                newPointRow += (pointsPerTile - 1);
-                            }
-                            else if (newPointRow >= pointsPerTile)
-                            {
-                                // Now at the bottom of the tile above
-                                newTileRow = (tileRow + 1) % MaxTerrainDim;
-                                // 1 point off because edges overlap
-                                newPointRow -= (pointsPerTile - 1);
-                            }
-
-                            switch(idx)
-                            {
-                                case 0:
-                                    heightL = heightArray[newTileRow * pointsPerTile + newPointRow, newTileCol * pointsPerTile + newPointCol];
-                                    break;
-
-                                case 1:
-                                    heightR = heightArray[newTileRow * pointsPerTile + newPointRow, newTileCol * pointsPerTile + newPointCol];
-                                    break;
-
-                                case 2:
-                                    heightD = heightArray[newTileRow * pointsPerTile + newPointRow, newTileCol * pointsPerTile + newPointCol];
-                                    break;
-
-                                case 3:
-                                    heightU = heightArray[newTileRow * pointsPerTile + newPointRow, newTileCol * pointsPerTile + newPointCol];
-                                    break;
-                            }
-
-                        }
-
-                        float dx = (heightR - heightL);
-                        float dy = (heightU - heightD);
-
-                        Vector3 normal = new Vector3(-dx, -dy, 1.0f).normalized;
-                        normalsArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] = new Color(normal.x * 0.5f + 0.5f, normal.y * 0.5f + 0.5f, normal.z * 0.5f + 0.5f);
-
-                    }
-                }
-                // End of Point Loops
-
-            }
-        }
-        // End of Tile Loops
-    }*/
-
     private void GenerateNewHeightMap()
     {
         // First we generate a set of peak locations for each tile
@@ -664,6 +564,11 @@ public class TerrainManager : MonoBehaviour
         currentBottomLeftY = currentBottomLeftTile / MaxTerrainDim;
     }
 
+    public void GenerateShrubLocations()
+    {
+
+    }
+
     private void PlaceFinish()
     {
         if(FinishPrefab != null)
@@ -697,6 +602,8 @@ public class TerrainManager : MonoBehaviour
         }
     }
 
+    // Windstuff unneeded for now
+    /*
     public void IncrementWind()
     {
         Debug.Log("wind");
@@ -863,6 +770,7 @@ public class TerrainManager : MonoBehaviour
         heightArray = windHeightArray;
         
     }
+    */ // Windstuff unneeded for now
 
     private void SetAllVertexHeights()
     {

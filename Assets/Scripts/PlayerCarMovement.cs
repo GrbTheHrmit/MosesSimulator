@@ -326,7 +326,7 @@ public class PlayerCarMovement : MonoBehaviour
             input.currentActionMap.FindAction("AirFriction").performed += OnAirFrictionAction;
             input.currentActionMap.FindAction("Boost").performed += OnBoostStartAction;
             input.currentActionMap.FindAction("Boost").canceled += OnBoostReleaseAction;
-            input.currentActionMap.FindAction("WindPass").performed += OnWindAction;
+            //input.currentActionMap.FindAction("WindPass").performed += OnWindAction;
         }
 
         FollowManager.Instance().FollowObject = rb;
@@ -341,7 +341,7 @@ public class PlayerCarMovement : MonoBehaviour
         trickRotationPercent = Mathf.Pow(TrickRotationCancel, Time.fixedDeltaTime);
     }
 
-    public void OnWindAction(InputAction.CallbackContext context)
+    /*public void OnWindAction(InputAction.CallbackContext context)
     {
         if(context.ReadValue<float>() > 0)
         {
@@ -351,7 +351,7 @@ public class PlayerCarMovement : MonoBehaviour
                 tManager.IncrementWind();
             }
         }
-    }
+    }*/
 
     // Input Bindings
     public void OnSteerAction(InputAction.CallbackContext context)
