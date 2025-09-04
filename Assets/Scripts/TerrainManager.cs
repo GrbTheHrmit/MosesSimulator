@@ -149,7 +149,7 @@ public class TerrainManager : MonoBehaviour
 
             
             GenerateNewHeightMap();
-            GenerateShrubLocations();
+            //GenerateShrubLocations();
 
             PlaceFinish();
             //SpawnPlayer();

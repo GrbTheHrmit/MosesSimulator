@@ -43,7 +43,7 @@ Material:
     m_TexEnvs:
     - _BaseMap:
         m_Texture: {fileID: 2800000, guid: 2432dd63ffd86804cb88e85c044bfd90, type: 3}
-        m_Scale: {x: 10, y: 10}
+        m_Scale: {x: 6, y: 10}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 2800000, guid: 19b81e6df5e1a284cb634130482e3bc9, type: 3}
@@ -67,7 +67,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 2432dd63ffd86804cb88e85c044bfd90, type: 3}
-        m_Scale: {x: 10, y: 10}
+        m_Scale: {x: 6, y: 10}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 2800000, guid: a03e7f90dc0ee9f46bda99cc83d22ba4, type: 3}
@@ -103,7 +103,7 @@ Material:
     - _AlphaToMask: 0
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
-    - _BumpScale: 0.35
+    - _BumpScale: 0.5
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -117,11 +117,11 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
-    - _OcclusionStrength: 0.881
-    - _Parallax: 0.08
+    - _OcclusionStrength: 1
+    - _Parallax: 0.0521
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Smoothness: 0.156
+    - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1

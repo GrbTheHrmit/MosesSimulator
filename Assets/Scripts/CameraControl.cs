@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,7 +27,12 @@ public class CameraControl : MonoBehaviour
     [SerializeField]
     private float MaxVSwivelAngle = 45;
 
-    public GameObject FocusObject;
+    public GameObject LookAtPrefab;
+    public GameObject FollowPrefab;
+    private Transform _lookAt;
+    private Transform _follow;
+    private CinemachineVirtualCamera _camera;
+
     private PlayerCarMovement PlayerMovement;
 
     private Vector2 lastInput;
@@ -40,27 +46,22 @@ public class CameraControl : MonoBehaviour
     void Start()
     {
         PlayerMovement = FindObjectOfType<PlayerCarMovement>();
-
-        if (FocusObject == null)
-        {
-            FocusObject = PlayerMovement.gameObject;
-        }
-
         if(PlayerMovement == null)
         {
             Debug.LogError("Camera could not find player object");
         }
 
-        transform.position = FocusObject.transform.TransformPoint(new Vector3(0, CameraHeight, -MinDistToPlayer));
-        transform.LookAt(FocusObject.transform);
+        _lookAt = Instantiate(LookAtPrefab).transform;
+        _follow = Instantiate(FollowPrefab).transform;
+        _camera = GetComponentInChildren<CinemachineVirtualCamera>();
+        _camera.LookAt = _lookAt;
+        _camera.Follow = _follow;
 
         PlayerInput input = PlayerMovement.GetComponent<PlayerInput>();
         if(input != null )
         {
             input.currentActionMap.FindAction("Camera").performed += OnCameraAction;
         }
-
-        CameraObject = GetComponentInChildren<Camera>().gameObject;
         
     }
 
@@ -77,7 +78,9 @@ public class CameraControl : MonoBehaviour
 
         float velocityFactor = (playerVelocity.magnitude - MinMoveSpeed) / PlayerMovement.GetMaxSpeed;
         float targetPlayerDist = velocityFactor * MaxDistToPlayer + (1 - velocityFactor) * MinDistToPlayer;
-        Vector3 newPosition = FocusObject.transform.position;
+
+        // Move Follow position based on look at position and intended offset based on velocity
+        Vector3 newPosition = _lookAt.position;
         float camSpeed = playerVelocity.magnitude + MinMoveSpeed;
         if (playerVelocity.magnitude > 1f)
         {
@@ -90,44 +93,28 @@ public class CameraControl : MonoBehaviour
             lookDirection.Normalize();
             lookDirection.y = Mathf.Clamp(lookDirection.y, -0.1f, 0.1f);
 
-            if(lookDirection.magnitude <= 0.21f)
+            // If velocity is all y component, use the look forward instead
+            if (lookDirection.magnitude <= 0.1f)
             {
-                lookDirection = FocusObject.transform.forward;
+                lookDirection = _lookAt.transform.forward;
                 lookDirection.y = Mathf.Sign(playerVelocity.y) * 0.1f;
+                Debug.Log("did we do this?");
             }
 
+            // Add calculated offset (rotated by look) to the new follow position
             newPosition += Quaternion.FromToRotation(Vector3.forward, lookDirection.normalized) * new Vector3(0, CameraHeight, -targetPlayerDist);
+            Debug.Log(newPosition);
         }
         else // No velocity
         {
-            newPosition = FocusObject.transform.TransformPoint(new Vector3(0, CameraHeight, -MinDistToPlayer));
-            camSpeed = 1f;
+            newPosition = _lookAt.transform.TransformPoint(new Vector3(0, CameraHeight, -MinDistToPlayer));
+            camSpeed = MinMoveSpeed;
+            Debug.Log("no vel");
         }
+        _follow.position = Vector3.MoveTowards(_follow.position, newPosition, camSpeed * Time.fixedDeltaTime);
 
-        transform.position = Vector3.MoveTowards(transform.position, newPosition, camSpeed * Time.fixedDeltaTime);
+        _lookAt.position = PlayerMovement.transform.position;// + playerVelocity.normalized;
 
-        // Set Rotation, Using LookAt and then resetting pitch so we can set it in the camera object
-        Quaternion lastRotation = transform.rotation;
-        transform.LookAt(FocusObject.transform);
-        float pitch = transform.eulerAngles.x; // Record pitch for later
-        transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0); // Only rotate around Y
-        // interpValue = (HSwivelSpeed * Time.fixedDeltaTime) / Mathf.Max(Quaternion.Angle(transform.rotation, lastRotation), HSwivelSpeed * Time.fixedDeltaTime);
-        //transform.rotation = Quaternion.Lerp(lastRotation, transform.rotation, interpValue); // Make sure we dont rotate further than time allows
-
-        // Set Camera Object location and rotation based on inputs and recorded pitch
-        cameraInput = Vector2.MoveTowards(cameraInput, lastInput, 3 * Mathf.Abs(lastInput.magnitude - cameraInput.magnitude) * Time.fixedDeltaTime);
-        Vector3 rotationVector = new Vector3(-cameraInput.y * MaxVSwivelAngle, cameraInput.x * MaxHSwivelAngle, 0);
-        Vector3 localOffset = Quaternion.Euler(0, -transform.eulerAngles.y, 0) * (PlayerMovement.transform.position - transform.position);
-        localOffset.y = 0;
-        Vector3 targetLocalPos = localOffset + Quaternion.Euler(rotationVector) * -localOffset;
-        CameraObject.transform.localPosition = targetLocalPos;
-
-        /*if(Mathf.Abs(pitch - lastCameraPitch) > VSwivelSpeed * Time.fixedDeltaTime)
-        {
-            pitch = lastCameraPitch + Mathf.Sign(pitch - lastCameraPitch) * VSwivelSpeed * Time.fixedDeltaTime;
-        }*/
-
-        CameraObject.transform.localRotation = Quaternion.Euler(rotationVector) * Quaternion.Euler(pitch, 0, 0);
-        lastCameraPitch = pitch;
+        //_lookAt.rotation = PlayerMovement.transform.rotation;
     }
 }
