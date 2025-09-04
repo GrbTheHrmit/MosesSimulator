@@ -9,6 +9,6 @@ PhysicMaterial:
   m_Name: CarBodyPhysics
   dynamicFriction: 0.2
   staticFriction: 0.8
-  bounciness: 0.1
+  bounciness: 0.05
   frictionCombine: 3
   bounceCombine: 2
