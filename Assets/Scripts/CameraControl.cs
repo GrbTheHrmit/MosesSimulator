@@ -1,4 +1,5 @@
 using Cinemachine;
+using Cinemachine.Utility;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,6 +40,8 @@ public class CameraControl : MonoBehaviour
 
     private PlayerCarMovement PlayerMovement;
 
+    private bool reverseCamera = false;
+    private bool flipCamera = false;
     private Vector2 lastInput;
     private Vector3 cameraRotation = Vector3.zero;
     private Vector3 lastLookUnrotated = Vector3.zero;
@@ -72,6 +75,8 @@ public class CameraControl : MonoBehaviour
         if(input != null )
         {
             input.currentActionMap.FindAction("Camera").performed += OnCameraAction;
+            input.currentActionMap.FindAction("ReverseCamera").performed += OnCameraReverse;
+            input.currentActionMap.FindAction("ReverseCamera").canceled += OnCameraReverse;
         }
         
     }
@@ -82,8 +87,27 @@ public class CameraControl : MonoBehaviour
         lastInput = context.ReadValue<Vector2>();
     }
 
+    public void OnCameraReverse(InputAction.CallbackContext context)
+    {
+        Debug.Log(context.ReadValue<float>());
+        bool shouldReverse = context.ReadValue<float>() > 0.5f;
+        if(reverseCamera != shouldReverse)
+        {
+            reverseCamera = shouldReverse;
+            flipCamera = true;
+        }
+
+    }
+
     // Update is called once per frame
     void FixedUpdate()
+    {
+
+        MoveCamera();
+        AddCameraSwivel();
+    }
+
+    private void MoveCamera()
     {
         Vector3 playerVelocity = PlayerMovement.GetCurrentVelocity;
 
@@ -110,20 +134,35 @@ public class CameraControl : MonoBehaviour
             }
 
             // Look location should always be in direction of motion
-            newLookPosition += playerVelocity.normalized * LookDist;
+            newLookPosition += playerVelocity.normalized * LookDist * (reverseCamera ? -1 : 1);
             // Follow location is based on the above calculated direction
-            newFollowPosition += Quaternion.FromToRotation(Vector3.forward, followDirection.normalized) * new Vector3(0, CameraHeight, -targetPlayerDist);
+            newFollowPosition += Quaternion.FromToRotation(Vector3.forward, followDirection.normalized) * new Vector3(0, CameraHeight, -targetPlayerDist * (reverseCamera ? -1 : 1));
         }
-        else // No velocitya
+        else // No velocity
         {
-            newLookPosition = PlayerMovement.transform.TransformPoint(0, 0, LookDist);
-            newFollowPosition = PlayerMovement.transform.TransformPoint(0, CameraHeight, -targetPlayerDist);
+            newLookPosition = PlayerMovement.transform.TransformPoint(0, 0, LookDist * (reverseCamera ? -1 : 1));
+            newFollowPosition = PlayerMovement.transform.TransformPoint(0, CameraHeight, -targetPlayerDist * (reverseCamera ? -1 : 1));
         }
 
-        // Need to do this first because using MoveTowards messes with rotational movement
-        lastFollowUnrotated = Vector3.MoveTowards(lastFollowUnrotated, newFollowPosition, camSpeed * Time.fixedDeltaTime);
-        lastLookUnrotated = Vector3.MoveTowards(lastLookUnrotated, newLookPosition, camSpeed * Time.fixedDeltaTime);
+        if(!flipCamera)
+        {
+            lastFollowUnrotated = Vector3.MoveTowards(lastFollowUnrotated, newFollowPosition, camSpeed * Time.fixedDeltaTime);
+            lastLookUnrotated = Vector3.MoveTowards(lastLookUnrotated, newLookPosition, camSpeed * Time.fixedDeltaTime);
+        }
+        else // Flipping camera should happen instantly
+        {
+            flipCamera = false;
+            // Need to do this first because using MoveTowards messes with rotational movement
+            lastFollowUnrotated = newFollowPosition;
+            lastLookUnrotated = newLookPosition;
+        }
 
+        _follow.position = lastFollowUnrotated;
+        _lookAt.position = lastLookUnrotated;
+    }
+
+    private void AddCameraSwivel()
+    {
         // Get the swivel rotation vector
         Vector3 rotationVector = new Vector3(-lastInput.y * MaxVSwivelAngle, lastInput.x * MaxHSwivelAngle, 0);
 
@@ -131,11 +170,9 @@ public class CameraControl : MonoBehaviour
         cameraRotation.x = Mathf.MoveTowards(cameraRotation.x, rotationVector.x, VSwivelSpeed * Time.fixedDeltaTime);
         cameraRotation.y = Mathf.MoveTowards(cameraRotation.y, rotationVector.y, HSwivelSpeed * Time.fixedDeltaTime);
 
-
-        Vector3 followOffset = Quaternion.Euler(cameraRotation) * PlayerMovement.transform.InverseTransformPoint(lastFollowUnrotated);
-        Vector3 lookOffset = Quaternion.Euler(cameraRotation) * PlayerMovement.transform.InverseTransformPoint(lastLookUnrotated);
+        Vector3 followOffset = Quaternion.Euler(cameraRotation * (reverseCamera ? -1 : 1)) * PlayerMovement.transform.InverseTransformPoint(lastFollowUnrotated);
+        Vector3 lookOffset = Quaternion.Euler(cameraRotation * (reverseCamera ? -1 : 1)) * PlayerMovement.transform.InverseTransformPoint(lastLookUnrotated);
         _follow.position = PlayerMovement.transform.TransformPoint(followOffset);
         _lookAt.position = PlayerMovement.transform.TransformPoint(lookOffset);
-
     }
 }

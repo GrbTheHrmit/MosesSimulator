@@ -87,9 +87,9 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "WindPass",
+                    "name": "ReverseCamera",
                     "type": "Value",
-                    "id": "fc58cb05-07bc-497e-85a6-99d94b0a9329",
+                    "id": "257b4f57-a654-4633-91f4-2d35a57b9c8c",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -550,12 +550,12 @@
                 },
                 {
                     "name": "",
-                    "id": "048135ba-f04b-4815-9b7b-fb370d3cedcb",
-                    "path": "<Keyboard>/tab",
+                    "id": "aa2504a5-57a0-46bd-b08b-d9c09ff9fca9",
+                    "path": "<Gamepad>/rightStickPress",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "WindPass",
+                    "action": "ReverseCamera",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
