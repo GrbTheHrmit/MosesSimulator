@@ -239,15 +239,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93ea6f8271b714f4d91bf021d5ce9db1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MinCamMoveSpeed: 15
+  MinPlayerMoveSpeed: 5
   MinDistToPlayer: 25
   MaxDistToPlayer: 35
   CameraHeight: 8
-  MinMoveSpeed: 15
-  HSwivelSpeed: 90
-  VSwivelSpeed: 30
+  LookDist: 2
+  HSwivelSpeed: 180
+  VSwivelSpeed: 60
   MaxHSwivelAngle: 120
-  MaxVSwivelAngle: 20
+  MaxVSwivelAngle: 60
   LookAtPrefab: {fileID: 835814350116152075, guid: a9f176b65f94bbd4881be5b3ba7ca91d, type: 3}
+  FollowPrefab: {fileID: 972644882580772424, guid: eafe15a0aa4139746928ab1f3c919670, type: 3}
 --- !u!1001 &2799652571610151822
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -258,6 +261,22 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 621059181764295368, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
       propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1100750903412010822, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
+      propertyPath: m_XDamping
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1100750903412010822, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
+      propertyPath: m_YDamping
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1100750903412010822, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
+      propertyPath: m_ZDamping
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1100750903412010822, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
+      propertyPath: m_FollowOffset.z
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3254799401661759945, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
@@ -308,12 +327,48 @@ PrefabInstance:
     - {fileID: 7572441920406393229, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
     - {fileID: 621059181764295368, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
     - {fileID: 481185740556800240, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
+    - {fileID: 4461488318299688148, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7381672738168337996, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7692569514748954384}
   m_SourcePrefab: {fileID: 100100000, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
 --- !u!4 &860473272572115527 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3254799401661759945, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
   m_PrefabInstance: {fileID: 2799652571610151822}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4659718255288618434 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7381672738168337996, guid: 8806335dab326704887fa90aac4f8f8e, type: 3}
+  m_PrefabInstance: {fileID: 2799652571610151822}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7692569514748954384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4659718255288618434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4044717213e31446939f7bd49c896ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TrackedObjectOffset: {x: 0, y: 0, z: 0}
+  m_LookaheadTime: 0
+  m_LookaheadSmoothing: 0
+  m_LookaheadIgnoreY: 0
+  m_HorizontalDamping: 0.1
+  m_VerticalDamping: 0.1
+  m_ScreenX: 0.5
+  m_ScreenY: 0.5
+  m_DeadZoneWidth: 0
+  m_DeadZoneHeight: 0
+  m_SoftZoneWidth: 0.8
+  m_SoftZoneHeight: 0.8
+  m_BiasX: 0
+  m_BiasY: 0
+  m_CenterOnActivate: 1

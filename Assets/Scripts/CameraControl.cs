@@ -8,14 +8,18 @@ using UnityEngine.InputSystem.HID;
 public class CameraControl : MonoBehaviour
 {
     [SerializeField]
+    private float MinCamMoveSpeed = 15;
+    [SerializeField]
+    private float MinPlayerMoveSpeed = 5;
+
+    [SerializeField]
     private float MinDistToPlayer = 25;
     [SerializeField]
     private float MaxDistToPlayer = 35;
     [SerializeField]
     private float CameraHeight = 8;
-
     [SerializeField]
-    private float MinMoveSpeed = 5;
+    private float LookDist = 2;
 
     [SerializeField]
     private float HSwivelSpeed = 90;
@@ -36,8 +40,9 @@ public class CameraControl : MonoBehaviour
     private PlayerCarMovement PlayerMovement;
 
     private Vector2 lastInput;
-    private Vector2 cameraInput;
-    private Vector3 lastRotationVector = Vector3.zero;
+    private Vector3 cameraRotation = Vector3.zero;
+    private Vector3 lastLookUnrotated = Vector3.zero;
+    private Vector3 lastFollowUnrotated = Vector3.zero;
     private GameObject CameraObject;
 
     private float lastCameraPitch = 0;
@@ -52,7 +57,13 @@ public class CameraControl : MonoBehaviour
         }
 
         _lookAt = Instantiate(LookAtPrefab).transform;
+        lastLookUnrotated = PlayerMovement.transform.TransformPoint(0, 0, LookDist);
+        _lookAt.position = lastLookUnrotated;
+
         _follow = Instantiate(FollowPrefab).transform;
+        lastFollowUnrotated = PlayerMovement.transform.TransformPoint(0, CameraHeight, -MinDistToPlayer);
+        _follow.position = lastFollowUnrotated;
+
         _camera = GetComponentInChildren<CinemachineVirtualCamera>();
         _camera.LookAt = _lookAt;
         _camera.Follow = _follow;
@@ -76,45 +87,55 @@ public class CameraControl : MonoBehaviour
     {
         Vector3 playerVelocity = PlayerMovement.GetCurrentVelocity;
 
-        float velocityFactor = (playerVelocity.magnitude - MinMoveSpeed) / PlayerMovement.GetMaxSpeed;
+        float velocityFactor = (playerVelocity.magnitude - MinPlayerMoveSpeed) / PlayerMovement.GetMaxSpeed;
         float targetPlayerDist = velocityFactor * MaxDistToPlayer + (1 - velocityFactor) * MinDistToPlayer;
 
         // Move Follow position based on look at position and intended offset based on velocity
-        Vector3 newPosition = _lookAt.position;
-        float camSpeed = playerVelocity.magnitude + MinMoveSpeed;
-        if (playerVelocity.magnitude > 1f)
+        Vector3 newLookPosition = PlayerMovement.transform.position;
+        Vector3 newFollowPosition = PlayerMovement.transform.position;
+        float camSpeed = playerVelocity.magnitude + MinCamMoveSpeed;
+        if (playerVelocity.magnitude > MinPlayerMoveSpeed)
         {
-            if (playerVelocity.magnitude < MinMoveSpeed)
+
+            Vector3 followDirection = playerVelocity;
+            followDirection.Normalize();
+            // Minimize the y component of the follow offset
+            followDirection.y = Mathf.Clamp(followDirection.y, -0.1f, 0.1f);
+
+            // If velocity is all y component, use the player forward instead
+            if (followDirection.magnitude <= 0.1f)
             {
-                camSpeed = MinMoveSpeed;
+                followDirection = PlayerMovement.transform.forward;
+                followDirection.y = Mathf.Sign(playerVelocity.y) * 0.1f;
             }
 
-            Vector3 lookDirection = playerVelocity;
-            lookDirection.Normalize();
-            lookDirection.y = Mathf.Clamp(lookDirection.y, -0.1f, 0.1f);
-
-            // If velocity is all y component, use the look forward instead
-            if (lookDirection.magnitude <= 0.1f)
-            {
-                lookDirection = _lookAt.transform.forward;
-                lookDirection.y = Mathf.Sign(playerVelocity.y) * 0.1f;
-                Debug.Log("did we do this?");
-            }
-
-            // Add calculated offset (rotated by look) to the new follow position
-            newPosition += Quaternion.FromToRotation(Vector3.forward, lookDirection.normalized) * new Vector3(0, CameraHeight, -targetPlayerDist);
-            Debug.Log(newPosition);
+            // Look location should always be in direction of motion
+            newLookPosition += playerVelocity.normalized * LookDist;
+            // Follow location is based on the above calculated direction
+            newFollowPosition += Quaternion.FromToRotation(Vector3.forward, followDirection.normalized) * new Vector3(0, CameraHeight, -targetPlayerDist);
         }
-        else // No velocity
+        else // No velocitya
         {
-            newPosition = _lookAt.transform.TransformPoint(new Vector3(0, CameraHeight, -MinDistToPlayer));
-            camSpeed = MinMoveSpeed;
-            Debug.Log("no vel");
+            newLookPosition = PlayerMovement.transform.TransformPoint(0, 0, LookDist);
+            newFollowPosition = PlayerMovement.transform.TransformPoint(0, CameraHeight, -targetPlayerDist);
         }
-        _follow.position = Vector3.MoveTowards(_follow.position, newPosition, camSpeed * Time.fixedDeltaTime);
 
-        _lookAt.position = PlayerMovement.transform.position;// + playerVelocity.normalized;
+        // Need to do this first because using MoveTowards messes with rotational movement
+        lastFollowUnrotated = Vector3.MoveTowards(lastFollowUnrotated, newFollowPosition, camSpeed * Time.fixedDeltaTime);
+        lastLookUnrotated = Vector3.MoveTowards(lastLookUnrotated, newLookPosition, camSpeed * Time.fixedDeltaTime);
 
-        //_lookAt.rotation = PlayerMovement.transform.rotation;
+        // Get the swivel rotation vector
+        Vector3 rotationVector = new Vector3(-lastInput.y * MaxVSwivelAngle, lastInput.x * MaxHSwivelAngle, 0);
+
+        // Adjust camera swivel inputs based on last input
+        cameraRotation.x = Mathf.MoveTowards(cameraRotation.x, rotationVector.x, VSwivelSpeed * Time.fixedDeltaTime);
+        cameraRotation.y = Mathf.MoveTowards(cameraRotation.y, rotationVector.y, HSwivelSpeed * Time.fixedDeltaTime);
+
+
+        Vector3 followOffset = Quaternion.Euler(cameraRotation) * PlayerMovement.transform.InverseTransformPoint(lastFollowUnrotated);
+        Vector3 lookOffset = Quaternion.Euler(cameraRotation) * PlayerMovement.transform.InverseTransformPoint(lastLookUnrotated);
+        _follow.position = PlayerMovement.transform.TransformPoint(followOffset);
+        _lookAt.position = PlayerMovement.transform.TransformPoint(lookOffset);
+
     }
 }

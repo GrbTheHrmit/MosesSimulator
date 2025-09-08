@@ -1266,22 +1266,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4416730103855031427, guid: 68fe56452ef1f65468a2e93d8f945cc9, type: 3}
-      propertyPath: FollowPrefab
-      value: 
-      objectReference: {fileID: 972644882580772424, guid: eafe15a0aa4139746928ab1f3c919670, type: 3}
-    - target: {fileID: 4416730103855031427, guid: 68fe56452ef1f65468a2e93d8f945cc9, type: 3}
-      propertyPath: MinMoveSpeed
-      value: 35
-      objectReference: {fileID: 0}
-    - target: {fileID: 4416730103855031427, guid: 68fe56452ef1f65468a2e93d8f945cc9, type: 3}
-      propertyPath: MaxDistToPlayer
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 4416730103855031427, guid: 68fe56452ef1f65468a2e93d8f945cc9, type: 3}
-      propertyPath: MinDistToPlayer
-      value: 15
-      objectReference: {fileID: 0}
     - target: {fileID: 5652820128962227679, guid: 68fe56452ef1f65468a2e93d8f945cc9, type: 3}
       propertyPath: m_Name
       value: Player Camera
