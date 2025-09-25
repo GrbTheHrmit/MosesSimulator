@@ -89,7 +89,7 @@ public class TerrainManager : MonoBehaviour
     {
         if (instance != null)
         {
-            Debug.Log(tile + ", " + x + " : " + z);
+            
             return instance.GetHeightAtPoint(tile, x, z);
         }
         return 0;
