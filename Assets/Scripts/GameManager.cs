@@ -50,7 +50,12 @@ public class GameManager : MonoBehaviour
 
     public void SpawnPlayer(Vector3 spawnPos)
     {
-        if (playerPrefab != null)
+        GameObject existingPlayer = FindObjectOfType<PlayerCarMovement>().gameObject;
+        if(existingPlayer != null)
+        {
+            existingPlayer.transform.position = spawnPos;
+        }
+        else if (playerPrefab != null)
         {
             Instantiate(playerPrefab, spawnPos, Quaternion.identity);
         }

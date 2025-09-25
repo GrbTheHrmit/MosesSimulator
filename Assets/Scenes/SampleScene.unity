@@ -647,6 +647,7 @@ GameObject:
   - component: {fileID: 1655544156}
   - component: {fileID: 1655544155}
   - component: {fileID: 1655544157}
+  - component: {fileID: 1655544158}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -708,7 +709,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TerrainPrefab: {fileID: 3346664031508845981, guid: 1b26e23f1b6929248aded47b25bc2c43, type: 3}
   FinishPrefab: {fileID: 6182003461833472563, guid: 4dc419715abf73644b28a80725cd102b, type: 3}
-  PeakDebugPrefab: {fileID: 7208642259307279786, guid: 7aa01adf27a49e54394e4fdb0e979e3d, type: 3}
+  PeakDebugPrefab: {fileID: 0}
   SwapEdgeDistance: 1
   MaxTerrainDim: 16
   TerrainTileDims: 16
@@ -729,15 +730,28 @@ MonoBehaviour:
     HeightStrength: 0.1
   RandomInfluence: 0
   RandomPeakRadius: 0.35
-  ShrubList:
-  - ShrubPrefab: {fileID: 0}
-    PlacementChance: []
-  - ShrubPrefab: {fileID: 0}
-    PlacementChance: []
-  - ShrubPrefab: {fileID: 0}
-    PlacementChance: []
-  - ShrubPrefab: {fileID: 0}
-    PlacementChance: []
+--- !u!114 &1655544158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1655544154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f38a66534dec48440a6ea69694c25554, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numShrubs: 512
+  maxPerTile: 8
+  minShrubHeight: 0
+  maxShrubHeight: 0.5
+  maxTries: 3
+  possibleShrubs:
+  - {fileID: 6676770800265293796, guid: a36d3562990f06247b65edcc17ed0fc3, type: 3}
+  - {fileID: 6737997166280044696, guid: f0e16225f2431bf4cb86365e44d4aa3f, type: 3}
+  - {fileID: 5487945912518162902, guid: 55491ec1e09ed574da28c99dae727145, type: 3}
+  - {fileID: 1948086971866951518, guid: 5c65988f088929f49abcc0edfa90bf6b, type: 3}
 --- !u!1 &1800582410
 GameObject:
   m_ObjectHideFlags: 0

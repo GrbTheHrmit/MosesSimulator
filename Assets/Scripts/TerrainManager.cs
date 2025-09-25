@@ -1,12 +1,6 @@
-using JetBrains.Annotations;
-using System.Collections;
+
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
-using UnityEngine.ProBuilder;
-using UnityEngine.SocialPlatforms;
-using UnityEngine.Tilemaps;
 using static UnityEditor.ShaderData;
 
 [System.Serializable]
@@ -60,22 +54,6 @@ public class TerrainManager : MonoBehaviour
     [Tooltip("How far from center we can generate a peak")]
     private float RandomPeakRadius = 0.3f;
 
-    [SerializeField]
-    private List<ShrubTerrainObject> ShrubList;
-
-    // Not using wind options right now
-    /*
-    [Header("Procecural Wind Settings")]
-    [SerializeField]
-    [Tooltip("Height that can transfer from one point to another in 1 iteration")]
-    private float FlatSandPerIter = 0.2f;
-    [SerializeField]
-    [Tooltip("Additional height that can transfer from one point to another based on wind strength per iter")]
-    private float SandPerWindStr = 0.2f;
-    [SerializeField]
-    private float SlipSteepness = 0.05f;
-    */
-
     // The world location of the map's bottom left corner
     private Vector3 currentOrigin = Vector3.zero;
     private float baseHeight = -5;
@@ -84,13 +62,6 @@ public class TerrainManager : MonoBehaviour
     private float TerrainInterval = 1000f;
     private float TerrainDefaultScale = 10f; // need for vert locationsa
     private float PointInterval;
-
-    private struct ShrubLocation
-    {
-        public GameObject ShrubInstance;
-        public Vector3 Position;
-    }
-    private Dictionary<int,List<ShrubLocation>> ShrubLocations = new Dictionary<int,List<ShrubLocation>>();
 
     // For Tracking Looping World
     // these represent where the bottom left terrain object is in world X and Y coordinates
@@ -103,19 +74,61 @@ public class TerrainManager : MonoBehaviour
     private int TerrainBottomLeftY = 0;
 
     private static TerrainManager instance = null;
+    //public TerrainManager Instance { get { return instance; } }
     public static float GetWorldHeightAtLocation(Vector3 location)
     {
         if(instance != null)
         {
-            return instance.GetHeightAtLocation(location) + instance.baseHeight;
+            return instance.GetHeightAtLocation(location);
         }
 
         return 0;
     }
 
+    public static float GetWorldHeightAtPoint(int tile, float x, float z)
+    {
+        if (instance != null)
+        {
+            Debug.Log(tile + ", " + x + " : " + z);
+            return instance.GetHeightAtPoint(tile, x, z);
+        }
+        return 0;
+    }
+
+    public static Vector3 GetWorldLocationAtPoint(int tile, float x, float z)
+    {
+        if (instance != null)
+        {
+            return instance.GetLocationAtPoint(tile, x, z);
+        }
+        return Vector3.zero;
+    }
+
+    private Vector3 GetLocationAtPoint(int tile, float x, float z)
+    {
+        Vector3 position = GetTileLocation(tile);
+
+        //position += new Vector3((x - 0.5f) * TerrainInterval, 0, (z * TerrainInterval);
+        position.y = GetHeightAtLocation(position);
+
+        return position;
+    }
+
+    private Vector3 GetTileLocation(int tile)
+    {
+        float tileX = (tile % TerrainTileDims) - ((TerrainTileDims - 1) * 0.5f);
+        float tileZ = ((int)(tile / TerrainTileDims)) - ((TerrainTileDims - 1) * 0.5f);
+        return new Vector3(tileX * TerrainInterval, 0, tileZ * TerrainInterval) + currentOrigin;
+    }
+
+
     // Start is called before the first frame update
     void Start()
     {
+        if(instance != null)
+        {
+            Destroy(this);
+        }
         instance = this;
 
         heightArray = new float[pointsPerTile * MaxTerrainDim, pointsPerTile * MaxTerrainDim];
@@ -130,9 +143,7 @@ public class TerrainManager : MonoBehaviour
         {
             for(int i = 0; i < TerrainTileDims * TerrainTileDims; i++)
             {
-                float x = (i % TerrainTileDims) - ((TerrainTileDims - 1) * 0.5f);
-                float y = ((int)(i / TerrainTileDims)) - ((TerrainTileDims - 1) * 0.5f);
-                Vector3 position = new Vector3(x * TerrainInterval, baseHeight, y * TerrainInterval);
+                Vector3 position = GetTileLocation(i);
 
                 GameObject newTerrain = Instantiate(TerrainPrefab, position, Quaternion.identity);
                 terrainList.Add(newTerrain.GetComponent<ProceduralTerrainScript>());
@@ -149,16 +160,15 @@ public class TerrainManager : MonoBehaviour
 
             
             GenerateNewHeightMap();
-            //GenerateShrubLocations();
+            GenerateShrubs();
 
             PlaceFinish();
-            //SpawnPlayer();
+            SpawnPlayer();
         }
         
     }
 
     
-
     void SpawnPlayer()
     {
         Vector3 location = Vector3.zero;
@@ -386,8 +396,8 @@ public class TerrainManager : MonoBehaviour
         }
         tileRow = tileRow % MaxTerrainDim;
 
-        int pointCol = Mathf.RoundToInt(localX * pointsPerTile);
-        int pointRow = Mathf.RoundToInt(localZ * pointsPerTile);
+        int pointCol = Mathf.RoundToInt(localX * (pointsPerTile - 1));
+        int pointRow = Mathf.RoundToInt(localZ * (pointsPerTile - 1));
 
         return heightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] * MaxTerrainHeight;
 
@@ -398,8 +408,8 @@ public class TerrainManager : MonoBehaviour
         int tileCol = tile % MaxTerrainDim;
         int tileRow = (tile / MaxTerrainDim) % MaxTerrainDim;
 
-        int pointCol = Mathf.RoundToInt(x * pointsPerTile);
-        int pointRow = Mathf.RoundToInt(z * pointsPerTile);
+        int pointCol = Mathf.RoundToInt(x * (pointsPerTile - 1));
+        int pointRow = Mathf.RoundToInt(z * (pointsPerTile - 1));
 
         return heightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] * MaxTerrainHeight;
     }
@@ -568,36 +578,9 @@ public class TerrainManager : MonoBehaviour
         currentBottomLeftY = currentBottomLeftTile / MaxTerrainDim;
     }
 
-    public void GenerateShrubLocations()
+    public void GenerateShrubs()
     {
-        ShrubLocations.Clear();
-
-        for (int tile = 0; tile < MaxTerrainDim * MaxTerrainDim; tile++)
-        {
-            foreach(ShrubTerrainObject shrub in ShrubList)
-            {
-                List<ShrubLocation> tileShrubList = new List<ShrubLocation>();
-
-                foreach(float chance in shrub.PlacementChance)
-                {
-                    if(Random.Range(0f, 1f) < chance)
-                    {
-                        // Todo Fix random location and rotation
-                        Vector3 spawnLocation = Vector3.zero;
-                        Quaternion spawnRotation = Quaternion.identity;
-                        ShrubLocation spawnedShrub;
-                        spawnedShrub.ShrubInstance = Instantiate(shrub.ShrubPrefab, spawnLocation, spawnRotation);
-                        spawnedShrub.Position = spawnLocation;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                ShrubLocations.Add(tile, tileShrubList);
-            }
-        }
+        ShrubManager.Instance.PlaceShrubs(MaxTerrainDim);
     }
 
     private void PlaceFinish()
@@ -632,176 +615,6 @@ public class TerrainManager : MonoBehaviour
             Instantiate(FinishPrefab, position, Quaternion.identity);
         }
     }
-
-    // Windstuff unneeded for now
-    /*
-    public void IncrementWind()
-    {
-        Debug.Log("wind");
-        ComputeWindPass(1, new Vector2Int(1, 0));
-
-        // Reset Terrain to match
-        SetAllVertexHeights();
-    }
-
-    private void SimulateWind(int steps)
-    {
-        // Pick Wind strength and direction
-        float strength = 1;
-        Vector2Int direction = new Vector2Int(1, 0);
-
-        for(int i = 0; i < steps; i++)
-        {
-            ComputeWindPass(strength, direction);
-        }
-
-        // Set Terrain to match
-        SetAllVertexHeights();
-    }
-
-    private void ComputeWindPass(float windStr, Vector2Int windDirection)
-    {
-        for (int tileCol = 0; tileCol < MaxTerrainDim; tileCol++)
-        {
-            for (int tileRow = 0; tileRow < MaxTerrainDim; tileRow++)
-            {
-
-                // Starting on 1 because edges overlap and we dont wanna compute them twice
-                for (int pointCol = 1; pointCol < pointsPerTile; pointCol++)
-                {
-                    for (int pointRow = 1; pointRow < pointsPerTile; pointRow++)
-                    {
-
-                        // For each point in the world compute the "sand" the wind blows to adjacent points
-                        // Strength determines how far sand can blow in terms of rows of points
-                        for (int windRow = 1; windRow <= windStr; windRow++)
-                        {
-                            // Wind blows in a cone so row 1 has 3 points, row 2 has 5 etc
-                            for (int i = 0; i < 1 + 2 * windRow; i++)
-                            {
-                                // Modified value of I that goes from -2*windRow to 2*windRow to make calculations easier
-                                int modified = i - (1 + windRow);
-                                // Quick equation for getting next row in an expanding cone.
-                                // NOTE: this gets a bit fucky with corner directions but it should be ok (just skips the half rows in between)
-                                int newPointCol = pointCol + windDirection.x * windRow + (modified * windDirection.y);
-                                int newPointRow = pointRow + windDirection.y * windRow - (modified * windDirection.x);
-
-                                int newTileCol = tileCol;
-                                int newTileRow = tileRow;
-
-                                // We aren't computing col 0
-                                if (newPointCol < 1)
-                                {
-                                    // Now at the right side of the tile to the left
-                                    newTileCol = (tileCol + (MaxTerrainDim - 1)) % MaxTerrainDim;
-                                    // 1 point off because edges overlap
-                                    newPointCol += (pointsPerTile - 1);
-                                }
-                                else if (newPointCol >= pointsPerTile)
-                                {
-                                    // Now at the left side of the tile to the right
-                                    newTileCol = (tileCol + 1) % MaxTerrainDim;
-                                    // 1 point off because edges overlap
-                                    newPointCol -= (pointsPerTile - 1);
-                                }
-
-                                // Again we aren't computing row 0
-                                if (newPointRow < 1)
-                                {
-                                    // Now at the top of the tile below
-                                    newTileRow = (tileRow + (MaxTerrainDim - 1)) % MaxTerrainDim;
-                                    // 1 point off because edges overlap
-                                    newPointRow += (pointsPerTile - 1);
-                                }
-                                else if (newPointRow >= pointsPerTile)
-                                {
-                                    // Now at the bottom of the tile above
-                                    newTileRow = (tileRow + 1) % MaxTerrainDim;
-                                    // 1 point off because edges overlap
-                                    newPointRow -= (pointsPerTile - 1);
-                                }
-
-                                // Treating windstr 1 as default so need to subtract 1
-                                float sandGrabbed = FlatSandPerIter + SandPerWindStr * (windStr - 1);
-
-                                float heightDiff = heightArray[newTileRow * pointsPerTile + newPointRow, newTileCol * pointsPerTile + newPointCol] - heightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol];
-
-                                // If this is an uphill, decrease the amound of sand by the steepness multiplied by the distance from the original point
-                                if (heightDiff >= 0)
-                                {
-                                    sandGrabbed -= (heightDiff * windRow);
-                                }
-                                else
-                                {
-                                    if(heightDiff < -SlipSteepness)
-                                    {
-                                        
-                                    }
-                                }
-
-                                // Add sand to the new point
-                                windHeightArray[newTileRow * pointsPerTile + newPointRow, newTileCol * pointsPerTile + newPointCol] += sandGrabbed;
-                                windHeightArray[newTileRow * pointsPerTile + newPointRow, newTileCol * pointsPerTile + newPointCol] = Mathf.Min(windHeightArray[newTileRow * pointsPerTile + newPointRow, newTileCol * pointsPerTile + newPointCol], 1);
-
-                                // Copy the overlaps for adding sand if necessary
-                                if (newPointCol == pointsPerTile)
-                                {
-                                    int overlapTile = (newTileCol + 1) % MaxTerrainDim;
-                                    windHeightArray[newTileRow * pointsPerTile + newPointRow, overlapTile * pointsPerTile + 0] += sandGrabbed;
-                                    windHeightArray[newTileRow * pointsPerTile + newPointRow, overlapTile * pointsPerTile + 0] = Mathf.Min(windHeightArray[newTileRow * pointsPerTile + newPointRow, newTileCol * pointsPerTile + newPointCol], 1);
-
-                                }
-
-                                if (newPointRow == pointsPerTile)
-                                {
-                                    int overlapTile = (newTileRow + 1) % MaxTerrainDim;
-                                    windHeightArray[overlapTile * pointsPerTile + 0, newTileCol * pointsPerTile + newPointCol] += sandGrabbed;
-                                    windHeightArray[overlapTile * pointsPerTile + 0, newTileCol * pointsPerTile + newPointCol] = Mathf.Min(windHeightArray[newTileRow * pointsPerTile + newPointRow, newTileCol * pointsPerTile + newPointCol], 1);
-
-                                }
-
-                                // Remove sand from the old point
-                                windHeightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] -= sandGrabbed;
-                                windHeightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol] = Mathf.Max(windHeightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol], 0);
-
-                                // Compute overlaps for removal
-                                if (pointCol == pointsPerTile)
-                                {
-                                    int overlapTile = (tileCol + 1) % MaxTerrainDim;
-                                    windHeightArray[tileRow * pointsPerTile + pointRow, overlapTile * pointsPerTile + 0] -= sandGrabbed;
-                                    windHeightArray[tileRow * pointsPerTile + pointRow, overlapTile * pointsPerTile + 0] = Mathf.Max(windHeightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol], 0);
-
-                                }
-
-                                if (pointRow == pointsPerTile)
-                                {
-                                    int overlapTile = (tileRow + 1) % MaxTerrainDim;
-                                    windHeightArray[overlapTile * pointsPerTile + 0, tileCol * pointsPerTile + pointCol] -= sandGrabbed;
-                                    windHeightArray[overlapTile * pointsPerTile + 0, tileCol * pointsPerTile + pointCol] = Mathf.Max(windHeightArray[tileRow * pointsPerTile + pointRow, tileCol * pointsPerTile + pointCol], 0);
-
-                                }
-
-
-                            }
-                            // End Individual Wind Row
-
-                        }
-                        // End Wind Shift
-
-
-                    }
-                }
-                // End of Point Loops
-
-            }
-        }
-        // End of Tile Loops
-
-        // Once we are done with all the points, set the height array to the newly computed one
-        heightArray = windHeightArray;
-        
-    }
-    */ // Windstuff unneeded for now
 
     private void SetAllVertexHeights()
     {
