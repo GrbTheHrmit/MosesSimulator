@@ -99,6 +99,7 @@ public class ShrubManager : MonoBehaviour
                 tile = Random.Range(0, tileDims * tileDims);
                 if (tileCount[tile] <= maxPerTile)
                 {
+                    shrub.tile = tile;
                     break;
                 }
             }
@@ -136,7 +137,7 @@ public class ShrubManager : MonoBehaviour
                 shrub.currentObj = GetAvailableShrub();
                 if(shrub.currentObj != null)
                 {
-                    Debug.Log(location);
+                    Debug.Log("Tile: " + shrub.tile + " Pos: " + shrub.pos);
                     shrub.currentObj.transform.position = location;
                 }
                 

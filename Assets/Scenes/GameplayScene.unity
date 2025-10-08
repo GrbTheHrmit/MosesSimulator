@@ -729,7 +729,7 @@ MonoBehaviour:
     ZFrequency: 42
     HeightStrength: 0.1
   RandomInfluence: 0
-  RandomPeakRadius: 0.35
+  RandomPeakRadius: 0
 --- !u!114 &1655544158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -743,6 +743,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numShrubs: 512
+  maxActiveShrubs: 512
   maxPerTile: 8
   minShrubHeight: 0
   maxShrubHeight: 0.5
@@ -752,6 +753,7 @@ MonoBehaviour:
   - {fileID: 6737997166280044696, guid: f0e16225f2431bf4cb86365e44d4aa3f, type: 3}
   - {fileID: 5487945912518162902, guid: 55491ec1e09ed574da28c99dae727145, type: 3}
   - {fileID: 1948086971866951518, guid: 5c65988f088929f49abcc0edfa90bf6b, type: 3}
+  hideLocation: {x: 0, y: -1000, z: 0}
 --- !u!1 &1800582410
 GameObject:
   m_ObjectHideFlags: 0
@@ -1087,6 +1089,22 @@ PrefabInstance:
     - target: {fileID: 6503413759995862816, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: MaxStaticTravelForce
+      value: 50000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: MaxStaticLateralForce
+      value: 28000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: MinKineticTravelForce
+      value: 15000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062446476219220792, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
+      propertyPath: MinKineticLateralForce
+      value: 6000
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 655978632007471063, guid: 5551788cfb435c64bab1bdde128ccc0e, type: 3}
